@@ -1250,7 +1250,7 @@ int l_Fsfirst(lua_State *L) {
 }
 
 /*
-  Fsfirst. Search next entry in a directory
+  Fsnext. Search next entry in a directory
   Inputs:
     1) userdata: dta
   Returns:
