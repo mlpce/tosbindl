@@ -849,7 +849,7 @@ int l_Frename(lua_State *L) {
     (defined(__GNUC__) && defined(__atarist__))
   const long result = Frename(0, old_name, new_name);
 #else
-  #error How to Frename on this compiler
+  #error How to Frename on this compiler?
 #endif
 
   lua_pushinteger(L, result); /* Error code */

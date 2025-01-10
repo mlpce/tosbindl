@@ -118,7 +118,7 @@ static int GetEnvTbl(lua_State *L, const char **gemdos_envp) {
       ++ptr;
 
     if (*ptr == '=') {
-      const size_t key_len = ptr - gemdos_env_var;
+      const size_t key_len = (size_t) (ptr - gemdos_env_var);
       if (key_len) {
         lua_pushlstring(L, gemdos_env_var, key_len);  /* key */
         lua_pushstring(L, ptr + 1);  /* value */
