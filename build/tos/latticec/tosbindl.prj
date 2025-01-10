@@ -1,0 +1,5 @@
+TOSBINDL.LIB
+.C	[-b4 -r6 -d0 -m0 -rs -fm -i. -dMLPCE_ENABLED]
+.S	[-m0]
+=
+..\..\..\SRC\TOSBINDL.C

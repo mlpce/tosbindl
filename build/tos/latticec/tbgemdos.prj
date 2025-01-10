@@ -1,0 +1,13 @@
+TBGEMDOS.LIB
+.C	[-b4 -r6 -d0 -m0 -rs -fm -i. -i..\..\.. -dMLPCE_ENABLED]
+.S	[-m0]
+=
+..\..\..\SRC\GEMDOS\GEMDOS_C.C
+..\..\..\SRC\GEMDOS\GEMDOS_D.C
+..\..\..\SRC\GEMDOS\GEMDOS_F.C
+..\..\..\SRC\GEMDOS\GEMDOS_M.C
+..\..\..\SRC\GEMDOS\GEMDOS_P.C
+..\..\..\SRC\GEMDOS\GEMDOS_S.C
+..\..\..\SRC\GEMDOS\GEMDOS_T.C
+..\..\..\SRC\GEMDOS\GEMDOSI.C
+..\..\..\SRC\GEMDOS\TBGEMDOS.C
