@@ -97,6 +97,15 @@ static void PushArgsString(lua_State *L, int tbl_idx) {
   luaL_pushresultsize(&b, total_len);
 }
 
+/*
+  Pexec0. Execute a program using Pexec mode zero.
+  Inputs:
+    1) string: Path of the program's executable.
+    2) table: Array of arguments to pass to the child
+  Returns:
+    1) integer: Return code from child
+    2) string: GEMDOS error message
+*/
 int l_Pexec0(lua_State *L) {
   char tail[128];
   char *tail_dest_ptr;
@@ -104,7 +113,6 @@ int l_Pexec0(lua_State *L) {
   const char *args_end_ptr;
   size_t args_len;
   const char *argv_ptr = "ARGV=";
-  /* Registry key for gemdos environment pointer */
   long result;
   size_t child_path_len;
 
