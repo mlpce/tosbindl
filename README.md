@@ -318,7 +318,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. string: on success: bytes read
     2. string: on failure: gemdos error string
 
-  Note: Can return less bytes than requested if EOF reached. Will return 0 bytes and empty string if EOF already reached.
+  Note: Can return less bytes than requested if EOF reached. Will return 0
+  bytes and empty string if EOF already reached.
   ```
 ### gemdos.Fwrites (file, s [, i [, j]])
   Fwrites. Writes bytes from a string into a file.
@@ -329,7 +330,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     i: integer: position of the first byte in the string (default is first)
     j: integer: position of the last byte in the string (default is last)
 
-  Note: The first byte is at position 1. Negative positions count from end of string with -1 being the last byte.
+  Note: The first byte is at position 1. Negative positions count from end
+  of string with -1 being the last byte.
   ```
   ```
   Results
@@ -352,7 +354,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. table: on success: array of integers holding bytes read
     2. string: on failure: gemdos error string
 
-  Note: Can return less bytes than requested if EOF reached. Will return 0 bytes and empty table if EOF already reached.
+  Note: Can return less bytes than requested if EOF reached. Will return 0
+  bytes and empty table if EOF already reached.
   ```
 ### gemdos.Fwritet (file, t [, i [, j]])
   Fwritet. Writes bytes from an array table into a file.
@@ -363,7 +366,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     i: integer: position of the first byte to write (default first)
     j: integer: position of the last byte to write (default last)
 
-  Note: The first byte is at position 1. Negative positions count from end of the table with -1 being the last byte.
+  Note: The first byte is at position 1. Negative positions count from end
+  of the table with -1 being the last byte.
   ```
   ```
   Results
@@ -415,7 +419,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. string: on success: empty string
     2. string: on failure: gemdos error string
 
-  Note: Can read less bytes than requested if EOF reached. Will read 0 bytes if EOF already reached.
+  Note: Can read less bytes than requested if EOF reached. Will read 0
+  bytes if EOF already reached.
   ```
 ### gemdos.Fwritem (fie, memory, offset, numbytes)
   Fwritem. Write bytes from a memory userdata into a file userdata
@@ -439,7 +444,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     file: userdata: file userdata
     relpos: integer: relative position
-    mode: integer: seekmode relative to: 0 = beginning, 1 = current pos, 2 = end
+    mode: integer: seekmode relative to: 0 = beginning, 1 = current, 2 = end
 
   Note: gemdos.const.Fseek contains seek mode constants
   ```
@@ -790,7 +795,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     i: optional integer: position of the first byte to write (default first)
     j: optional integer: position of the last byte to write (default last)
 
-  Note: The first byte is at position 1. Negative positions count from end of table with -1 being the last byte.
+  Note: The first byte is at position 1. Negative positions count from end
+  of table with -1 being the last byte.
   ```
   ```
   Results
@@ -802,7 +808,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
   Parameters
     offset: integer: offset
-    numbytes: optional integer: number of bytes to read (offset to end if missing)
+    numbytes: optional integer: number of bytes to read (offset to end if
+    missing)
   ```
   ```
   Results
@@ -819,7 +826,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     i: integer: position of the first byte in the string (default first)
     j: integer: position of the last byte in the string (default last)
 
-  Note: The first byte is at position 1. Negative positions count from end of string with -1 being the last byte.
+  Note: The first byte is at position 1. Negative positions count from end
+  of string with -1 being the last byte.
   ```
   ```
   Results
@@ -831,7 +839,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
   Parameters
     offset: integer: offset
-    numbytes: optional integer: number of bytes to read (offset to end if missing)
+    numbytes: optional integer: number of bytes to read (offset to end if
+    missing)
   ```
   ```
   Results
@@ -882,7 +891,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     offset: integer: destination offset
     n: integer: byte value
-    numbytes: optional integer: number of bytes to set (the default is from offset to end)
+    numbytes: optional integer: number of bytes to set (the default is from
+    offset to end)
   ```
   ```
   Results
