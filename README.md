@@ -871,13 +871,27 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: the byte value
   ```
 
-  ### copym (offset, srcmemory, srcoffset, n)
+  ### comparem (offset, other_memory, other_offset, n)
+  Compares data between two (possibly the same) memories.
+  ```
+  Parameters
+    offset: integer: offset
+    other_memory: userdata: other memory
+    other_offset: integer: other offset
+    n: integer: length of data in bytes
+  ```
+  ```
+  Results
+    1. integer: result of memcmp
+  ```
+
+  ### copym (offset, src_memory, src_offset, n)
   Copies data between two (possibly the same) memories.
   ```
   Parameters
     offset: integer: destination offset
-    srcmemory: userdata: source memory
-    srcoffset: integer: source offset
+    src_memory: userdata: source memory
+    src_offset: integer: source offset
     n: integer: length of data in bytes
   ```
   ```

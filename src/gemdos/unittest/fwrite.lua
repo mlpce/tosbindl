@@ -249,7 +249,6 @@ end
 count, msg = fud:writem(mud, 0, mud:size())
 assert(count == 4104)
 fud:close()
-mud:free()
 
 -- Read it back
 local mud2
@@ -261,6 +260,11 @@ assert(ec == 0, fud)
 count, msg = fud:readm(mud2, 0, mud2:size())
 assert(count == 4104)
 fud:close()
+
+-- Compare both memories
+assert(mud:comparem(0, mud2, 0, mud:size()) == 0)
+
+mud:free()
 mud2:free()
 
 ---------------------------------------------------------------------

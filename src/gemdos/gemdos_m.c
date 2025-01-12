@@ -386,19 +386,7 @@ static int MemoryPeek(lua_State *L) {
   return 1;
 }
 
-/*
-  Memory userdata function "copym".
-  Copies data between two memories.
-  Inputs:
-    1) userdata: destination memory
-    2) integer: destination offset
-    3) userdata: source memory
-    4) integer: source offset
-    5) integer: length of data
-  Returns:
-    1) integer: number of bytes copied
-*/
-static int MemoryCopym(lua_State *L) {
+static int MemoryOp(lua_State *L, short copy) {
   const Memory *const dst_mud =
     (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
   const lua_Integer dst_offset = luaL_checkinteger(L, 2); /* Memory offset */
@@ -406,6 +394,7 @@ static int MemoryCopym(lua_State *L) {
     TOSBINDL_UD_T_Gemdos_Memory); /* Source memory userdata */
   const lua_Integer src_offset = luaL_checkinteger(L, 4); /* Source offset */
   const lua_Integer length = luaL_checkinteger(L, 5); /* Data length */
+  lua_Integer result;
 
   /* Check destination */
   luaL_argcheck(L, dst_mud && dst_mud->ptr, 1,
@@ -431,13 +420,52 @@ static int MemoryCopym(lua_State *L) {
   luaL_argcheck(L, src_offset + length <= src_mud->size, 5,
     TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
 
-  /* Copy data between same or different memories */
-  memmove(dst_mud->ptr + dst_offset, src_mud->ptr + src_offset,
-    (size_t) length);
+  if (copy) {
+    /* Copy data between same or different memories */
+    memmove(dst_mud->ptr + dst_offset, src_mud->ptr + src_offset,
+      (size_t) length);
+    result = length;
+  } else {
+    /* Compare data between same or different memories */
+    result = memcmp(dst_mud->ptr + dst_offset, src_mud->ptr + src_offset,
+      (size_t) length);
+  }
 
   /* Return number of bytes copied */
-  lua_pushinteger(L, length);
+  lua_pushinteger(L, result);
   return 1;
+}
+
+/*
+  Memory userdata function "copym".
+  Copies data between two memories.
+  Inputs:
+    1) userdata: destination memory
+    2) integer: destination offset
+    3) userdata: source memory
+    4) integer: source offset
+    5) integer: length of data
+  Returns:
+    1) integer: number of bytes copied
+*/
+static int MemoryCopym(lua_State *L) {
+  return MemoryOp(L, 1);
+}
+
+/*
+  Memory userdata function "comparem".
+  Compares data between two memories.
+  Inputs:
+    1) userdata: memory
+    2) integer: offset
+    3) userdata: other memory
+    4) integer: other offset
+    5) integer: length of data
+  Returns:
+    1) integer: memcmp result
+*/
+static int MemoryComparem(lua_State *L) {
+  return MemoryOp(L, 0);
 }
 
 /*
@@ -539,6 +567,8 @@ int l_Malloc(lua_State *L) {
   lua_setfield(L, -2, "poke");
   lua_pushcfunction(L, MemoryPeek);
   lua_setfield(L, -2, "peek");
+  lua_pushcfunction(L, MemoryComparem);
+  lua_setfield(L, -2, "comparem");
   lua_pushcfunction(L, MemoryCopym);
   lua_setfield(L, -2, "copym");
   lua_pushcfunction(L, MemorySet);

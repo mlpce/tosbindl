@@ -331,4 +331,54 @@ assert(num_bytes == 20)
 num_bytes, str = mud:reads(0)
 assert(num_bytes == 32 and str == "Copy memories with copym. copym.")
 
+---------------------------------------------------------------------
+-- Compare memory ---------------------------------------------------
+---------------------------------------------------------------------
+
+-- Comparing a memory with itself must match
+local muda
+ec, muda = gemdos.Malloc(16)
+num_bytes = muda:set(0, 69)
+assert(num_bytes == 16)
+assert(muda:comparem(0, muda, 0, muda:size()) == 0)
+
+-- Comparing a memory with an identical memory must match
+local mudb
+ec, mudb = gemdos.Malloc(16)
+num_bytes = mudb:set(0,69)
+assert(num_bytes == 16)
+assert(muda:comparem(0, mudb, 0, muda:size()) == 0)
+
+-- Comparing different memories, must not match
+num_bytes = muda:set(0,0)
+assert(num_bytes == 16)
+num_bytes = mudb:set(0,1)
+assert(num_bytes == 16)
+assert(muda:comparem(0, mudb, 0, muda:size()) ~= 0)
+
+-- Comparing portions
+muda:set(0, 1, muda:size()/2)
+muda:set(muda:size()/2, 2, muda:size()/2)
+mudb:copym(0, muda, 0, mudb:size())
+
+assert(muda:comparem(0, mudb, 0, muda:size()) == 0)
+assert(muda:comparem(0, mudb, muda:size()/2, muda:size()/2) ~= 0)
+assert(muda:comparem(muda:size()/2, mudb, 0, muda:size()/2) ~= 0)
+assert(muda:comparem(0, mudb, 0, muda:size()/2) == 0)
+assert(muda:comparem(muda:size()/2, mudb, muda:size()/2, muda:size()/2) == 0)
+
+---------------------------------------------------------------------
+-- Check comparing memory out of bounds -----------------------------
+---------------------------------------------------------------------
+
+ok, msg = pcall(function() muda:comparem(0, mudb, 0, muda:size() + 1) end)
+assert(not ok)
+ok, msg = pcall(function() muda:comparem(0, mudb, 0, -1) end)
+assert(not ok)
+ok, msg = pcall(function() muda:comparem(15, mudb, 0, 2) end)
+assert(not ok)
+
+muda:free()
+mudb:free()
+
 gemdos.Cconws("Test gemdos.Malloc completed\r\n")
