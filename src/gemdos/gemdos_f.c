@@ -9,7 +9,7 @@
 #include "src/gemdos/gemdos_m.h"
 #include "src/gemdos/gemdos_f.h"
 
-#define BLOCK_SIZE 8192
+#define BLOCK_SIZE 512
 
 typedef struct File {
   short valid; /* handle is set to a Gemdos handle */

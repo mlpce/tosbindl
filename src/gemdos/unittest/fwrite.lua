@@ -56,6 +56,32 @@ assert(ec == 32 and new == "cool computing is retro Atari ST", new)
 fud:close()
 
 ---------------------------------------------------------------------
+-- Test writing and reading a longer string -------------------------
+---------------------------------------------------------------------
+
+-- Create the same file so truncate
+ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
+assert(ec == 0, fud)
+-- Write a long string
+str = string.rep("01234567", 513)
+local count
+count, msg = fud:writes(str)
+assert(count == 4104)
+fud:close()
+
+-- Read it back
+ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
+assert(ec == 0, fud)
+local new_count
+new_count, new = fud:reads(count)
+assert(new_count == count)
+-- Check match
+assert(new == str)
+fud:close()
+new = nil
+str = nil
+
+---------------------------------------------------------------------
 -- Test writing tables into a file ----------------------------------
 ---------------------------------------------------------------------
 
@@ -118,6 +144,37 @@ assert(ec == 32 and
 fud:close()
 
 ---------------------------------------------------------------------
+-- Test writing and reading a longer table --------------------------
+---------------------------------------------------------------------
+
+-- Write and read 513 bytes. This is just over BLOCK_SIZE in gemdos_f.c.
+
+-- Create the same file so truncate
+ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
+assert(ec == 0, fud)
+assert(fud:handle() >= 6)
+
+tbl = {}
+for i = 0,511 do
+  tbl[#tbl + 1] = i % 8
+end
+tbl[#tbl + 1] = 66
+
+fud:writet(tbl)
+fud:close()
+
+ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
+assert(ec == 0, fud)
+ec, tbl = fud:readt(513)
+assert(ec == 513)
+fud:close()
+for i = 0,511 do
+  assert(tbl[i + 1] == i % 8)
+end
+assert(tbl[513] == 66)
+tbl = nil
+
+---------------------------------------------------------------------
 -- Test writing memory into a file ----------------------------------
 ---------------------------------------------------------------------
 
@@ -167,6 +224,44 @@ assert(ec == 16)
 ec, str = mud:reads(0, 16)
 assert(ec == 16, str)
 assert(str == "89ABCDEF01234567")
+
+---------------------------------------------------------------------
+-- Test writing and reading a longer memory -------------------------
+---------------------------------------------------------------------
+
+-- Create the same file so truncate
+ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
+assert(ec == 0, fud)
+ec, mud = gemdos.Malloc(4104)
+assert(ec == 4104, mud)
+
+for i = 0, 7 do
+  mud:poke(i,i)
+end
+
+local src_offset = 0
+for i = 1, 512 do
+  local dst_offset = src_offset + 8
+  mud:copym(dst_offset, mud, src_offset, 8)
+  src_offset = dst_offset
+end
+
+count, msg = fud:writem(mud, 0, mud:size())
+assert(count == 4104)
+fud:close()
+mud:free()
+
+-- Read it back
+local mud2
+ec, mud2 = gemdos.Malloc(4104)
+assert(ec == 4104, mud2)
+
+ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
+assert(ec == 0, fud)
+count, msg = fud:readm(mud2, 0, mud2:size())
+assert(count == 4104)
+fud:close()
+mud2:free()
 
 ---------------------------------------------------------------------
 -- Test writing a value into a file ---------------------------------
