@@ -921,6 +921,9 @@ The GEMDOS functions are published through a global table 'gemdos'
 ## Constants
   Constant tables are published through the table 'gemdos.const'.
 
+### gemdos.const.Error
+  EINVFN, EFILNF, EPTHNF, ENHNDL, EACCDN, EIHNDL, ENSMEM, EIMBA, EDRIVE, ENMFIL, ERANGE, EINTRN, EPLFMT, EGSBF
+
 ### gemdos.const.Fattrib
   none, readonly, hidden, system, volume, dir, archive
 
