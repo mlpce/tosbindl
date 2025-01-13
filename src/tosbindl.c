@@ -1,4 +1,6 @@
-#include <lauxlib.h>
+#include "lua.h"
+#include "lauxlib.h"
+
 #include "tosbindl.h"
 
 const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max] = {
