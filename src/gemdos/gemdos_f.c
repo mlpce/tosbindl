@@ -180,7 +180,7 @@ int l_Fcreate(lua_State *L) {
   luaL_argcheck(L,
     !(attr & TOSBINDL_GEMDOS_FA_DIR) && !((attr & TOSBINDL_GEMDOS_FA_VOLUME)
     && (attr ^ TOSBINDL_GEMDOS_FA_VOLUME)), 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_BadAttr]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Push the File userdata which will hold the Gemdos file handle */
   fud = PushFileUserData(L);
@@ -230,7 +230,7 @@ int l_Fopen(lua_State *L) {
   /* Mode constraint */
   luaL_argcheck(L, mode >= TOSBINDL_GEMDOS_FO_READ &&
     mode <= TOSBINDL_GEMDOS_FO_RW, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_BadOpenMode]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Push the File userdata which will hold the Gemdos file handle */
   fud = PushFileUserData(L);
@@ -290,7 +290,7 @@ int l_Freads(lua_State *L) {
     TOSBINDL_ErrMess[TOSBINDL_EM_WriteOnly]);
   /* Check count */
   luaL_argcheck(L, count >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Initialise the buffer */
   str = luaL_buffinitsize(L, &b, (size_t) count);
@@ -363,13 +363,13 @@ int l_Fwrites(lua_State *L) {
     TOSBINDL_ErrMess[TOSBINDL_EM_ReadOnly]);
   /* Check starting index is within the string (zero based) */
   luaL_argcheck(L, index >= 0 && index < (lua_Integer) str_len, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInString]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Check ending index is within the string (one based) */
   luaL_argcheck(L, end > 0 && end <= (lua_Integer) str_len, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInString]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Zero based start index must be before one based end */
   luaL_argcheck(L, index < end, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_StartAfterEnd]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Advance string pointer by zero based start index */
   str += index;
@@ -427,7 +427,7 @@ int l_Freadt(lua_State *L) {
     TOSBINDL_ErrMess[TOSBINDL_EM_WriteOnly]);
   /* Check count */
   luaL_argcheck(L, count >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Create table to hold the array */
   lua_createtable(L, count < INT_MAX ? (int) count : INT_MAX, 0);
   /* Userdata for temporary space */
@@ -510,13 +510,13 @@ int l_Fwritet(lua_State *L) {
     TOSBINDL_ErrMess[TOSBINDL_EM_ReadOnly]);
   /* Check the start is within the array */
   luaL_argcheck(L, start > 0 && start <= tbl_len, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInArray]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Check that the end is in the array */
   luaL_argcheck(L, end > 0 && end <= tbl_len, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInArray]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Check the start is not after the end */
   luaL_argcheck(L, start <= end, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_StartAfterEnd]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Loop while bytes are remaining to write */
   while (remaining) {
@@ -672,13 +672,10 @@ static int MemoryIO(lua_State *L, short read) {
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
   /* Check offset */
   luaL_argcheck(L, offset >= 0, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  /* Check count */
-  luaL_argcheck(L, count >= 0, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Check offset and count is contained in the memory area */
-  luaL_argcheck(L, offset + count <= mud->size, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, count >= 0 && offset + count <= mud->size, 4,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Pointer to memory offset */
   ptr = mud->ptr + offset;
@@ -769,7 +766,7 @@ int l_Fseek(lua_State *L) {
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidFile]);
   /* Check seek mode */
   luaL_argcheck(L, seek_mode >= 0 && seek_mode <= 2, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_BadSeekMode]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Seek within the file */
   result = Fseek(rel_pos, fud->handle, seek_mode);
@@ -874,14 +871,15 @@ int l_Fattrib(lua_State *L) {
   long result;
 
   /* Check flag, it can be 0 or 1 */
-  luaL_argcheck(L, !(flag & ~1), 2, TOSBINDL_ErrMess[TOSBINDL_EM_BadFlag]);
+  luaL_argcheck(L, !(flag & ~1), 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Attribute constraints: Cannot set directory or volume attribute. */
   luaL_argcheck(L,
     !(attr & ~(TOSBINDL_GEMDOS_FA_READONLY |
       TOSBINDL_GEMDOS_FA_HIDDEN |
       TOSBINDL_GEMDOS_FA_SYSTEM |
       TOSBINDL_GEMDOS_FA_ARCHIVE)),
-    3, TOSBINDL_ErrMess[TOSBINDL_EM_BadAttr]);
+    3, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Get or set the attributes */
   result = Fattrib(fname, flag, attr);
@@ -943,19 +941,19 @@ int l_Fdatime(lua_State *L) {
     /* Check arguments and set up DATETIME */
     int days_in_month;
     luaL_argcheck(L, year >= 1980 && year <= 2099, 2,
-      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidYear]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
     luaL_argcheck(L, month >= 1 && month <= 12, 3,
-      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMonth]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
     days_in_month = (month == 2 && !(year & 3)) ?
       29 : TOSBINDL_GEMDOS_DaysInMonth[month];
     luaL_argcheck(L, day >= 1 && day <= days_in_month, 4,
-      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidDay]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
     luaL_argcheck(L, hours >= 0 && hours <= 23, 5,
-      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidHours]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
     luaL_argcheck(L, minutes >= 0 && minutes <= 59, 6,
-      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMinutes]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
     luaL_argcheck(L, seconds >= 0 && seconds <= 59, 7,
-      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidSeconds]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
     dt.hour = (unsigned) hours & 0x1F;
     dt.minute = (unsigned) minutes & 0x3F;
@@ -1011,7 +1009,7 @@ int l_Fdup(lua_State *L) {
   /* Check the standard file handle is in range */
   luaL_argcheck(L, handle >= TOSBINDL_GEMDOS_SH_CONIN &&
     handle <= TOSBINDL_GEMDOS_SH_PRN, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidHandle]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Push a file userdata to hold the duplicated handle */
   fud = PushFileUserData(L);
@@ -1067,7 +1065,7 @@ int l_Fforce(lua_State *L) {
   /* Check the standard file handle is in range */
   luaL_argcheck(L, handle >= TOSBINDL_GEMDOS_SH_CONIN &&
     handle <= TOSBINDL_GEMDOS_SH_PRN, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidHandle]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Force the standard handle to file handle */
   result = Fforce(handle, fud->handle);
@@ -1184,7 +1182,7 @@ int l_Fsfirst(lua_State *L) {
       TOSBINDL_GEMDOS_FA_VOLUME |
       TOSBINDL_GEMDOS_FA_DIR |
       TOSBINDL_GEMDOS_FA_ARCHIVE)),
-    2, TOSBINDL_ErrMess[TOSBINDL_EM_BadAttr]);
+    2, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* DTA userdata */
   dud = lua_newuserdatauv(L, sizeof(Dta), 0);

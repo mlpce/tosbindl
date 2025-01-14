@@ -31,7 +31,7 @@ int l_Dsetdrv(lua_State *L) {
 
   /* Check argument, A:=0, B:=1, ... */
   luaL_argcheck(L, drive >= 0 && drive <= 15, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidDrive]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   result = Dsetdrv(drive);
 
@@ -72,7 +72,7 @@ int l_Dfree(lua_State *L) {
 
   /* Check argument, 0 is current drive, A:=1, B:=2, ... */
   luaL_argcheck(L, drive >= 0 && drive <= 16, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidDrive]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
 #if defined(__VBCC__)
   result = Dfree(&disk_info, drive);
@@ -187,7 +187,7 @@ int l_Dgetpath(lua_State *L) {
 
   /* Check argument. 0 is current drive, A is 1, ... */
   luaL_argcheck(L, drive >= 0 && drive <= 16, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidDrive]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Userdata for temporary space */
   path = lua_newuserdatauv(L, max_path_size, 0);

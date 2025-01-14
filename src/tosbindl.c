@@ -8,25 +8,8 @@ const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max] = {
   "Write only",
   "Invalid file",
   "Invalid memory",
-  "Invalid handle",
-  "Not in string",
-  "Not in array",
-  "Not in memory",
-  "Unexpected array value",
-  "Start after end",
-  "Bad open mode",
-  "Bad attr",
-  "Bad seek mode",
-  "Bad flag",
-  "Negative value",
-  "Invalid value",
-  "Invalid drive",
-  "Invalid year",
-  "Invalid month",
-  "Invalid day",
-  "Invalid hours",
-  "Invalid minutes",
-  "Invalid seconds"
+  "Invalid array value",
+  "Invalid value"
 };
 
 /* Metamethod names */

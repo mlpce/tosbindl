@@ -46,13 +46,13 @@ int l_Tsetdate(lua_State *L) {
 
   /* Check arguments */
   luaL_argcheck(L, year >= 1980 && year <= 2099, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidYear]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   luaL_argcheck(L, month >= 1 && month <= 12, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMonth]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   days_in_month = (month == 2 && !(year & 3)) ?
     29 : TOSBINDL_GEMDOS_DaysInMonth[month];
   luaL_argcheck(L, day >= 1 && day <= days_in_month, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidDay]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   result = Tsetdate(date);
 
@@ -103,11 +103,11 @@ int l_Tsettime(lua_State *L) {
 
   /* Check arguments */
   luaL_argcheck(L, hours >= 0 && hours <= 23, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidHours]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   luaL_argcheck(L, minutes >= 0 && minutes <= 59, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMinutes]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   luaL_argcheck(L, seconds >= 0 && seconds <= 59, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidSeconds]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   result = Tsettime(time);
 

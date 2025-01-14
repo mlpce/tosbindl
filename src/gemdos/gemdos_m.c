@@ -120,26 +120,23 @@ static int MemoryWritet(struct lua_State *L) {
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  /* Offset must not be negative */
-  luaL_argcheck(L, offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  /* Offset must be within the memory size */
-  luaL_argcheck(L, offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  /* Offset must not be negative and offset must be within the memory size */
+  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Table start key must be in the array */
   luaL_argcheck(L, start_key > 0 && start_key <= tbl_len, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInArray]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Table end key must be in the array */
   luaL_argcheck(L, end_key > 0 && end_key <= tbl_len, 5,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInArray]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Start key must not be after the end key */
   luaL_argcheck(L, start_key <= end_key, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_StartAfterEnd]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Check write fits into memory */
   luaL_argcheck(L, offset + count <= mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Destination write pointer starts at memory plus offset */
   dest = mud->ptr + offset;
@@ -185,20 +182,14 @@ static int MemoryReadt(struct lua_State *L) {
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  /* Offset must not be negative */
-  luaL_argcheck(L, offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  /* Offset must be within the memory size */
-  luaL_argcheck(L, offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  /* Offset must not be negative and must fit within the memory size */
+  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Number of bytes to read */
   count = luaL_optinteger(L, 3, mud->size - offset);
-  /* Count must not be negative */
-  luaL_argcheck(L, count >= 0, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  /* Check read is within the memory */
-  luaL_argcheck(L, offset + count <= mud->size, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  /* Count must not be negative and check read is within the memory */
+  luaL_argcheck(L, count >= 0 && offset + count <= mud->size, 3,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Push number of bytes read */
   lua_pushinteger(L, count);
@@ -248,24 +239,22 @@ static int MemoryWrites(lua_State *L) {
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Check string */
   luaL_argcheck(L, zero_based_index >= 0 &&
     zero_based_index < (lua_Integer) str_len, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInString]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   luaL_argcheck(L, one_based_end_index > 0 &&
     one_based_end_index <= (lua_Integer) str_len,
-    5, TOSBINDL_ErrMess[TOSBINDL_EM_NotInString]);
+    5, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   luaL_argcheck(L, zero_based_index < one_based_end_index, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_StartAfterEnd]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Check write fits into memory */
   luaL_argcheck(L, offset + count <= mud->size, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Copy from string into memory */
   memcpy(mud->ptr + offset, str + zero_based_index, (size_t) count);
@@ -297,15 +286,11 @@ static int MemoryReads(lua_State *L) {
   /* Check arguments */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   count = luaL_optinteger(L, 3, mud->size - offset);
-  luaL_argcheck(L, count >= 0, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, offset + count <= mud->size, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, count >= 0 && offset + count <= mud->size, 3,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Number of bytes read */
   lua_pushinteger(L, count);
@@ -339,10 +324,8 @@ static int MemoryPoke(lua_State *L) {
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   luaL_argcheck(L, i >= 0 && i <= 255, 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
@@ -375,10 +358,8 @@ static int MemoryPeek(lua_State *L) {
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Push byte as an integer value */
   lua_pushinteger(L, *(mud->ptr + offset));
@@ -399,26 +380,20 @@ static int MemoryOp(lua_State *L, short copy) {
   /* Check destination */
   luaL_argcheck(L, dst_mud && dst_mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]); 
-  luaL_argcheck(L, dst_offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, dst_offset < dst_mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, dst_offset >= 0 && dst_offset < dst_mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Check source */
   luaL_argcheck(L, src_mud && src_mud->ptr, 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]); 
-  luaL_argcheck(L, src_offset >= 0, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, src_offset < src_mud->size, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, src_offset >= 0 && src_offset < src_mud->size, 4,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Check length */
-  luaL_argcheck(L, length >= 0, 5,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, dst_offset + length <= dst_mud->size, 5,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
-  luaL_argcheck(L, src_offset + length <= src_mud->size, 5,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, length >= 0 &&
+    dst_offset + length <= dst_mud->size &&
+    src_offset + length <= src_mud->size, 5,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   if (copy) {
     /* Copy data between same or different memories */
@@ -489,10 +464,8 @@ static int MemorySet(lua_State *L) {
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Check value is in range of byte */
   luaL_argcheck(L, i >= 0 && i <= 255, 3,
@@ -500,10 +473,8 @@ static int MemorySet(lua_State *L) {
 
   /* Check offset and length */
   length = luaL_optinteger(L, 4, mud->size - offset);
-  luaL_argcheck(L, length >= 0, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NegativeValue]);
-  luaL_argcheck(L, offset + length <= mud->size, 4,
-    TOSBINDL_ErrMess[TOSBINDL_EM_NotInMemory]);
+  luaL_argcheck(L, length >= 0 && offset + length <= mud->size, 4,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Set the memory data */
   memset(mud->ptr + offset, (int) i, (size_t) length);
