@@ -771,7 +771,7 @@ int l_Fseek(lua_State *L) {
   luaL_argcheck(L, seek_mode >= 0 && seek_mode <= 2, 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_BadSeekMode]);
 
-  /* Seek withing the file */
+  /* Seek within the file */
   result = Fseek(rel_pos, fud->handle, seek_mode);
 
   /* Push -ve error code or absolute position relative to start */
