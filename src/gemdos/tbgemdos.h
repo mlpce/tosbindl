@@ -1,7 +1,7 @@
-#ifndef GEMDOS_HEADER_INCLUDED
-#define GEMDOS_HEADER_INCLUDED
+#ifndef TBGEMDOS_HEADER_INCLUDED
+#define TBGEMDOS_HEADER_INCLUDED
 
-#define MLPCE_GEMDOSLIBNAME "gemdos"
+#define TOSBINDL_GEMDOSLIBNAME "gemdos"
 LUAMOD_API int (luaopen_gemdos)(lua_State *L);
 
 #endif
