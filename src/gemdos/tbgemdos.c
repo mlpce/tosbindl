@@ -86,7 +86,7 @@ static const struct luaL_Reg gemdos[] = {
     1) nil: on failure: the env var was not found
 */
 static int GetEnvStr(lua_State *L, const char *env_var,
-    size_t env_var_len, const char **gemdos_envp) {
+    size_t env_var_len, const char *const *gemdos_envp) {
   while (*gemdos_envp) {
     const char *const gemdos_env_var = *gemdos_envp;
     if (memcmp(gemdos_env_var, env_var, env_var_len) == 0 &&
@@ -108,7 +108,7 @@ static int GetEnvStr(lua_State *L, const char *env_var,
   Returns:
     1) table: GEMDOS environment
 */
-static int GetEnvTbl(lua_State *L, const char **gemdos_envp) {
+static int GetEnvTbl(lua_State *L, const char *const *gemdos_envp) {
   lua_newtable(L);
 
   while (*gemdos_envp) {
@@ -144,7 +144,7 @@ static int GetEnvTbl(lua_State *L, const char **gemdos_envp) {
 static int GetEnv(lua_State *L) {
   size_t env_var_len;
   const char *env_var = luaL_optlstring(L, 1, NULL, &env_var_len);
-  const char **gemdos_envp = TOSBINDL_GEMDOS_EnvP(L);
+  const char *const *gemdos_envp = TOSBINDL_GEMDOS_EnvP(L);
   if (env_var)
     return GetEnvStr(L, env_var, env_var_len, gemdos_envp);
 

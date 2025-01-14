@@ -53,17 +53,17 @@ const unsigned char TOSBINDL_GEMDOS_DaysInMonth[13] = {
   0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
 
-const char **TOSBINDL_GEMDOS_EnvP(lua_State *L) {
+const char *const *TOSBINDL_GEMDOS_EnvP(lua_State *L) {
   /* Registry key for gemdos environment pointer */
   const char *const gemdos_envp_reg_key = "gemdos.envp";
-  const char **gemdos_envp;
+  const char *const *gemdos_envp;
 
   /* Get the gemdos environment pointer from the registry */
   lua_getfield(L, LUA_REGISTRYINDEX, gemdos_envp_reg_key);
   if (!lua_islightuserdata(L, -1)) {
     luaL_error(L, "%s missing", gemdos_envp_reg_key);
   }
-  gemdos_envp = (const char **)lua_touserdata (L, -1);
+  gemdos_envp = (const char *const *)lua_touserdata (L, -1);
   if (!gemdos_envp) {
     luaL_error(L, "%s invalid", gemdos_envp_reg_key);
   }

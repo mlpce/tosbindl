@@ -64,6 +64,6 @@ extern const char *const TOSBINDL_UD_T_Gemdos_Dta;
 extern const unsigned char TOSBINDL_GEMDOS_DaysInMonth[13];
 
 /* Gets the GEMDOS environment pointer */
-const char **TOSBINDL_GEMDOS_EnvP(lua_State *L);
+const char *const *TOSBINDL_GEMDOS_EnvP(lua_State *L);
 
 #endif

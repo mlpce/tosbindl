@@ -33,7 +33,7 @@ int l_Pterm(lua_State *L) {
 
 static void PushGemdosEnvString(lua_State *L) {
   /* Get the GEMDOS environment pointer */
-  const char **gemdos_envp = TOSBINDL_GEMDOS_EnvP(L);
+  const char *const *gemdos_envp = TOSBINDL_GEMDOS_EnvP(L);
   luaL_Buffer b; /* Buffer for '\0' delimited concatenated arguments  */
 
   /* Convert gemdos environment to single '\0' delimited string */
