@@ -8,6 +8,10 @@ This is a Lua binding to low level GEMDOS functions. The functions available in 
 
 For information about Lua see the [Lua website](https://www.lua.org/). For the copyright notice of the Lua API included by this binding see lua.h.
 
+luaconf.h should be configured with
+  1. #define LUA_USE_C89
+  2. #define LUA_32BITS 1
+
 ## Precaution
 This binding has the potential to change and destroy data. Development and testing of scripts using this binding should be performed in a safe environment isolated from sensitive data. Additionally, the unit tests themselves change and delete data on GEMDOS drives (HD and floppy) and must only be run in an isolated test environment.
 
