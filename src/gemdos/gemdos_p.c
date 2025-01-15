@@ -40,7 +40,7 @@ static void PushGemdosEnvString(lua_State *L) {
   luaL_buffinit(L, &b);
   while( *gemdos_envp != NULL ) {
     /* Add str to buffer including the '\0' delimiter */
-    size_t str_len = strlen(*gemdos_envp) + 1;
+    const size_t str_len = strlen(*gemdos_envp) + 1;
     luaL_addlstring(&b, *gemdos_envp, str_len);
     ++gemdos_envp;
   }
@@ -69,7 +69,7 @@ static void PushArgsString(lua_State *L, int tbl_idx) {
     /* Get the string pointer. Empty arguments are not supported. */
     luaL_argcheck(L, lua_isstring(L, -1) &&
       (str = lua_tolstring(L, -1, &str_len)) && str_len, tbl_idx,
-      TOSBINDL_ErrMess[TOSBINDL_EM_UnexpectedArrayValue]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidArrayValue]);
     lua_pop(L, 1);
 
     ++str_len;  /* Plus one for '\0' delimiter */
@@ -77,7 +77,7 @@ static void PushArgsString(lua_State *L, int tbl_idx) {
   }
 
   /* Initialise the buffer with the total length */
-  dst_ptr = luaL_buffinitsize(L, &b, (size_t) total_len);
+  dst_ptr = luaL_buffinitsize(L, &b, total_len);
 
   /* Copy the data */
   for (key = 1; key <= tbl_len; ++key) {

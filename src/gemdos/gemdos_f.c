@@ -530,7 +530,7 @@ int l_Fwritet(lua_State *L) {
       /* Check the value is an integer and within byte range */
       luaL_argcheck(L, lua_isinteger(L, -1) &&
         (integer = lua_tointeger(L, -1)) >= 0 && integer <= 255, 2,
-        TOSBINDL_ErrMess[TOSBINDL_EM_UnexpectedArrayValue]);
+        TOSBINDL_ErrMess[TOSBINDL_EM_InvalidArrayValue]);
 
       /* Store in temporary buffer */
       buff[i] = (unsigned char) integer;
@@ -714,8 +714,7 @@ static int MemoryIO(lua_State *L, short read) {
   Returns:
     1) integer: on success:  >= 0 number of bytes read
     1) integer: on failure:  -ve gemdos error number
-    2) string: on success: empty string
-    2) string: on failure: gemdos error string
+    2) string: gemdos error string
   Note:
     Can read less bytes than requested if EOF reached.
     Will read 0 bytes if EOF already reached.
@@ -735,8 +734,7 @@ int l_Freadm(lua_State *L) {
   Returns:
     1) integer: on success:  >= 0 number of bytes written
     1) integer: on failure:  -ve gemdos error number
-    2) string: on success: empty string
-    2) string: on failure: gemdos error string
+    2) string: gemdos error string
 */
 int l_Fwritem(lua_State *L) {
   /* Perform write I/O */

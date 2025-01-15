@@ -416,8 +416,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: on success:  >= 0 number of bytes read
     1. integer: on failure:  -ve gemdos error number
-    2. string: on success: empty string
-    2. string: on failure: gemdos error string
+    2. string: gemdos error string
 
   Note: Can read less bytes than requested if EOF reached. Will read 0
   bytes if EOF already reached.
@@ -435,8 +434,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: on success:  >= 0 number of bytes written
     1. integer: on failure:  -ve gemdos error number
-    2. string: on success: empty string
-    2. string: on failure: gemdos error string
+    2. string: gemdos error string
   ```
 ### gemdos.Fseek (file, relpos, mode)
   Fseek. Seek position within a file.

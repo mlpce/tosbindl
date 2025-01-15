@@ -148,7 +148,7 @@ static int MemoryWritet(struct lua_State *L) {
     /* The value must be an integer and be within byte range */
     luaL_argcheck(L, lua_isinteger(L, -1) &&
       (integer = lua_tointeger(L, -1)) >= 0 && integer <= 255, 3,
-      TOSBINDL_ErrMess[TOSBINDL_EM_UnexpectedArrayValue]);
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidArrayValue]);
 
     /* Copy the byte to the destination */
     *dest++ = (unsigned char) integer;

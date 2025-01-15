@@ -7,7 +7,7 @@ enum {
   TOSBINDL_EM_WriteOnly,
   TOSBINDL_EM_InvalidFile,
   TOSBINDL_EM_InvalidMemory,
-  TOSBINDL_EM_UnexpectedArrayValue,
+  TOSBINDL_EM_InvalidArrayValue,
   TOSBINDL_EM_InvalidValue,
   TOSBINDL_EM_Max
 };
