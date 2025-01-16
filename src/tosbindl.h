@@ -14,6 +14,7 @@ enum {
 
 extern const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max];
 
+/* Metamethod names */
 enum {
   TOSBINDL_MMFN_gc,
   TOSBINDL_MMFN_close,
@@ -24,7 +25,6 @@ enum {
   TOSBINDL_MMFN_Max
 };
 
-/* Metamethod names */
 extern const char *const TOSBINDL_MMF_Names[TOSBINDL_MMFN_Max];
 
 /* Wrap a table passed on the stack with a read-only proxy */

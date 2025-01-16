@@ -12,6 +12,10 @@ luaconf.h should be configured with
   1. #define LUA_USE_C89
   2. #define LUA_32BITS 1
 
+## Lua registry
+
+The binding expects the GEMDOS environment pointer (the third parameter to main()) to be stored in the registry as a light userdata with the key "gemdos.envp". The pointer is obtained in the function TOSBINDL_GEMDOS_EnvP.
+
 ## Precaution
 This binding has the potential to change and destroy data. Development and testing of scripts using this binding should be performed in a safe environment isolated from sensitive data. Additionally, the unit tests themselves change and delete data on GEMDOS drives (HD and floppy) and must only be run in an isolated test environment.
 
@@ -772,6 +776,11 @@ The GEMDOS functions are published through a global table 'gemdos'
     5. integer: minute
     6. integer: second
   ```
+### Self method
+  The following self method calls the equivalent gemdos table Fsnext function. The DTA userdata parameter is omitted from the parameter list:
+
+  snext.
+
 ## Memory Userdata functions
 
 ### address ()
