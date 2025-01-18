@@ -429,7 +429,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Note: Can read less bytes than requested if EOF reached. Will read 0
   bytes if EOF already reached.
   ```
-### gemdos.Fwritem (fie, memory, offset, numbytes)
+### gemdos.Fwritem (file, memory, offset, numbytes)
   Fwritem. Write bytes from a memory userdata into a file userdata
   ```
   Parameters
