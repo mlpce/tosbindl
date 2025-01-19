@@ -26,6 +26,8 @@ This binding has the potential to change and destroy data. Development and testi
 Cconin, Cconout, Cauxin, Cauxout, Cprnout, Crawio, Crawcin, Cnecin, Cconws,
 Cconrs, Cconis, Cconos, Cprnos, Cauxis, Cauxos.
 
+If there is a use case to send a lot of data through the character based output functions e.g. Cauxout, then it's worth checking if the throughput is limited by the interpreter execution speed. If it is then a utility function can be written to loop the output using native C code.
+
 ### Directory functions
 
 Dgetdrv, Dsetdrv, Dfree, Dcreate, Ddelete, Dsetpath, Dgetpath
