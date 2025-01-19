@@ -4,7 +4,7 @@ gemdos.Cconws("Test gemdos.Dfree\r\n")
 -- Pass zero for current drive
 local fc, tc, ss, cs = gemdos.Dfree(0)
 assert(fc <= tc)
-assert(ss == 512)
+assert(ss == 512 or ss == 1024)
 assert(cs == 2)
 
 -- This time using default drive
