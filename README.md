@@ -788,14 +788,14 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: address
   ```
 
-  ### size ()
+### size ()
   Get the size of the memory in bytes
   ```
   Returns
     1. integer: the memory size
   ```
 
-  ### writet (offset, t [, i [, j]])
+### writet (offset, t [, i [, j]])
   Writes bytes from an array table into a memory.
   ```
   Parameters
@@ -812,7 +812,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: number of bytes written into the memory
   ```
 
-  ### readt (offset [, numbytes])
+### readt (offset [, numbytes])
   Read bytes from a memory into an array table.
   ```
   Parameters
@@ -826,7 +826,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. table: on array of integers holding bytes read
   ```
 
-  ### writes (offset, s [, i [, j]])
+### writes (offset, s [, i [, j]])
   Writes bytes from a string into a memory.
   ```
   Parameters
@@ -843,7 +843,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: the number of bytes written
   ```
 
-  ### reads (offset [, numbytes])
+### reads (offset [, numbytes])
   Reads bytes from a memory into a string.
   ```
   Parameters
@@ -857,7 +857,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. string: bytes read
   ```
 
-  ### poke (offset, n)
+### poke (offset, n)
   Writes byte from integer into a memory.
   ```
   Parameters
@@ -869,7 +869,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: the old byte value
   ```
 
-  ### peek (offset)
+### peek (offset)
   Reads a byte from memory into an integer.
   ```
   Parameters
@@ -880,7 +880,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: the byte value
   ```
 
-  ### comparem (offset, other_memory, other_offset, n)
+### comparem (offset, other_memory, other_offset, n)
   Compares data between two (possibly the same) memories.
   ```
   Parameters
@@ -894,7 +894,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: result of memcmp
   ```
 
-  ### copym (offset, src_memory, src_offset, n)
+### copym (offset, src_memory, src_offset, n)
   Copies data between two (possibly the same) memories.
   ```
   Parameters
@@ -908,7 +908,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: number of bytes copied
   ```
 
-  ### set (offset, n [, numbytes])
+### set (offset, n [, numbytes])
   Sets memory to a byte value.
   ```
   Parameters
