@@ -5,12 +5,6 @@
 #include "src/gemdos/gemdosi.h"
 #include "src/gemdos/gemdos_c.h"
 
-#if (defined(ATARI) && defined(LATTICE))
-#define CCONWS(c) (Cconws(c), 0)
-#else
-#define CCONWS(c) (Cconws(c))
-#endif
-
 /*
   Cconin. Wait for a keyboard character.
   Returns:
@@ -127,12 +121,10 @@ int l_Cnecin(lua_State *L) {
   Cconws. Write string to screen
   Inputs:
     1) string: the string to write
-  Returns:
-    1) integer: status code
 */
 int l_Cconws(lua_State *L) {
-  lua_pushinteger(L, CCONWS(luaL_checkstring(L, 1)) == 0 ? 0 : -1);
-  return 1;
+  (void) Cconws(luaL_checkstring(L, 1));
+  return 0;
 }
 
 /*

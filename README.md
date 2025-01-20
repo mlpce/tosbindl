@@ -136,10 +136,6 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     s: string: the string to write
   ```
-  ```
-  Results
-    1. integer: status code
-  ```
 
 ### gemdos.Cconrs (numchars)
 
