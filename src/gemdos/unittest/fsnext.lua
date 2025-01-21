@@ -26,10 +26,24 @@ for k,v in pairs(gemdos.const.Fattrib) do
     assert(ec == 0, dta)
     assert(dta:attr() & v)
 
+    if v == gemdos.const.Fattrib.readonly then
+      -- remove the readonly attribute so it can be deleted later
+      local flags
+      flags, msg = gemdos.Fattrib("TESTDIR\\" .. dta:name(), 1, 0)
+      assert(flags == 0, msg)
+    end
+
     -- Get the next one
     ec, msg = gemdos.Fsnext(dta)
     assert(ec == 0, msg)
     assert(dta:attr() & v)
+
+    if v == gemdos.const.Fattrib.readonly then
+      -- remove the readonly attribute so it can be deleted later
+      local flags
+      flags, msg = gemdos.Fattrib("TESTDIR\\" .. dta:name(), 1, 0)
+      assert(flags == 0, msg)
+    end
 
     -- There isn't another one
     ec, msg = gemdos.Fsnext(dta)
@@ -46,10 +60,11 @@ ec, dta = gemdos.Fsfirst("TESTDIR\\*",
   gemdos.const.Fattrib.archive)
 assert(ec == 0, dta)
 
-repeat
+while ec == 0 do
   ec, msg = gemdos.Fdelete("TESTDIR\\" .. dta:name())
+  assert(ec == 0, msg)
   ec, msg = dta:snext()
-until ec < 0
+end
 assert(ec == gemdos.const.Error.ENMFIL, msg)
 
 -- Create two subdirectory in TESTDIR
@@ -57,30 +72,29 @@ ec, msg = gemdos.Dcreate("TESTDIR\\one")
 ec, msg = gemdos.Dcreate("TESTDIR\\two")
 
 -- Check search finds both directories
-
+-- It will also find '.' and '..' so check for those too
+local found = { }
+local found_count = 0
 -- one
 ec, dta = gemdos.Fsfirst("TESTDIR\\*", gemdos.const.Fattrib.dir)
 assert(ec == 0, dta)
-assert(dta:attr() & gemdos.const.Fattrib.dir)
-
--- two
-ec, msg = gemdos.Fsnext(dta)
-assert(ec == 0, msg)
-assert(dta:attr() & gemdos.const.Fattrib.dir)
-
--- No more
-ec, msg = gemdos.Fsnext(dta)
+while ec == 0 do
+  assert(dta:attr() & gemdos.const.Fattrib.dir)
+  found[dta:name()] = true
+  found_count = found_count + 1
+  ec, msg = dta:snext()
+end
 assert(ec == gemdos.const.Error.ENMFIL, msg)
+
+assert(found_count == 4)
+assert(found["."])
+assert(found[".."])
+assert(found["ONE"])
+assert(found["TWO"])
 
 -- Now delete the directories that were created in TESTDIR
-local ec, dta = gemdos.Fsfirst("TESTDIR\\*", gemdos.const.Fattrib.dir)
-assert(ec == 0, dta)
-
-repeat
-  ec, msg = gemdos.Ddelete("TESTDIR\\" .. dta:name())
-  ec, msg = gemdos.Fsnext(dta)
-until ec < 0
-assert(ec == gemdos.const.Error.ENMFIL, msg)
+ec, msg = gemdos.Ddelete("TESTDIR\\ONE")
+ec, msg = gemdos.Ddelete("TESTDIR\\TWO")
 
 -- Finally delete TESTDIR
 ec, msg = gemdos.Ddelete("TESTDIR")
