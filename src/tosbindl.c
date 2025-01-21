@@ -3,6 +3,7 @@
 
 #include "tosbindl.h"
 
+/* Error messages */
 const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max] = {
   "Read only",
   "Write only",
