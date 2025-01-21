@@ -36,8 +36,7 @@ static int FileCloseHandle(struct lua_State *L) {
     /* Close the gemdos file handle */
     const long result = Fclose(fud->handle);
     if (result < 0) {
-      printf("FileClose: Fclose: Error: %ld %s\r\n",
-        result, TOSBINDL_GEMDOS_ErrMess(result));
+      printf("FileClose: %s\n", TOSBINDL_GEMDOS_ErrMess(result));
     }
     /* userdata is no longer valid */
     fud->valid = 0;
