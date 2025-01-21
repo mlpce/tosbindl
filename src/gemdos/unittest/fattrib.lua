@@ -8,9 +8,13 @@ gemdos.Cconws("Test gemdos.Fattrib\r\n")
 local ec, fud = gemdos.Fcreate("A:\\TESTFILE", gemdos.const.Fattrib.none)
 assert(ec == 0, fud)
 assert(fud:handle() >= 6)
+local msg
+ec, msg = fud:close()
+assert(ec == 0, msg)
 
 -- Check no attributes are set
-local attrib, msg = gemdos.Fattrib("A:\\TESTFILE", 0, 0);
+local attrib
+attrib, msg = gemdos.Fattrib("A:\\TESTFILE", 0, 0);
 assert(attrib == 0, msg)
 
 ---------------------------------------------------------------------
