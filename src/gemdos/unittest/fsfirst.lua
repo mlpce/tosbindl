@@ -42,6 +42,17 @@ for k,v in pairs(gemdos.const.Fattrib) do
     assert(dta:attr() & v)
     assert(dta:length() == 0)
 
+    -- If the attribute is read only then deleting must fail
+    if k == "readonly" then
+      ec, msg = gemdos.Fdelete("TESTDIR\\TESTFILE")
+      assert(ec == gemdos.const.Error.EACCDN, msg)
+
+      -- remove the readonly attribute so it can be deleted later
+      local flags
+      flags, msg = gemdos.Fattrib("TESTDIR\\TESTFILE", 1, 0);
+      assert(flags == 0, msg)
+    end
+
     -- No more files in this directory
     ec, msg = dta:snext()
     assert(ec == gemdos.const.Error.ENMFIL, msg)
