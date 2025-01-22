@@ -101,10 +101,12 @@ static void PushArgsString(lua_State *L, int tbl_idx) {
   Pexec0. Execute a program using Pexec mode zero.
   Inputs:
     1) string: Path of the program's executable.
-    2) table: Array of arguments to pass to the child
+    2) optional table: Array of string arguments to pass to the child
   Returns:
     1) integer: Return code from child
     2) string: GEMDOS error message
+  Note:
+    An error will be raised if a string argument has zero length
 */
 int l_Pexec0(lua_State *L) {
   char tail[128];
@@ -119,6 +121,14 @@ int l_Pexec0(lua_State *L) {
   /* Path to child process */
   const char *child_path = luaL_checklstring(L, 1, &child_path_len);
 
+  /* Argument 2 can be a table, nil, or absent */
+  const int arg_2_type = lua_type(L, 2);
+  if (arg_2_type != LUA_TTABLE &&
+      arg_2_type != LUA_TNIL &&
+      arg_2_type != LUA_TNONE) {
+    luaL_typeerror(L, 2, lua_typename(L, LUA_TTABLE));
+  }
+
   /* Push '\0' delimited gemdos environment as a string. */
   PushGemdosEnvString(L);
 
@@ -128,8 +138,14 @@ int l_Pexec0(lua_State *L) {
   /* Push child name and '\0' terminator */
   lua_pushlstring(L, child_path, child_path_len + 1);
 
-  /* Push '\0' delimited arguments as a string. */
-  PushArgsString(L, 2);
+  /* Are there any arguments to pass to the child? */
+  if (arg_2_type == LUA_TTABLE) {
+    /* Push '\0' delimited arguments as a string. */
+    PushArgsString(L, 2);
+  } else {
+    /* Argument 2 is nil or absent. */
+    lua_pushstring(L, "");
+  }
 
   /* Push a '\0' finisher as a string. */
   lua_pushlstring(L, "", 1);
