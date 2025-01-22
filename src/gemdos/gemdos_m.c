@@ -406,7 +406,7 @@ static int MemoryOp(lua_State *L, short copy) {
       (size_t) length);
   }
 
-  /* Return number of bytes copied */
+  /* Return number of bytes copied or result of memcmp */
   lua_pushinteger(L, result);
   return 1;
 }
