@@ -225,6 +225,10 @@ ec, str = mud:reads(0, 16)
 assert(ec == 16, str)
 assert(str == "89ABCDEF01234567")
 
+-- Close the file
+ec, msg = gemdos.Fclose(fud)
+assert(ec == 0, msg)
+
 ---------------------------------------------------------------------
 -- Test writing and reading a longer memory -------------------------
 ---------------------------------------------------------------------
@@ -309,5 +313,8 @@ ec, val = fud:readi()
 -- One byte read
 assert(ec == 1, val)
 assert(val == string.byte("1"))
+
+-- Close the file
+fud:close()
 
 gemdos.Cconws("Test gemdos.Fwrite completed\r\n")
