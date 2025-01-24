@@ -6,8 +6,12 @@ local ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
 assert(ec == 0, fud)
 assert(fud:handle() >= 6)
 
--- Delete it
+-- Close the file
 local msg
+ec, msg = gemdos.Fclose(fud)
+assert(ec == 0, msg)
+
+-- Delete it
 ec, msg = gemdos.Fdelete("TESTFILE")
 assert(ec == 0, msg)
 

@@ -17,4 +17,8 @@ assert(ec == 0, year)
 assert(year == 2000 and month == 6 and day == 20 and
   hours == 18 and minutes == 20 and seconds == 12)
 
+-- Close the file handle
+ec, msg = gemdos.Fclose(fud)
+assert(ec == 0, msg)
+
 gemdos.Cconws("Test gemdos.Fdatime completed\r\n")
