@@ -60,4 +60,8 @@ assert(abs_pos == 0, msg)
 num_bytes, val = fud:readi(abs_pos)
 assert(num_bytes == 1 and val == 0, val)
 
+-- Close the file
+ec, msg = gemdos.Fclose(fud)
+assert(ec == 0, msg)
+
 gemdos.Cconws("Test gemdos.Fseek completed\r\n")
