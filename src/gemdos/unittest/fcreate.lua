@@ -17,12 +17,17 @@ assert(ec == 0, msg)
 
 -- Create the file again - this will truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
+assert(ec == 0, fud)
 
--- TODO CHECK: Fcreate makes write only file handle?
+-- TODO CHECK: Should Fcreate make RO, R/W or WO file handle?
 
 -- Will read zero bytes due to truncation
 local num_bytes, str = gemdos.Freads(fud, 6);
 assert(num_bytes == 0, str)
+
+-- Close the file
+ec, msg = gemdos.Fclose(fud)
+assert(ec == 0, msg)
 
 -- Create with directory attribute set must fail
 local ok
