@@ -12,10 +12,10 @@ local msg
 ec, msg = fud:close()
 assert(ec == 0, msg)
 
--- Check no attributes are set
+-- Archive bit set on newly created file
 local attrib
 attrib, msg = gemdos.Fattrib("A:\\TESTFILE", 0, 0);
-assert(attrib == 0, msg)
+assert(attrib == gemdos.const.Fattrib.archive, msg)
 
 ---------------------------------------------------------------------
 -- Readonly attribute -----------------------------------------------
@@ -110,12 +110,12 @@ if orig_ec == 0 then
     gemdos.const.Fattrib.volume)
   assert(ec == 0, fud)
   fud:close()
-end
 
--- Find the volume label
-ec, test_dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
-assert(ec == 0, test_dta)
-assert(test_dta:name() == orig_dta:name())
+  -- Check the volume label matches the original volume label
+  ec, test_dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
+  assert(ec == 0, test_dta)
+  assert(test_dta:name() == orig_dta:name())
+end
 
 ---------------------------------------------------------------------
 -- Dir attribute ----------------------------------------------------
