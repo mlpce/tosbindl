@@ -66,4 +66,8 @@ assert(fud:readt(1) == 0)
 assert(fud:readm(mud, 0, 1) == 0)
 assert(fud:readi(1) == 0)
 
+-- Close the file
+ec, msg = gemdos.Fclose(fud)
+assert(ec, msg)
+
 gemdos.Cconws("Test gemdos.Fread completed\r\n")
