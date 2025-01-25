@@ -91,30 +91,46 @@ ok, msg = pcall(function() gemdos.Fattrib("A:\\TESTFILE", 1,
 assert(not ok)
 
 -- Find the existing volume file if there is one (there can be only one)
-local orig_ec, orig_dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
-assert(orig_ec == 0 or orig_ec == gemdos.const.Error.EFILNF, orig_dta)
+local dta
+ec, dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
+assert(ec == 0 or ec == gemdos.const.Error.EFILNF, dta)
+local orig_volume_name
+if ec == 0 then
+  orig_volume_name = dta:name()
+
+  -- There must not be a next one
+  ec, msg = gemdos.Fsnext(dta)
+  assert(ec == gemdos.const.Error.ENMFIL, msg)
+end
 
 -- Create new volume label
 ec, fud = gemdos.Fcreate("A:\\TESTVOLU", gemdos.const.Fattrib.volume)
 fud:close()
 
 -- Find the volume label
-local test_dta
-ec, test_dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
-assert(ec == 0, test_dta)
-assert(test_dta:name() == "TESTVOLU")
+ec, dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
+assert(ec == 0, dta)
+assert(dta:name() == "TESTVOLU")
+
+-- There must not be a next one
+ec, msg = gemdos.Fsnext(dta)
+assert(ec == gemdos.const.Error.ENMFIL, msg)
 
 -- Restore the original volume label if there was one
-if orig_ec == 0 then
-  ec, fud = gemdos.Fcreate("A:\\" .. orig_dta:name(),
+if orig_volume_name then
+  ec, fud = gemdos.Fcreate("A:\\" .. orig_volume_name,
     gemdos.const.Fattrib.volume)
   assert(ec == 0, fud)
   fud:close()
 
   -- Check the volume label matches the original volume label
-  ec, test_dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
-  assert(ec == 0, test_dta)
-  assert(test_dta:name() == orig_dta:name())
+  ec, dta = gemdos.Fsfirst("A:\\*.*", gemdos.const.Fattrib.volume);
+  assert(ec == 0, dta)
+  assert(dta:name() == orig_volume_name)
+
+  -- There must not be a next one
+  ec, msg = gemdos.Fsnext(dta)
+  assert(ec == gemdos.const.Error.ENMFIL, msg)
 end
 
 ---------------------------------------------------------------------
