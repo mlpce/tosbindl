@@ -1,4 +1,5 @@
-gemdos.Cconws("Run auto tests: free memory " .. gemdos.Malloc(-1) .. "\r\n")
+gemdos.Cconws("Run auto tests: largest free memory block " ..
+  gemdos.Malloc(-1) .. "\r\n")
 
 dofile("unittest\\dcreate.lua")
 dofile("unittest\\ddelete.lua")
