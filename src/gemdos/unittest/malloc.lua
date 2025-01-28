@@ -123,9 +123,9 @@ assert(mud:writes(4, str, -5, -5) == 1)  -- ' '
 assert(mud:writes(5, str, 7, -9) == 9)   -- 'computing'
 assert(mud:writes(14, str, 16, 19) == 4) -- ' is '
 assert(mud:writes(18, str, 1, 5) == 5)   -- 'retro'
-mud:writes(23, ' Atari ')
-mud:writes(30, 'S', -1, -1)
-mud:writes(31, 'T', 1, 1)
+assert(mud:writes(23, ' Atari ') == 7)   -- ' Atari '
+assert(mud:writes(30, 'S', -1, -1) == 1) -- 'S'
+assert(mud:writes(31, 'T', 1, 1) == 1)   -- 'T'
 num_bytes, new = mud:reads(0)
 assert(new == "cool computing is retro Atari ST")
 
@@ -305,10 +305,11 @@ assert(num_bytes == 16)
 num_bytes, str = mud:reads(0)
 assert(str == "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
+mud:poke(0, 42)
 num_bytes = mud16:copym(15, mud, 0, 1)
 assert(num_bytes == 1)
 
-assert(mud16:peek(15) == 69)
+assert(mud16:peek(15) == 42)
 
 ---------------------------------------------------------------------
 -- Check copying memory out of bounds -------------------------------
