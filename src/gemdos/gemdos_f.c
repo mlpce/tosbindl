@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <limits.h>
+#include <string.h>
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -24,6 +25,8 @@ typedef struct Dta {
   DTA dta;
 #endif
 } Dta;
+
+static Dta *PushDtaUserData(lua_State *L);
 
 /*
   Close the userdata's gemdos file handle
@@ -1152,6 +1155,59 @@ static int DtaDatime(lua_State *L) {
   return 6;
 }
 
+/* Copies the DTA userdata */
+static int DtaCopydta(lua_State *L) {
+  const Dta *const dud = (const Dta *) lua_touserdata(L, 1); /* DTA ud */
+  Dta *const new_dud = PushDtaUserData(L);
+  memcpy(new_dud, dud, sizeof(Dta));
+  return 1;
+}
+
+/*
+  Pushes userdata TOSBINDL_UD_T_Gemdos_Dta
+  Returns:
+    1) userdata: TOSBINDL_UD_T_Gemdos_Dta
+*/
+static Dta *PushDtaUserData(lua_State *L) {
+  /* DTA userdata */
+  Dta *dud = lua_newuserdatauv(L, sizeof(Dta), 0);
+
+#if (defined(__GNUC__) && defined(__atarist__))
+  dud->dta.dta_name[0] = '\0';
+#else
+  dud->dta.d_fname[0] = '\0';
+#endif
+
+  /* Push new metatable for type TOSBINDL_UD_T_Gemdos_Dta */
+  luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_Dta);
+
+  /* Table for __index */
+  lua_createtable(L, 0, 5);
+  lua_pushcfunction(L, DtaName); /* Fn to push name from DTA */
+  lua_setfield(L, -2, "name");
+  lua_pushcfunction(L, DtaLength); /* Fn to push length from DTA */
+  lua_setfield(L, -2, "length");
+  lua_pushcfunction(L, DtaAttr); /* Fn to push attributes from DTA */
+  lua_setfield(L, -2, "attr");
+  lua_pushcfunction(L, DtaDatime); /* Fn to push datime from DTA */
+  lua_setfield(L, -2, "datime");
+  lua_pushcfunction(L, DtaCopydta); /* Fn to copy DTA userdata */
+  lua_setfield(L, -2, "copydta");
+  lua_pushcfunction(L, l_Fsnext); /* Fn to search next extry */
+  lua_setfield(L, -2, "snext");
+  /* Set __index on metatable */
+  lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
+
+  lua_pushcfunction(L, DtaToString); /* To string function */
+  /* Set __tostring on metatable */
+  lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_tostring]);
+
+  /* Set the metatable on the userdata */
+  lua_setmetatable(L, -2);
+
+  return dud;
+}
+
 /*
   Fsfirst. Search first entry in a directory
   Inputs:
@@ -1181,39 +1237,8 @@ int l_Fsfirst(lua_State *L) {
       TOSBINDL_GEMDOS_FA_ARCHIVE)),
     2, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* DTA userdata */
-  dud = lua_newuserdatauv(L, sizeof(Dta), 0);
-
-#if (defined(__GNUC__) && defined(__atarist__))
-  dud->dta.dta_name[0] = '\0';
-#else
-  dud->dta.d_fname[0] = '\0';
-#endif
-
-  /* Push new metatable for type TOSBINDL_UD_T_Gemdos_Dta */
-  luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_Dta);
-
-  /* Table for __index */
-  lua_createtable(L, 0, 5);
-  lua_pushcfunction(L, DtaName); /* Fn to push name from DTA */
-  lua_setfield(L, -2, "name");
-  lua_pushcfunction(L, DtaLength); /* Fn to push length from DTA */
-  lua_setfield(L, -2, "length");
-  lua_pushcfunction(L, DtaAttr); /* Fn to push attributes from DTA */
-  lua_setfield(L, -2, "attr");
-  lua_pushcfunction(L, DtaDatime); /* Fn to push datime from DTA */
-  lua_setfield(L, -2, "datime");
-  lua_pushcfunction(L, l_Fsnext); /* Fn to search next extry */
-  lua_setfield(L, -2, "snext");
-  /* Set __index on metatable */
-  lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
-
-  lua_pushcfunction(L, DtaToString); /* To string function */
-  /* Set __tostring on metatable */
-  lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_tostring]);
-
-  /* Set the metatable on the userdata */
-  lua_setmetatable(L, -2);
+  /* Push DTA userdata */
+  dud = PushDtaUserData(L);
 
   /* Get original dta */
   original_dta = Fgetdta();

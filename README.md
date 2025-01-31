@@ -774,6 +774,12 @@ The GEMDOS functions are published through a global table 'gemdos'
     5. integer: minute
     6. integer: second
   ```
+### copydta ()
+  Copies the DTA into a new Userdata
+  ```
+  Results
+    1. userdata: Copied dta userdata
+  ```
 ### Self method
   The following self method calls the equivalent gemdos table Fsnext function. The DTA userdata parameter is omitted from the parameter list:
 
