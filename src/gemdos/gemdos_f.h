@@ -19,7 +19,6 @@ int l_Fseek(lua_State *L);
 int l_Fattrib(lua_State *L);
 int l_Fdup(lua_State *L);
 int l_Fforce(lua_State *L);
-int l_FsIterate(lua_State *L);
 int l_Frename(lua_State *L);
 int l_Fdatime(lua_State *L);
 int l_Fsfirst(lua_State *L);
