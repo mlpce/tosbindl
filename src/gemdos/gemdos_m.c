@@ -21,8 +21,7 @@ static int MemoryFree(struct lua_State *L) {
     /* Free the Gemdos memory */
     const long result = Mfree(memory);
     if (result < 0) {
-      printf("MemoryFree: Mfree: Error: %ld %s\r\n",
-        result, TOSBINDL_GEMDOS_ErrMess(result));
+      printf("MemoryFree: %s\n", TOSBINDL_GEMDOS_ErrMess(result));
     }
     mud->ptr = NULL;
     mud->size = 0;
