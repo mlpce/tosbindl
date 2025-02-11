@@ -26,7 +26,7 @@ ec, msg = gemdos.Fforce(file_fud, gemdos.const.Fdup.conout)
 assert(ec == 0, msg)
 
 -- Pexec0 some output
-ec, msg = gemdos.Pexec0("lua.ttp", { "-e print(\"HELLO\")" } )
+ec, msg = gemdos.Pexec0("\\lua.ttp", { "-e print(\"HELLO\")" } )
 assert(ec == 0, msg)
 
 -- Restore conout

@@ -2,7 +2,7 @@
 -- The script path refers to this script.
 -- Lua runs this script, placing the script name in arg[0].
 -- The remaining arguments go into arg[1], arg[2], arg[3], ...
-assert(arg[0] == "UNITTEST\\pexec0rx.lua")
+assert(arg[0] == "pexec0rx.lua")
 assert(#arg == 499)
 
 -- Check arguments
