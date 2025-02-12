@@ -198,9 +198,8 @@ int l_Dgetpath(lua_State *L) {
   lua_pushinteger(L, result);
   lua_pushstring(L, result ? TOSBINDL_GEMDOS_ErrMess(result) : path);
 
-  /* Rotate temporary space userdata to top of stack and pop it */
-  lua_rotate(L, 2, 2);
-  lua_pop(L, 1);
+  /* Remove temporary user data */
+  lua_remove(L, 2);
 
   return 2;
 }
