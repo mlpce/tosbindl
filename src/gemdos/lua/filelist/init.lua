@@ -102,7 +102,7 @@ end
 
 -- List the contents of a path
 -- Second parameter is optional file userdata for output (defaults to con:)
-function FileList.process(path, fud)
+function FileList.path(path, fud)
   if type(path) ~= "string" then
     error("Path must be a string", 2)
   end
