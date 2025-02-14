@@ -672,6 +672,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   
   Recognised names:
   'conterm' : 0x484
+  '_hz_200' : 0x4ba
   ```
   ```
   Results

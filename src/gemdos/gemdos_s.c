@@ -30,17 +30,25 @@ int l_Sversion(lua_State *L) {
 int l_SuperPeek(lua_State *L) {
   const char *value_name = luaL_checkstring(L, 1);
   const unsigned char *uchar_address = NULL;
+  const unsigned long *ulong_address = NULL;
   lua_Integer value;
   void *save_ssp;
 
   if (strcmp(value_name, "conterm") == 0)
     uchar_address = (unsigned char *) 0x484;
+  else if (strcmp(value_name, "_hz_200") == 0)
+    ulong_address = (unsigned long *) 0x4ba;
 
-  luaL_argcheck(L, uchar_address, 1,
+  luaL_argcheck(L, uchar_address || ulong_address, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   save_ssp = (void *) Super(0); /* Switch to supervisor mode */
-  value = *uchar_address;
+
+  if (uchar_address)
+    value = *uchar_address;
+  else if (ulong_address)
+    value = *ulong_address;
+
   Super(save_ssp); /* Switch to user mode */
 
   lua_pushinteger(L, value);
