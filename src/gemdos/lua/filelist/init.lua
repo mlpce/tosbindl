@@ -9,6 +9,7 @@ local Fsfirst = gemdos.Fsfirst
 local dir_attribute = gemdos.const.Fattrib.dir
 local file_mask = gemdos.const.Fattrib.readonly | gemdos.const.Fattrib.hidden |
   gemdos.const.Fattrib.system | gemdos.const.Fattrib.dir
+local esc = gemdos.utility.esc
 
 -- Process a path recursively
 local function process_path(path, fud)
@@ -78,6 +79,7 @@ local function process_path(path, fud)
         "%s  0x%02x  ", attr & dir_attribute ~= 0 and "DIR" or "FIL",
         attr) .. string.format("%04d/%02d/%02d %02d:%02d:%02d  ",
         year, month, day, hour, minute, second) .. length .. "\r\n")
+    esc()
   end
 
   -- First print the directory entries

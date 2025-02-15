@@ -1011,7 +1011,7 @@ seek_set, seek_cur, seek_end
   Utility functions are published through the table 'gemdos.utility'
 
 ### gemdos.utility.esc ()
-  Consume a key press if available and raise an error if the key pressed
+  Read a key press if available and raise an error if the key pressed
   is the escape key.
 
   ```

@@ -158,7 +158,7 @@ static void lstop(lua_State *L, lua_Debug *ar) {
 }
 
 /*
-  Esc. Consume a key press if available and raise an error if the key pressed
+  Esc. Read a key press if available and raise an error if the key pressed
   is the escape key.
   Inputs:
     None
