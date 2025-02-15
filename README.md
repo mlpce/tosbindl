@@ -58,6 +58,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### gemdos.Cconin ()
   Cconin. Wait for a keyboard character.
+
   ```
   Results
     1. integer: ASCII
@@ -65,8 +66,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     3. integer: Shift key bits (requires conterm)
   ```
 ### gemdos.Cconout (c)
-
   Cconout. Send character to console.
+
   ```
   Parameters
     c: integer: character to output
@@ -74,18 +75,21 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### gemdos.Cauxin ()
   Cauxin. Wait for character from RS232.
+
   ```
   Results
     1. integer: character received
   ```
 ### gemdos.Cauxout (c)
   Cauxout. Send a character to RS232.
+
   ```
   Parameters
     c: integer: character to send
   ```
 ### gemdos.Cprnout (c)
   Cprnout. Sends a character to parallel port
+
   ```
   Parameters
     c: integer: character to send
@@ -96,6 +100,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Crawio (c)
   Crawio. Raw I/O to Gemdos handle 0 or 1.
+
   ```
   Parameters
     c: integer: character
@@ -110,8 +115,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Crawcin ()
-
   Cconin. Wait for a keyboard character.
+
   ```
   Results
     1. integer: ASCII
@@ -120,8 +125,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cnecin ()
-
   Cnecin. Wait for a keyboard character without echo.
+
   ```
   Results
     1. integer: ASCII
@@ -130,16 +135,16 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cconws (s)
-
   Cconws. Write string to screen.
+
   ```
   Parameters
     s: string: the string to write
   ```
 
 ### gemdos.Cconrs (numchars)
-
   Cconrs. Read a string from the keyboard.
+
   ```
   Parameters
     numchars: integer: the maximum number of chars to read (up to 255)
@@ -150,56 +155,56 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cconis ()
-
   Cconis. keyboard input status.
+
   ```
   Results
     1. boolean: true if a character is waiting
   ```
 
 ### gemdos.Cconos ()
-
   Cconos. screen output status.
+
   ```
   Results
     1. boolean: true if ready to accept a character
   ```
 
 ### gemdos.Cprnos ()
-
   Cprnos. printer output status.
+
   ```
   Results
     1. boolean: true if printer is ready to accept a character
   ```
 
 ### gemdos.Cauxis ()
-
   Cauxis. RS232 input status.
+
   ```
   Results
     1. boolean: true if a character is waiting
   ```
 
 ### gemdos.Cauxos ()
-
   Cauxos. RS232 output status.
+
   ```
   Results
     1. boolean: true if a character can be output
   ```
 
 ### gemdos.Dgetdrv ()
-
   Dgetdrv. Get the default drive.
+
   ```
   Results
     1. integer: the default drive (A:=0, B:=1, C:=2, ...)
   ```
 
 ### gemdos.Dsetdrv (drive)
-
   Dsetdrv. Set the default drive and obtain available drives.
+
   ```
   Parameters
     drive: integer: the drive to set as default (A:=0, B:=1, C:=2, ...)
@@ -210,8 +215,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Dfree (drive)
-
   Dfree. Obtain the disk free information.
+
   ```
   Parameters
     drive: integer: 0 current drive, otherwise A:=1, B:=2, C:=3, ...
@@ -227,8 +232,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Dcreate (path)
-
   Dcreate. Create a directory.
+
   ```
   Parameters
     path: string: the path of the directory
@@ -240,8 +245,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. string: gemdos error string
   ```
 ### gemdos.Ddelete (path)
-
   Ddelete. Delete a directory.
+
   ```
   Parameters
     path: string: the path of the directory
@@ -253,8 +258,8 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. string: gemdos error string
   ```
 ### gemdos.Dsetpath (path)
-
   Dsetpath. Set the drive's default path.
+
   ```
   Parameters
     path: string: the path of the directory
@@ -267,6 +272,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Dgetpath (drive)
   Dgetpath. Get the drive's default path.
+
   ```
   Parameters
     drive: integer: the drive to check (0=current, A:=1, B:=2, C:=3, ...)
@@ -280,6 +286,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fcreate (path, attributes)
   Fcreate. Create a file.
+
   ```
   Parameters
     path: string: name
@@ -296,6 +303,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fopen (path, mode)
   Fopen. Open a file.
+
   ```
   Parameters
     path: string: name
@@ -312,6 +320,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Freads (file, numbytes)
   Freads. Read bytes from a file into a string.
+
   ```
   Parameters
     file: userdata: file userdata
@@ -329,6 +338,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fwrites (file, s [, i [, j]])
   Fwrites. Writes bytes from a string into a file.
+
   ```
   Parameters
     file: userdata: file userdata
@@ -348,6 +358,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Freadt (file, numbytes)
   Freadt. Read bytes from a file into an array table.
+
   ```
   Parameters
     file: userdata: file
@@ -365,6 +376,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fwritet (file, t [, i [, j]])
   Fwritet. Writes bytes from an array table into a file.
+
   ```
   Parameters
     file: userdata: file
@@ -383,6 +395,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fwritei (file, n)
   Fwritei. Writes an integer value representing a byte into a file
+
   ```
   Parameters
     file: userdata: file userdata
@@ -396,6 +409,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Freadi (file)
   Freadi. Reads a byte from a file into an integer
+
   ```
   Parameters
     file: userdata: file userdata
@@ -409,8 +423,9 @@ The GEMDOS functions are published through a global table 'gemdos'
 
   Note: Will return 0 bytes and value zero if EOF already reached.
   ```
-  ### gemdos.Freadm (file, memory, offset, numbytes)
+### gemdos.Freadm (file, memory, offset, numbytes)
   Freadm. Read bytes from a file userdata into a memory userdata
+
   ```
   Parameters
     file: userdata: file userdata
@@ -429,6 +444,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fwritem (file, memory, offset, numbytes)
   Fwritem. Write bytes from a memory userdata into a file userdata
+
   ```
   Parameters
     file: userdata: file userdata
@@ -444,6 +460,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fseek (file, relpos, mode)
   Fseek. Seek position within a file.
+
   ```
   Parameters
     file: userdata: file userdata
@@ -460,6 +477,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fdelete (path)
   Fdelete. Deletes a file
+
   ```
   Parameters
     path: string: the name of the file to delete
@@ -471,6 +489,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fclose (file)
   Fclose. Closes a file
+
   ```
   Parameters
     file: userdata: the file to close
@@ -482,6 +501,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Frename (oldname, newname)
   Frename. Renames a file
+
   ```
   Parameters
     oldname: string: the old name
@@ -494,6 +514,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fattrib (path, flag, attributes)
   Fattrib. Get and set file attributes.
+
   ```
   Parameters
     path: string: the name
@@ -509,6 +530,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fdatime (file [, y, m, d, h, m, s])
   Fdatime. Set or get file timestamp
+
   ```
   Parameters
     file: userdata: file userdata
@@ -539,6 +561,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fdup (stdhandle)
   Fdup. Duplicate standard file handle
+
   ```
   Parameters
     stdhandle: integer: standard file handle (0 to 3)
@@ -554,6 +577,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fforce (file, stdhandle)
   Fforce. Force standard file handle to file handle
+
   ```
   Parameters
     file: userdata: file userdata
@@ -568,6 +592,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fsfirst (path, attributes)
   Fsfirst. Search first entry in a directory
+
   ```
   Parameters
     path: string: name
@@ -584,6 +609,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Fsnext (dta)
   Fsnext. Search next entry in a directory
+
   ```
   Parameters
     dta: userdata: dta userdata
@@ -595,6 +621,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Malloc (n)
   Malloc. Allocate memory
+
   ```
   Parameters
     n: integer: either -1 or greater than 0
@@ -614,6 +641,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Mfree (memory)
   Mfree. Free memory.
+
   ```
   Input:
     memory: userdata: memory userdata
@@ -625,6 +653,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Mshrink (memory, keep)
   Mshrink. Shrink memory.
+
   ```
   Input:
     memory: userdata: memory userdata
@@ -640,6 +669,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### gemdos.Pterm (n)
   Pterm. Terminate with result code.
+
   ```
   Parameters
     n: integer: Return status code
@@ -647,6 +677,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### gemdos.Pexec0 (path, args)
   Pexec0. Execute a program using Pexec mode zero.
+
   ```
   Parameters
     path: string: Path of the program's executable.
@@ -659,6 +690,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Sversion ()
   Svesion. Get GEMDOS version number.
+
   ```
   Results
     1. integer: Major version
@@ -666,6 +698,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.SuperPeek (name)
   SuperPeek. Peek a named address in supervisor mode.
+
   ```
   Parameters
     name: string: the named address
@@ -681,6 +714,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### gemdos.SuperPoke (name, n)
   SuperPoke. Poke a named address in supervisor mode
+
   ```
   Parameters
     name: string: the named address
@@ -691,6 +725,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Tgetdate ()
   Tgetdate. Get the date.
+
   ```
   Results
     1. integer: year
@@ -699,6 +734,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Tsetdate (year, month, day)
   Tsetdate. Set the date.
+
   ```
   Parameters
     year: integer: year
@@ -712,6 +748,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Tgettime ()
   Tgettime. Get the time.
+
   ```
   Results
     1. integer: hours
@@ -720,6 +757,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### gemdos.Tsettime (hours, minutes, seconds)
   Tsettime. Set the time.
+
   ```
   Parameters
     hours: integer: hours
@@ -735,6 +773,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### handle ()
   Get underlying gemdos handle.
+
   ```
   Results
     1. integer: underlying gemdos handle
@@ -748,24 +787,28 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### name ()
   Get the name of the file.
+
   ```
   Results
     1. string: the name of the file 
   ```
 ### length ()
   Get the length of the file.
+
   ```
   Results
     1. integer: the length of the file
   ```
 ### attr ()
   Get the attributes of the file.
+
   ```
   Results
     1. integer: the attributes of the file
   ```
 ### datime ()
   Get the datime of the file.
+
   ```
   Results
     1. integer: year
@@ -777,6 +820,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 ### copydta ()
   Copies the DTA into a new Userdata
+
   ```
   Results
     1. userdata: Copied dta userdata
@@ -790,6 +834,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### address ()
   Get the address of the memory.
+
   ```
   Returns
     1. integer: address
@@ -797,6 +842,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### size ()
   Get the size of the memory in bytes
+
   ```
   Returns
     1. integer: the memory size
@@ -804,6 +850,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### writet (offset, t [, i [, j]])
   Writes bytes from an array table into a memory.
+
   ```
   Parameters
     offset: integer: destination offset into the memory
@@ -821,6 +868,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### readt (offset [, numbytes])
   Read bytes from a memory into an array table.
+
   ```
   Parameters
     offset: integer: offset
@@ -835,6 +883,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### writes (offset, s [, i [, j]])
   Writes bytes from a string into a memory.
+
   ```
   Parameters
     offset: integer: offset
@@ -852,6 +901,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### reads (offset [, numbytes])
   Reads bytes from a memory into a string.
+
   ```
   Parameters
     offset: integer: offset
@@ -866,6 +916,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### poke (offset, n)
   Writes byte from integer into a memory.
+
   ```
   Parameters
     offset: integer: offset
@@ -878,6 +929,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### peek (offset)
   Reads a byte from memory into an integer.
+
   ```
   Parameters
     offset: integer: offset
@@ -889,6 +941,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### comparem (offset, other_memory, other_offset, n)
   Compares data between two (possibly the same) memories.
+
   ```
   Parameters
     offset: integer: offset
@@ -903,6 +956,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### copym (offset, src_memory, src_offset, n)
   Copies data between two (possibly the same) memories.
+
   ```
   Parameters
     offset: integer: destination offset
@@ -917,6 +971,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### set (offset, n [, numbytes])
   Sets memory to a byte value.
+
   ```
   Parameters
     offset: integer: destination offset
@@ -954,6 +1009,19 @@ seek_set, seek_cur, seek_end
 
 ## Utility functions
   Utility functions are published through the table 'gemdos.utility'
+
+### gemdos.utility.esc ()
+  Consume a key press if available and raise an error if the key pressed
+  is the escape key.
+
+  ```
+  Parameters
+    None
+  ```
+  ```
+  Results
+    None
+  ```
 
 ### gemdos.utility.getenv ([s])
   Gets an environment variable, or a table containing all environment variables.

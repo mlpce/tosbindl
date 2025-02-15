@@ -151,6 +151,31 @@ static int GetEnv(lua_State *L) {
   return GetEnvTbl(L, gemdos_envp);
 }
 
+static void lstop(lua_State *L, lua_Debug *ar) {
+  (void)ar;  /* unused arg. */
+  lua_sethook(L, NULL, 0, 0);  /* reset hook */
+  luaL_error(L, "Escape");
+}
+
+/*
+  Esc. Consume a key press if available and raise an error if the key pressed
+  is the escape key.
+  Inputs:
+    None
+  Returns:
+    None
+*/
+static int Esc(lua_State *L) {  
+  /* Check for escape key press */
+  if (Cconis() && (Cnecin() & 0xFF) == '\033') {
+    const int flag =
+      LUA_MASKCALL | LUA_MASKRET | LUA_MASKLINE | LUA_MASKCOUNT;
+    lua_sethook(L, lstop, flag, 1);
+  }
+
+  return 0;
+}
+
 int luaopen_gemdos(lua_State *L) {
   luaL_newlib(L, gemdos);
 
@@ -279,6 +304,8 @@ int luaopen_gemdos(lua_State *L) {
 
   lua_pushcfunction(L, GetEnv); /* Fn to get environment variable or table */
   lua_setfield(L, -2, "getenv");
+  lua_pushcfunction(L, Esc); /* Fn to raise an error if escape key pressed */
+  lua_setfield(L, -2, "esc");
 
   /* Set field with name utility in Gemdos table to have Utility table as
   value */
