@@ -109,6 +109,7 @@ function FileList.path(path, fud)
     error("Path must be a string", 2)
   end
 
+  -- Open con: for output if fud is nil
   local ec, local_fud
   if fud == nil then
     ec, local_fud = gemdos.Fopen("con:", gemdos.const.Fopen.writeonly)
@@ -117,6 +118,8 @@ function FileList.path(path, fud)
     end
     fud = local_fud
   end
+  -- Ensure local_fud file handle will be closed when leaving scope
+  local local_fud_close <close> = local_fud
 
   local total_bytes, total_dirs, total_files
   total_bytes, total_dirs, total_files = process_path(path, fud)
@@ -125,10 +128,6 @@ function FileList.path(path, fud)
       total_bytes, total_dirs, total_files))
   else
     fud:writes("Error: " .. total_bytes .. "\r\n")
-  end
-
-  if local_fud then
-    local_fud:close()
   end
 end
 
