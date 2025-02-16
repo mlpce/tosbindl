@@ -76,7 +76,7 @@ static int FileClose(struct lua_State *L) {
     1) string: string representing the userdata
 */
 static int FileToString(struct lua_State *L) {
-  const File *const fud = (const File *)lua_touserdata(L, 1); /* File ud */
+  const File *const fud = (const File *) lua_touserdata(L, 1); /* File ud */
   lua_pushfstring(L, "File: %I", (lua_Integer) fud->handle);
   return 1;
 }
@@ -89,7 +89,8 @@ static int FileToString(struct lua_State *L) {
     1) integer: Handle of the gemdos file
 */
 static int FileGetHandle(struct lua_State *L) {
-  const File *const fud = (const File *) lua_touserdata(L, 1); /* File ud */
+  const File *const fud =
+    (const File *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_File);
   lua_pushinteger(L, (lua_Integer) fud->handle);
   return 1;
 }
@@ -1082,7 +1083,8 @@ int l_Fforce(lua_State *L) {
 
 /* Pushes the name from the DTA */
 static int DtaName(lua_State *L) {
-  const Dta *const dud = (const Dta *) lua_touserdata(L, 1); /* DTA ud */
+  const Dta *const dud =
+    (const Dta *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Dta);
   const char *name;
 
 #if (defined(__GNUC__) && defined(__atarist__))
@@ -1097,7 +1099,8 @@ static int DtaName(lua_State *L) {
 
 /* Pushes the length from the DTA */
 static int DtaLength(lua_State *L) {
-  const Dta *const dud = (const Dta *) lua_touserdata(L, 1); /* DTA ud */
+  const Dta *const dud =
+    (const Dta *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Dta);
   lua_Integer length;
 
 #if (defined(__GNUC__) && defined(__atarist__))
@@ -1112,7 +1115,8 @@ static int DtaLength(lua_State *L) {
 
 /* Pushes the attribute from the DTA */
 static int DtaAttr(lua_State *L) {
-  const Dta *const dud = (const Dta *) lua_touserdata(L, 1); /* DTA ud */
+  const Dta *const dud =
+    (const Dta *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Dta);
   lua_Integer attribute;
 
 #if (defined(__GNUC__) && defined(__atarist__))
@@ -1142,7 +1146,8 @@ static int DtaToString(lua_State *L) {
 
 /* Pushes the datime from the DTA as integers */
 static int DtaDatime(lua_State *L) {
-  const Dta *const dud = (const Dta *) lua_touserdata(L, 1); /* DTA ud */
+  const Dta *const dud =
+    (const Dta *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Dta);
 #if (defined(__GNUC__) && defined(__atarist__))
   const _DATETIME *dt = (const _DATETIME *)&dud->dta.dta_time; /* datime */
 #else
@@ -1160,7 +1165,8 @@ static int DtaDatime(lua_State *L) {
 
 /* Copies the DTA userdata */
 static int DtaCopydta(lua_State *L) {
-  const Dta *const dud = (const Dta *) lua_touserdata(L, 1); /* DTA ud */
+  const Dta *const dud =
+    (const Dta *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Dta);
   Dta *const new_dud = PushDtaUserData(L);
   memcpy(new_dud, dud, sizeof(Dta));
   return 1;

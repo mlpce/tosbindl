@@ -71,7 +71,7 @@ static int MemoryToString(struct lua_State *L) {
 */
 static int MemoryGetAddress(struct lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   lua_pushinteger(L, (lua_Integer) mud->ptr);
   return 1;
 }
@@ -85,7 +85,7 @@ static int MemoryGetAddress(struct lua_State *L) {
 */
 static int MemoryGetSize(struct lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   lua_pushinteger(L, (lua_Integer) mud->size);
   return 1;
 }
@@ -104,7 +104,7 @@ static int MemoryGetSize(struct lua_State *L) {
 */
 static int MemoryWritet(struct lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Offset into memory */
   const lua_Integer tbl_len =
     (luaL_checktype(L, 3, LUA_TTABLE), luaL_len(L, 3)); /* Length of table */
@@ -172,7 +172,7 @@ static int MemoryWritet(struct lua_State *L) {
 */
 static int MemoryReadt(struct lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Offset into memory */
   lua_Integer count; /* Number of bytes read */
   const unsigned char *src; /* Source read pointer */
@@ -223,7 +223,7 @@ static int MemoryReadt(struct lua_State *L) {
 */
 static int MemoryWrites(lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Offset into memory */
   size_t str_len; /* String length */
   const char *const str = luaL_checklstring(L, 3, &str_len); /* String */
@@ -276,7 +276,7 @@ static int MemoryWrites(lua_State *L) {
 */
 static int MemoryReads(lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
   lua_Integer count; /* Number of bytes read */
   luaL_Buffer b; /* Buffer for string */
@@ -315,7 +315,7 @@ static int MemoryReads(lua_State *L) {
 */
 static int MemoryPoke(lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
   const lua_Integer i = luaL_checkinteger(L, 3); /* Value to poke */
   unsigned char *dest; /* Destination pointer within memory */
@@ -351,7 +351,7 @@ static int MemoryPoke(lua_State *L) {
 */
 static int MemoryPeek(lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
 
   /* Check memory */
@@ -368,7 +368,7 @@ static int MemoryPeek(lua_State *L) {
 
 static int MemoryOp(lua_State *L, short copy) {
   const Memory *const dst_mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer dst_offset = luaL_checkinteger(L, 2); /* Memory offset */
   const Memory *const src_mud = (const Memory *) luaL_checkudata(L, 3,
     TOSBINDL_UD_T_Gemdos_Memory); /* Source memory userdata */
@@ -455,7 +455,7 @@ static int MemoryComparem(lua_State *L) {
 */
 static int MemorySet(lua_State *L) {
   const Memory *const mud =
-    (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
+    (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
   const lua_Integer i = luaL_checkinteger(L, 3); /* Value to set */
   lua_Integer length; /* Length of data to set */
