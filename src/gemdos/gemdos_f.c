@@ -171,7 +171,6 @@ static File *PushFileUserData(lua_State *L) {
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
     2) userdata: on success: file
-    2) string: on failure: gemdos error string
 */
 int l_Fcreate(lua_State *L) {
   const char *const name = luaL_checkstring(L, 1);
@@ -198,8 +197,7 @@ int l_Fcreate(lua_State *L) {
   if (result < 0) {
     lua_pop(L, 1); /* Fcreate failed - pop userdata */
     lua_pushinteger(L, result); /* Error code */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-    return 2;
+    return 1;
   }
 
   /* Mark the userdata as valid, the mode as read/write and store the Gemdos
@@ -224,7 +222,6 @@ int l_Fcreate(lua_State *L) {
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
     2) userdata: on success: file
-    2) string: on failure: gemdos error string
 */
 int l_Fopen(lua_State *L) {
   const char *const name = luaL_checkstring(L, 1);
@@ -248,8 +245,7 @@ int l_Fopen(lua_State *L) {
   if (result < 0) {
     lua_pop(L, 1); /* Fopen failed - pop userdata */
     lua_pushinteger(L, result); /* Error code */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-    return 2;
+    return 1;
   }
 
   /* Mark the userdata as valid, the mode used and store the Gemdos file
@@ -274,7 +270,6 @@ int l_Fopen(lua_State *L) {
     1) integer: on success:  >= 0 number of bytes read
     1) integer: on failure:  -ve gemdos error number
     2) string: on success: bytes read
-    2) string: on failure: gemdos error string
   Note:
     Can return less bytes than requested if EOF reached.
     Will return 0 bytes and empty string if EOF already reached.
@@ -327,8 +322,8 @@ int l_Freads(lua_State *L) {
   if (result < 0) {
     /* Error - pop the result string */
     lua_pop(L, 1);
-    /* Push an error string instead */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
+    /* Push nil instead */
+    lua_pushnil(L);
   }
 
   /* Return result and result string */
@@ -345,8 +340,6 @@ int l_Freads(lua_State *L) {
   Returns:
     1) integer: on success:  >= 0 number of bytes written
     1) integer: on failure:  -ve gemdos error number
-    2) string: on success: empty string
-    2) string: on failure: gemdos error string
 */
 int l_Fwrites(lua_State *L) {
   const File *const fud = (File *) luaL_checkudata(L, 1,
@@ -397,9 +390,7 @@ int l_Fwrites(lua_State *L) {
 
   /* Result */
   lua_pushinteger(L, result < 0 ? result : count - remaining);
-  /* Result string */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result < 0 ? result : 0));
-  return 2;
+  return 1;
 }
 
 /*
@@ -411,7 +402,6 @@ int l_Fwrites(lua_State *L) {
     1) integer: on success:  >= 0 number of bytes read
     1) integer: on failure:  -ve gemdos error number
     2) table: on success: array of integers holding bytes read
-    2) string: on failure: gemdos error string
   Note:
     Can return less bytes than requested if EOF reached.
     Will return 0 bytes and empty table if EOF already reached.
@@ -472,8 +462,8 @@ int l_Freadt(lua_State *L) {
   if (result < 0) {
     /* An error occurred - pop the result table */
     lua_pop(L, 1);
-    /* And push an error message instead */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
+    /* push nil instead */
+    lua_pushnil(L);
   }
 
   /* Return result and array table */
@@ -490,7 +480,6 @@ int l_Freadt(lua_State *L) {
   Returns:
     1) integer: on success:  >= 0 number of bytes written
     1) integer: on failure:  -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Fwritet(lua_State *L) {
   const File *const fud = (const File *) luaL_checkudata(L, 1,
@@ -560,10 +549,8 @@ int l_Fwritet(lua_State *L) {
 
   /* Push the result */
   lua_pushinteger(L, result < 0 ? result : count - remaining);
-  /* Push the result string */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result < 0 ? result : 0));
 
-  return 2;
+  return 1;
 }
 
 /*
@@ -574,7 +561,6 @@ int l_Fwritet(lua_State *L) {
   Returns:
     1) integer: on success:  >= 0 number of bytes written
     1) integer: on failure:  -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Fwritei(lua_State *L) {
   const File *const fud = (const File *) luaL_checkudata(L, 1,
@@ -600,10 +586,8 @@ int l_Fwritei(lua_State *L) {
 
   /* Result (-ve error, 0 EOF, 1 byte written) */
   lua_pushinteger(L, result);
-  /* Error message */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result < 0 ? result : 0));
 
-  return 2;
+  return 1;
 }
 
 /*
@@ -614,7 +598,6 @@ int l_Fwritei(lua_State *L) {
     1) integer: on success:  >= 0 number of bytes read (zero or one)
     1) integer: on failure:  -ve gemdos error number
     2) integer: on success: value holding byte read
-    2) string: on failure: gemdos error string
   Note:
     Will return 0 bytes and value zero if EOF already reached.
 */
@@ -638,7 +621,7 @@ int l_Freadi(lua_State *L) {
   lua_pushinteger(L, result);
   if (result < 0)
     /* An error occurred */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
+    lua_pushnil(L);
   else {
     /* Success - push the byte read or zero if EOF */
     lua_pushinteger(L, result ? value : 0);
@@ -704,10 +687,8 @@ static int MemoryIO(lua_State *L, short read) {
 
   /* Push either error code or amount of bytes actually I/O */
   lua_pushinteger(L, result < 0 ? result : count - remaining);
-  /* Push result string */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result < 0 ? result : 0));
 
-  return 2;
+  return 1;
 }
 
 /*
@@ -720,7 +701,6 @@ static int MemoryIO(lua_State *L, short read) {
   Returns:
     1) integer: on success:  >= 0 number of bytes read
     1) integer: on failure:  -ve gemdos error number
-    2) string: gemdos error string
   Note:
     Can read less bytes than requested if EOF reached.
     Will read 0 bytes if EOF already reached.
@@ -740,7 +720,6 @@ int l_Freadm(lua_State *L) {
   Returns:
     1) integer: on success:  >= 0 number of bytes written
     1) integer: on failure:  -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Fwritem(lua_State *L) {
   /* Perform write I/O */
@@ -756,7 +735,6 @@ int l_Fwritem(lua_State *L) {
   Returns:
     1) integer: on success:  >= 0 new absolute offset from start of file
     1) integer: on failure:  -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Fseek(lua_State *L) {
   const File *const fud = (const File *) luaL_checkudata(L, 1,
@@ -777,10 +755,8 @@ int l_Fseek(lua_State *L) {
 
   /* Push -ve error code or absolute position relative to start */
   lua_pushinteger(L, result);
-  /* Error string */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result < 0 ? result : 0));
 
-  return 2;
+  return 1;
 }
 
 /*
@@ -789,15 +765,13 @@ int l_Fseek(lua_State *L) {
     1) string: the name of the file to delete
   Returns:
     1) integer: gemdos error code
-    2) string: gemdos error string
 */
 int l_Fdelete(lua_State *L) {
   const char *const name = luaL_checkstring(L, 1);
   const long result = Fdelete(name);
 
   lua_pushinteger(L, result); /* Error code */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-  return 2;
+  return 1;
 }
 
 /*
@@ -806,7 +780,6 @@ int l_Fdelete(lua_State *L) {
     1) userdata: the file to close
   Returns:
     1) integer: gemdos error code
-    2) string: gemdos error string
 */
 int l_Fclose(lua_State *L) {
   File *const fud =
@@ -826,8 +799,7 @@ int l_Fclose(lua_State *L) {
   fud->mode = 0;
 
   lua_pushinteger(L, result); /* Error code */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-  return 2;
+  return 1;
 }
 
 /*
@@ -837,7 +809,6 @@ int l_Fclose(lua_State *L) {
     2) string: the new name
   Returns:
     1) integer: gemdos error code
-    2) string: gemdos error string
 */
 int l_Frename(lua_State *L) {
   const char *const old_name = luaL_checkstring(L, 1);
@@ -854,8 +825,7 @@ int l_Frename(lua_State *L) {
 #endif
 
   lua_pushinteger(L, result); /* Error code */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-  return 2;
+  return 1;
 }
 
 /*
@@ -866,7 +836,6 @@ int l_Frename(lua_State *L) {
     3) integer: the attributes to set
   Returns:
     1) integer: flags or negtive gemdos error code
-    2) string: gemdos error string
 */
 int l_Fattrib(lua_State *L) {
   const char *const fname = luaL_checkstring(L, 1);
@@ -890,9 +859,7 @@ int l_Fattrib(lua_State *L) {
 
   /* Error code or attributes */
   lua_pushinteger(L, result);
-  /* Error string */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result < 0 ? result : 0));
-  return 2;
+  return 1;
 }
 
 /*
@@ -910,12 +877,10 @@ int l_Fattrib(lua_State *L) {
   Outputs:
     Use A)
     1) integer: gemdos error code
-    2) string: gemdos error string
     Use B)
     1) integer: on success: >= 1980 year
     1) integer: on failure: -ve gemdos error number
     2) integer: on success: month
-    2) string: on failure: gemdos error string
     3) integer: on success: day
     4) integer: on success: hours
     5) integer: on success: minutes
@@ -978,10 +943,9 @@ int l_Fdatime(lua_State *L) {
 #endif
 
   if (flag || result < 0) {
-    /* If setting or an error occurred push the error code and error string */
+    /* If setting or an error occurred push the error code */
     lua_pushinteger(L, result); /* Error code */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-    return 2;
+    return 1;
   }
 
   /* Push the success result and the datime as integers */
@@ -1003,7 +967,6 @@ int l_Fdatime(lua_State *L) {
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
     2) userdata: on success: file
-    2) string: on failure: gemdos error string
 */
 int l_Fdup(lua_State *L) {
   const lua_Integer handle = luaL_checkinteger(L, 1); /* Std file handle */
@@ -1024,8 +987,7 @@ int l_Fdup(lua_State *L) {
   if (result < 0) {
     lua_pop(L, 1); /* Fdup failed - pop userdata */
     lua_pushinteger(L, result); /* Error code */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-    return 2;
+    return 1;
   }
 
   /* Duplication success. Set userdata values. */
@@ -1054,7 +1016,6 @@ int l_Fdup(lua_State *L) {
     2) integer: standard file handle (0 to 3)
   Returns:
     1) integer: gemdos error code
-    2) string: gemdos error string
 */
 int l_Fforce(lua_State *L) {
   const File *const fud = (const File *) luaL_checkudata(L, 1,
@@ -1075,10 +1036,9 @@ int l_Fforce(lua_State *L) {
   result = Fforce(handle, fud->handle);
 
   lua_pushinteger(L, result); /* Error code */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
 
-  /* Return error code and error string */
-  return 2;
+  /* Return error code */
+  return 1;
 }
 
 /* Pushes the name from the DTA */
@@ -1229,7 +1189,6 @@ static Dta *PushDtaUserData(lua_State *L) {
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
     2) userdata: on success: dta
-    2) string: on failure: gemdos error string
 */
 int l_Fsfirst(lua_State *L) {
   const char *const name = luaL_checkstring(L, 1); /* Name to search */
@@ -1268,10 +1227,9 @@ int l_Fsfirst(lua_State *L) {
   if (result < 0) {
     lua_pop(L, 1); /* Discard DTA userdata */
 
-    /* Push error result and error string */
+    /* Push error result */
     lua_pushinteger(L, result); /* Error code */
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-    return 2;
+    return 1;
   }
 
   lua_pushinteger(L, 0); /* Success result */
@@ -1287,7 +1245,6 @@ int l_Fsfirst(lua_State *L) {
     1) userdata: dta
   Returns:
     1) integer: gemdos error code
-    2) string: gemdos error string
 */
 int l_Fsnext(lua_State *L) {
   Dta *const dud =
@@ -1306,8 +1263,7 @@ int l_Fsnext(lua_State *L) {
 
   /* Push the error code and error string */
   lua_pushinteger(L, result); /* Error code */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
 
-  /* Return error code and error string */
-  return 2;
+  /* Return error code */
+  return 1;
 }

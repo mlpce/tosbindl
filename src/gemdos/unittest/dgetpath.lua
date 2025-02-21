@@ -2,12 +2,12 @@
 gemdos.Cconws("Test gemdos.Dgetpath\r\n")
 
 -- Create test directory
-local ec, msg = gemdos.Dcreate("TESTDIR")
-assert(ec == 0, msg)
+local ec = gemdos.Dcreate("TESTDIR")
+assert(ec == 0)
 
 -- Set the path to the test directory
-ec, msg = gemdos.Dsetpath("TESTDIR")
-assert(ec == 0, msg)
+ec = gemdos.Dsetpath("TESTDIR")
+assert(ec == 0)
 
 -- Get the path
 local path
@@ -18,11 +18,12 @@ assert(ec == 0)
 assert(string.sub(path, -8, -1) == "\\TESTDIR")
 
 -- Go back to the containing directory
-ec, msg = gemdos.Dsetpath("..")
-gemdos.Ddelete("TESTDIR")
+ec = gemdos.Dsetpath("..")
+assert(ec == 0)
 
 -- Delete the test directory
-ec, msg = gemdos.Ddelete("TESTDIR")
+ec = gemdos.Ddelete("TESTDIR")
+assert(ec == 0)
 
 -- Completed
 gemdos.Cconws("Test gemdos.Dgetpath completed\r\n")

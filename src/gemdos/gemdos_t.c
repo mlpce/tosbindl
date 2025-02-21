@@ -33,7 +33,6 @@ int l_Tgetdate(lua_State *L) {
     3) integer: day
   Returns:
     1) integer: zero on success or -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Tsetdate(lua_State *L) {
   const lua_Integer year = luaL_checkinteger(L, 1);
@@ -57,10 +56,9 @@ int l_Tsetdate(lua_State *L) {
   result = Tsetdate(date);
 
   lua_pushinteger(L, result); /* Error code */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
 
-  /* Return error code and error string */
-  return 2;
+  /* Return error code */
+  return 1;
 }
 
 /*
@@ -91,7 +89,6 @@ int l_Tgettime(lua_State *L) {
     3) integer: seconds
   Returns:
     1) integer: zero on success or -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Tsettime(lua_State *L) {
   const lua_Integer hours = luaL_checkinteger(L, 1);
@@ -111,8 +108,7 @@ int l_Tsettime(lua_State *L) {
 
   result = Tsettime(time);
 
-  /* Return result and gemdos error string */
+  /* Return result */
   lua_pushinteger(L, result);
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
-  return 2;
+  return 1;
 }

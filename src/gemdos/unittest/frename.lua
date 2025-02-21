@@ -3,28 +3,28 @@ gemdos.Cconws("Test gemdos.Frename\r\n")
 
 -- Create test file
 local ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- Rename it
-local ec, msg = gemdos.Frename("TESTFILE", "TESTFIL2")
-assert(ec == 0, msg)
+local ec = gemdos.Frename("TESTFILE", "TESTFIL2")
+assert(ec == 0)
 
-local ec, msg = fud:close()
-assert(ec == 0, msg)
+local ec = fud:close()
+assert(ec == 0)
 
-local ec, msg = gemdos.Fdelete("TESTFIL2")
-assert(ec == 0, msg)
+local ec = gemdos.Fdelete("TESTFIL2")
+assert(ec == 0)
 
 -- Create test directory
-local ec, msg = gemdos.Dcreate("TESTDIR")
-assert(ec == 0, msg)
+local ec = gemdos.Dcreate("TESTDIR")
+assert(ec == 0)
 
 -- Rename it
-local ec, msg = gemdos.Frename("TESTDIR", "TESTDIR2")
-assert(ec == 0, msg)
+local ec = gemdos.Frename("TESTDIR", "TESTDIR2")
+assert(ec == 0)
 
 -- Delete it
-local ec, msg = gemdos.Ddelete("TESTDIR2")
-assert(ec == 0, msg)
+local ec = gemdos.Ddelete("TESTDIR2")
+assert(ec == 0)
 
 gemdos.Cconws("Test gemdos.Frename completed\r\n")

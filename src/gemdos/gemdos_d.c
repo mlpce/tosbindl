@@ -48,7 +48,6 @@ int l_Dsetdrv(lua_State *L) {
     1) integer: on success: number of free clusters
     1) integer: on failure: -ve gemdos error number
     2) integer: on success: total number of clusters
-    2) string: on failure: gemdos error string
     3) integer: on success: sector size in bytes
     4) integer: on success: cluster size in sectors    
 */
@@ -97,10 +96,9 @@ int l_Dfree(lua_State *L) {
 #endif
 
   if (result < 0) {
-    /* Return result and gemdos error string */
+    /* Return result */
     lua_pushinteger(L, result);
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
-    return 2;
+    return 1;
   }
 
   lua_pushinteger(L, number_free_clusters);
@@ -117,16 +115,14 @@ int l_Dfree(lua_State *L) {
   Returns:
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Dcreate(lua_State *L) {
   const char *const path = luaL_checkstring(L, 1);
   const long result = Dcreate(path);
 
-  /* Return result and gemdos error string */
+  /* Return result */
   lua_pushinteger(L, result);
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
-  return 2;
+  return 1;
 }
 
 /*
@@ -136,16 +132,14 @@ int l_Dcreate(lua_State *L) {
   Returns:
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Ddelete(lua_State *L) {
   const char *const path = luaL_checkstring(L, 1);
   const long result = Ddelete(path);
 
-  /* Return result and gemdos error string */
+  /* Return result */
   lua_pushinteger(L, result);
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
-  return 2;
+  return 1;
 }
 
 /*
@@ -155,16 +149,14 @@ int l_Ddelete(lua_State *L) {
   Returns:
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Dsetpath(lua_State *L) {
   const char *const path = luaL_checkstring(L, 1);
   const long result = Dsetpath(path);
 
-  /* Return result and gemdos error string */
+  /* Return result */
   lua_pushinteger(L, result);
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result));
-  return 2;
+  return 1;
 }
 
 /*
@@ -175,7 +167,6 @@ int l_Dsetpath(lua_State *L) {
     1) integer: on success: 0
     1) integer: on failure: -ve gemdos error number
     2) string: on success: path
-    2) string: on failure: gemdos error string
 */
 int l_Dgetpath(lua_State *L) {
   /* drive 0 is current drive, A:=1, B:=2, C:=3, ... */
@@ -195,8 +186,12 @@ int l_Dgetpath(lua_State *L) {
 
   result = Dgetpath(path, drive);
 
+  /* Push results */
   lua_pushinteger(L, result);
-  lua_pushstring(L, result ? TOSBINDL_GEMDOS_ErrMess(result) : path);
+  if (result)
+    lua_pushnil(L);
+  else
+    lua_pushstring(L, path);
 
   /* Remove temporary user data */
   lua_remove(L, 2);

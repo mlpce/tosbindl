@@ -12,17 +12,17 @@ for n = 2,500 do
 end
 
 -- Pexec the Lua interpreter, passing 500 arguments
-local err, msg = gemdos.Pexec0("\\lua.ttp", args)
+local err = gemdos.Pexec0("\\lua.ttp", args)
 
 -- pexec0rx.lua will return 0 if the arguments were correct
-assert(err == 0, msg)
+assert(err == 0)
 
 -- Empty arguments (i.e. zero length strings) are not supported
 local ok
-ok, msg = pcall(
+ok = pcall(
   function()
     gemdos.Pexec0("\\lua.ttp", { { "-e print(\"HELLO\")", "" }})
   end )
-assert(not ok, msg)
+assert(not ok)
 
 gemdos.Cconws("Test gemdos.Pexec0 completed\r\n")

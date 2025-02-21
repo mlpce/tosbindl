@@ -7,30 +7,29 @@ gemdos.Cconws("Test gemdos.Fwrite\r\n")
 
 -- Create a new file named TESTFILE
 local ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 assert(fud:handle() >= 6)
 
 -- Write string
-local msg
-ec, msg = gemdos.Fwrites(fud, "01234567")
-assert(ec == 8, msg)
-ec, msg = gemdos.Fclose(fud)
-assert(ec == 0, msg)
+ec = gemdos.Fwrites(fud, "01234567")
+assert(ec == 8)
+ec = gemdos.Fclose(fud)
+assert(ec == 0)
 
 -- Open the file
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- Check contents
 local new
 ec, new = fud:reads(8)
-assert(ec == 8 and new == "01234567", new)
-ec, msg = gemdos.Fclose(fud)
-assert(ec == 0, msg)
+assert(ec == 8 and new == "01234567")
+ec = gemdos.Fclose(fud)
+assert(ec == 0)
 
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 assert(fud:handle() >= 6)
 
 -- positive values are positions from the start of the string
@@ -48,11 +47,11 @@ fud:close()
 
 -- Open the file
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- Read 100 bytes - only 32 are obtained
 ec, new = fud:reads(100)
-assert(ec == 32 and new == "cool computing is retro Atari ST", new)
+assert(ec == 32 and new == "cool computing is retro Atari ST")
 fud:close()
 
 ---------------------------------------------------------------------
@@ -61,17 +60,16 @@ fud:close()
 
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 -- Write a long string
 str = string.rep("01234567", 513)
-local count
-count, msg = fud:writes(str)
+local count = fud:writes(str)
 assert(count == 4104)
 fud:close()
 
 -- Read it back
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
-assert(ec == 0, fud)
+assert(ec == 0)
 local new_count
 new_count, new = fud:reads(count)
 assert(new_count == count)
@@ -87,30 +85,29 @@ str = nil
 
 -- Create a new file named TESTFILE
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 assert(fud:handle() >= 6)
 
 -- Write table
-ec, msg =
-  gemdos.Fwritet(fud, table.pack(string.byte("01234567", 1, -1)))
-assert(ec == 8, msg)
-ec, msg = gemdos.Fclose(fud)
-assert(ec == 0, msg)
+ec = gemdos.Fwritet(fud, table.pack(string.byte("01234567", 1, -1)))
+assert(ec == 8)
+ec = gemdos.Fclose(fud)
+assert(ec == 0)
 
 -- Open the file
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- Check contents
 local tbl
 ec, tbl = fud:readt(8)
-assert(ec == 8 and string.char(table.unpack(tbl)) == "01234567", tbl)
-ec, msg = gemdos.Fclose(fud)
-assert(ec == 0, msg)
+assert(ec == 8 and string.char(table.unpack(tbl)) == "01234567")
+ec = gemdos.Fclose(fud)
+assert(ec == 0)
 
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 assert(fud:handle() >= 6)
 
 -- positive values are positions from the start of the table
@@ -127,10 +124,9 @@ fud:writet({ string.byte("T") }, 1, 1)
 fud:close()
 
 -- Writing value not in range 0 to 255 must fail
-local ok
-ok, msg = pcall(function() fud:writet({-1}) end)
+local ok = pcall(function() fud:writet({-1}) end)
 assert(not ok)
-ok, msg = pcall(function() fud:writet({256}) end)
+ok = pcall(function() fud:writet({256}) end)
 assert(not ok)
 
 -- Open the file
@@ -140,7 +136,7 @@ assert(ec == 0, fud)
 -- Read 100 bytes - only 32 are obtained
 ec, new = fud:readt(100)
 assert(ec == 32 and
-  string.char(table.unpack(new)) == "cool computing is retro Atari ST", new)
+  string.char(table.unpack(new)) == "cool computing is retro Atari ST")
 fud:close()
 
 ---------------------------------------------------------------------
@@ -151,7 +147,7 @@ fud:close()
 
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 assert(fud:handle() >= 6)
 
 tbl = {}
@@ -164,7 +160,7 @@ fud:writet(tbl)
 fud:close()
 
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
-assert(ec == 0, fud)
+assert(ec == 0)
 ec, tbl = fud:readt(513)
 assert(ec == 513)
 fud:close()
@@ -180,32 +176,32 @@ tbl = nil
 
 local mud
 ec, mud = gemdos.Malloc(16)
-assert(ec == 16, mud)
+assert(ec == 16)
 assert(mud:address() ~= 0)
 assert(mud:size() == 16)
 
 -- Write a string into the memory
-ec, msg = mud:writes(0, "0123456789ABCDEF")
-assert(ec == 16, msg)
+ec = mud:writes(0, "0123456789ABCDEF")
+assert(ec == 16)
 
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- Write the last 8 bytes then the first 8 bytes to the file
-ec, msg = fud:writem(mud, 8, 8)
-assert(ec == 8, msg)
-ec, msg = fud:writem(mud, 0, 8)
-assert(ec == 8, msg)
+ec = fud:writem(mud, 8, 8)
+assert(ec == 8)
+ec = fud:writem(mud, 0, 8)
+assert(ec == 8)
 
 -- Offset negative must fail
-ok, msg = pcall(function() fud:writem(mud, -1, 1) end)
+ok = pcall(function() fud:writem(mud, -1, 1) end)
 assert(not ok)
 
 -- Offset or run beyond end must fail
-ok, msg = pcall(function() fud:writem(mud, 16, 1) end)
+ok = pcall(function() fud:writem(mud, 16, 1) end)
 assert(not ok)
-ok, msg = pcall(function() fud:writem(mud, 15, 2) end)
+ok = pcall(function() fud:writem(mud, 15, 2) end)
 assert(not ok)
 
 -- close the file
@@ -213,7 +209,7 @@ fud:close()
 
 -- Open the file
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- read from file into memory
 mud:set(0, 0, mud:size())
@@ -222,12 +218,12 @@ assert(ec == 16)
 
 -- read from memory into string
 ec, str = mud:reads(0, 16)
-assert(ec == 16, str)
+assert(ec == 16)
 assert(str == "89ABCDEF01234567")
 
 -- Close the file
-ec, msg = gemdos.Fclose(fud)
-assert(ec == 0, msg)
+ec = gemdos.Fclose(fud)
+assert(ec == 0)
 
 ---------------------------------------------------------------------
 -- Test writing and reading a longer memory -------------------------
@@ -235,9 +231,9 @@ assert(ec == 0, msg)
 
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 ec, mud = gemdos.Malloc(4104)
-assert(ec == 4104, mud)
+assert(ec == 4104)
 
 for i = 0, 7 do
   mud:poke(i,i)
@@ -250,18 +246,18 @@ for i = 1, 512 do
   src_offset = dst_offset
 end
 
-count, msg = fud:writem(mud, 0, mud:size())
+count = fud:writem(mud, 0, mud:size())
 assert(count == 4104)
 fud:close()
 
 -- Read it back
 local mud2
 ec, mud2 = gemdos.Malloc(4104)
-assert(ec == 4104, mud2)
+assert(ec == 4104)
 
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0, fud)
-count, msg = fud:readm(mud2, 0, mud2:size())
+count = fud:readm(mud2, 0, mud2:size())
 assert(count == 4104)
 fud:close()
 
@@ -276,22 +272,22 @@ mud2:free()
 ---------------------------------------------------------------------
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- Write a value
-ec, msg = gemdos.Fwritei(fud, string.byte("0"))
+ec = gemdos.Fwritei(fud, string.byte("0"))
 -- One byte written
-assert(ec == 1, msg)
+assert(ec == 1)
 
 -- Write a value using self
-ec, msg = fud:writei(string.byte("1"))
+ec = fud:writei(string.byte("1"))
 -- One byte written
-assert(ec == 1, msg)
+assert(ec == 1)
 
 -- Writing an integer value out of range of a byte must fail
-ok, msg = pcall(function() fud:writei(-1) end)
+ok = pcall(function() fud:writei(-1) end)
 assert(not ok)
-ok, msg = pcall(function() fud:writei(256) end)
+ok = pcall(function() fud:writei(256) end)
 assert(not ok)
 
 -- Close the file
@@ -299,19 +295,19 @@ fud:close()
 
 -- Open the file
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- Read a value
 local val
 ec, val = gemdos.Freadi(fud)
 -- One byte read
-assert(ec == 1, val)
+assert(ec == 1)
 assert(val == string.byte("0"))
 
 -- Read a value using self
 ec, val = fud:readi()
 -- One byte read
-assert(ec == 1, val)
+assert(ec == 1)
 assert(val == string.byte("1"))
 
 -- Close the file

@@ -7,7 +7,7 @@ gemdos.Cconws("Test gemdos.Mfree\r\n")
 
 -- Allocate 32 bytes
 local ec, mud = gemdos.Malloc(32)
-assert(ec == 32, mud)
+assert(ec == 32)
 assert(mud:address() ~= 0)
 assert(mud:size() == 32)
 
@@ -18,17 +18,15 @@ assert(num_bytes == mud:size() and type(str) == "string")
 assert(str == "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
 -- Free the mud
-local msg
-ec,msg = gemdos.Mfree(mud)
-assert(ec == 0, msg)
+ec = gemdos.Mfree(mud)
+assert(ec == 0)
 
 -- Freeing it again must fail
-local ok
-ok, msg = pcall(function() gemdos.Mfree(mud) end)
+local ok = pcall(function() gemdos.Mfree(mud) end)
 assert(not ok)
 
 -- Reading from it must now fail
-ok, msg = pcall(function() mud:reads(0) end)
+ok = pcall(function() mud:reads(0) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
@@ -42,8 +40,8 @@ local lfmb = gemdos.Malloc(-1)
 for i=1,100 do
   num_bytes, mud = gemdos.Malloc(lfmb/2)
   assert(num_bytes > 0, mud)
-  ec, msg = gemdos.Mfree(mud)
-  assert(ec == 0, msg)
+  ec = gemdos.Mfree(mud)
+  assert(ec == 0)
 end
 
 ---------------------------------------------------------------------
@@ -63,7 +61,7 @@ assert(mud2:address() == 0 and mud2:size() == 0)
 
 num_bytes, mud = gemdos.Malloc(32);
 
-ec, msg = mud:free()
-assert(ec == 0, msg)
+ec = mud:free()
+assert(ec == 0)
 
 gemdos.Cconws("Test gemdos.Mfree completed\r\n")

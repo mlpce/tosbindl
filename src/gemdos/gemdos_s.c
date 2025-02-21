@@ -47,7 +47,9 @@ int l_SuperPeek(lua_State *L) {
   if (uchar_address)
     value = *uchar_address;
   else if (ulong_address)
-    value = *ulong_address;
+    value = (lua_Integer) *ulong_address;
+  else
+    value = 0;
 
   Super(save_ssp); /* Switch to user mode */
 

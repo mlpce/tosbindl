@@ -104,7 +104,6 @@ static void PushArgsString(lua_State *L, int tbl_idx) {
     2) optional table: Array of string arguments to pass to the child
   Returns:
     1) integer: Return code from child
-    2) string: GEMDOS error message
   Note:
     An error will be raised if a string argument has zero length
 */
@@ -179,6 +178,5 @@ int l_Pexec0(lua_State *L) {
   lua_pop(L, 1);
 
   lua_pushinteger(L, result); /* Error code  */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
-  return 2;
+  return 1;
 }

@@ -1,14 +1,14 @@
 -- Unittest for gemdos.Dcreate
 gemdos.Cconws("Test gemdos.Dcreate\r\n")
 
-local ec, msg = gemdos.Dcreate("TESTDIR")
-assert(ec == 0, msg)
+local ec = gemdos.Dcreate("TESTDIR")
+assert(ec == 0)
 
-ec, msg = gemdos.Dcreate("TESTDIR")
-assert(ec < 0, msg)
+ec = gemdos.Dcreate("TESTDIR")
+assert(ec < 0)
 
-ec, msg = gemdos.Ddelete("TESTDIR")
-assert(ec == 0, msg)
+ec = gemdos.Ddelete("TESTDIR")
+assert(ec == 0)
 
 -- Completed
 gemdos.Cconws("Test gemdos.Dcreate completed\r\n")

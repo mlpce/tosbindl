@@ -3,7 +3,7 @@ gemdos.Cconws("Test gemdos.Fdup\r\n")
 
 for k,v in pairs(gemdos.const.Fdup) do
   local ec, fud = gemdos.Fdup(v);
-  assert(ec == 0, fud);
+  assert(ec == 0);
   fud:close()
 end
 

@@ -10,19 +10,18 @@ assert(largest_free_block >= 0)
 ---------------------------------------------------------------------
 -- Test allocating too much memory ----------------------------------
 ---------------------------------------------------------------------
-local mud, msg = gemdos.Malloc(1024*1024*1024)
-assert(mud == gemdos.const.Error.ENSMEM and msg == "ENSMEM", msg)
+local mud = gemdos.Malloc(1024*1024*1024)
+assert(mud == gemdos.const.Error.ENSMEM)
 
 ---------------------------------------------------------------------
 -- Test parameter errors --------------------------------------------
 ---------------------------------------------------------------------
 -- Test bad parameter
-local ok
-ok, msg = pcall(function() gemdos.Malloc(-10) end)
+local ok = pcall(function() gemdos.Malloc(-10) end)
 assert(not ok)
 
 -- Number of bytes must be an integer
-ok, msg = pcall(function() gemdos.Malloc(1.2) end)
+ok = pcall(function() gemdos.Malloc(1.2) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
@@ -30,7 +29,7 @@ assert(not ok)
 ---------------------------------------------------------------------
 local ec
 ec, mud = gemdos.Malloc(32)
-assert(ec > 0, mud)
+assert(ec > 0)
 assert(mud:address() ~= 0)
 assert(mud:size() == 32)
 
@@ -100,14 +99,14 @@ assert(str == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
 -- Writing before the beginning
 local old
 num_bytes, old = mud:reads(0)
-ok, msg = pcall(function() mud:writes(-1, "No") end)
+ok = pcall(function() mud:writes(-1, "No") end)
 local new
 num_bytes, new = mud:reads(0)
 assert(not ok and old == new)
 
 -- Writing beyond the end
 num_bytes, old = mud:reads(0)
-ok, msg = pcall(function() mud:writes(31, "No") end)
+ok = pcall(function() mud:writes(31, "No") end)
 num_bytes, new = mud:reads(0)
 assert(not ok and old == new)
 
@@ -135,16 +134,16 @@ assert(new == "cool computing is retro Atari ST")
 
 str = "word"
 -- character start before start of the string
-ok, msg = pcall(function() mud:writes(0, str, 0, -1) end)
+ok = pcall(function() mud:writes(0, str, 0, -1) end)
 assert(not ok)
 -- character end after end of string
-ok, msg = pcall(function() mud:writes(0, str, 4, 5) end)
+ok = pcall(function() mud:writes(0, str, 4, 5) end)
 assert(not ok)
 -- character start after character end
-ok, msg = pcall(function() mud:writes(0, str, 3, 2) end)
+ok = pcall(function() mud:writes(0, str, 3, 2) end)
 assert(not ok)
 -- character start before the start of the string
-ok, msg = pcall(function() mud:writes(0, str, -5, -1) end)
+ok = pcall(function() mud:writes(0, str, -5, -1) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
@@ -199,13 +198,13 @@ assert(string.char(table.unpack(tbl)) == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
 
 -- Writing before the beginning
 num_bytes, old = mud:readt(0)
-ok, msg = pcall(function() mud:writet(-1, {1, 2}) end)
+ok = pcall(function() mud:writet(-1, {1, 2}) end)
 num_bytes, new = mud:readt(0)
 assert(not ok and table.concat(old) == table.concat(new))
 
 -- Writing beyond the end
 num_bytes, old = mud:readt(0)
-ok, msg = pcall(function() mud:writet(31, {1, 2}) end)
+ok = pcall(function() mud:writet(31, {1, 2}) end)
 num_bytes, new = mud:readt(0)
 assert(not ok and table.concat(old) == table.concat(new))
 
@@ -215,7 +214,7 @@ assert(not ok and table.concat(old) == table.concat(new))
 
 -- positive values are positions from the start of the table
 -- negative values are positions from the end of the table
-local tbl = table.pack(string.byte("retro computing is cool", 1, -1))
+tbl = table.pack(string.byte("retro computing is cool", 1, -1))
 assert(mud:writet(0, tbl, -4, -1) == 4)  -- 'cool'
 assert(mud:writet(4, tbl, -5, -5) == 1)  -- ' '
 assert(mud:writet(5, tbl, 7, -9) == 9)   -- 'computing'
@@ -230,13 +229,13 @@ assert(string.char(table.unpack(new)) == "cool computing is retro Atari ST")
 ---------------------------------------------------------------------
 
 tbl = table.pack(string.byte("word", 1, -1))
-ok, msg = pcall(function() mud:writes(0, tbl, 0, -1) end)
+ok = pcall(function() mud:writes(0, tbl, 0, -1) end)
 assert(not ok)
-ok, msg = pcall(function() mud:writes(0, tbl, 4, 5) end)
+ok = pcall(function() mud:writes(0, tbl, 4, 5) end)
 assert(not ok)
-ok, msg = pcall(function() mud:writes(0, tbl, 3, 2) end)
+ok = pcall(function() mud:writes(0, tbl, 3, 2) end)
 assert(not ok)
-ok, msg = pcall(function() mud:writes(0, tbl, -5, -1) end)
+ok = pcall(function() mud:writes(0, tbl, -5, -1) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
@@ -273,15 +272,15 @@ assert(mud:peek(31) == 4)
 ---------------------------------------------------------------------
 -- Some memory sets out of bounds -----------------------------------
 ---------------------------------------------------------------------
-ok, msg = pcall(function() mud:set(32, 1) end)
+ok = pcall(function() mud:set(32, 1) end)
 assert(not ok)
-ok, msg = pcall(function() mud:set(32, 1, 0) end)
+ok = pcall(function() mud:set(32, 1, 0) end)
 assert(not ok)
-ok, msg = pcall(function() mud:set(-1, 1) end)
+ok = pcall(function() mud:set(-1, 1) end)
 assert(not ok)
-ok, msg = pcall(function() mud:set(-1, 1, 0) end)
+ok = pcall(function() mud:set(-1, 1, 0) end)
 assert(not ok)
-ok, msg = pcall(function() mud:set(0, 1, -1) end)
+ok = pcall(function() mud:set(0, 1, -1) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
@@ -315,11 +314,11 @@ assert(mud16:peek(15) == 42)
 -- Check copying memory out of bounds -------------------------------
 ---------------------------------------------------------------------
 
-ok, msg = pcall(function() mud16:copym(0, mud, 0, mud:size()) end)
+ok = pcall(function() mud16:copym(0, mud, 0, mud:size()) end)
 assert(not ok)
-ok, msg = pcall(function() mud16:copym(0, mud, 0, -1) end)
+ok = pcall(function() mud16:copym(0, mud, 0, -1) end)
 assert(not ok)
-ok, msg = pcall(function() mud16:copym(15, mud, 0, 2) end)
+ok = pcall(function() mud16:copym(15, mud, 0, 2) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
@@ -372,11 +371,11 @@ assert(muda:comparem(muda:size()/2, mudb, muda:size()/2, muda:size()/2) == 0)
 -- Check comparing memory out of bounds -----------------------------
 ---------------------------------------------------------------------
 
-ok, msg = pcall(function() muda:comparem(0, mudb, 0, muda:size() + 1) end)
+ok = pcall(function() muda:comparem(0, mudb, 0, muda:size() + 1) end)
 assert(not ok)
-ok, msg = pcall(function() muda:comparem(0, mudb, 0, -1) end)
+ok = pcall(function() muda:comparem(0, mudb, 0, -1) end)
 assert(not ok)
-ok, msg = pcall(function() muda:comparem(15, mudb, 0, 2) end)
+ok = pcall(function() muda:comparem(15, mudb, 0, 2) end)
 assert(not ok)
 
 muda:free()

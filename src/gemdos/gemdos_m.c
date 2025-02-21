@@ -494,7 +494,6 @@ static int MemorySet(lua_State *L) {
     Use B) 1) integer: on success: number of bytes allocated
     Use B) 1) integer: on failure: gemdos error code
     Use B) 2) userdata: on success: memory
-    Use B) 2) string: on failure: gemdos error string
 */
 int l_Malloc(lua_State *L) {
   const lua_Integer amount = luaL_checkinteger(L, 1);
@@ -573,8 +572,7 @@ int l_Malloc(lua_State *L) {
   if (!mud->ptr) {
     lua_pop(L, 1); /* Malloc failed - pop user data */
     lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_ENSMEM);
-    lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_ENSMEM));
-    return 2;
+    return 1;
   }
 
   mud->size = amount;
@@ -591,7 +589,6 @@ int l_Malloc(lua_State *L) {
     1) userdata: TOSBINDL_UD_T_Gemdos_Memory
   Returns:
     1) integer: zero on success or -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Mfree(lua_State *L) {
   Memory *const mud =
@@ -608,10 +605,9 @@ int l_Mfree(lua_State *L) {
   mud->size = 0;
 
   lua_pushinteger(L, result); /* Error code */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
 
-  /* Return error code and error string */
-  return 2;
+  /* Return error code */
+  return 1;
 }
 
 /*
@@ -621,7 +617,6 @@ int l_Mfree(lua_State *L) {
     2) integer: number of bytes to keep allocated
   Returns:
     1) integer: number of bytes kept on success or -ve gemdos error number
-    2) string: gemdos error string
 */
 int l_Mshrink(lua_State *L) {
   Memory *const mud =
@@ -639,8 +634,7 @@ int l_Mshrink(lua_State *L) {
     mud->size = size;
 
   lua_pushinteger(L, result < 0 ? result : size); /* Error code or new size */
-  lua_pushstring(L, TOSBINDL_GEMDOS_ErrMess(result)); /* Error string */
 
-  /* Return error code or size, and gemdos error string */
-  return 2;
+  /* Return error code or size */
+  return 1;
 }

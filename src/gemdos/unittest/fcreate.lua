@@ -4,39 +4,37 @@ gemdos.Cconws("Test gemdos.Fcreate\r\n")
 -- Create a new file named TESTFILE
 -- See also fattrib.lua for attribute testing
 local ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 assert(fud:handle() >= 6)
 
 -- Write data
 gemdos.Fwrites(fud, "orange")
 
 -- Close it
-local msg
-ec, msg = gemdos.Fclose(fud)
+ec = gemdos.Fclose(fud)
 assert(ec == 0, msg)
 
 -- Create the file again - this will truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
-assert(ec == 0, fud)
+assert(ec == 0)
 
 -- TODO CHECK: Should Fcreate make RO, R/W or WO file handle?
 
 -- Will read zero bytes due to truncation
 local num_bytes, str = gemdos.Freads(fud, 6);
-assert(num_bytes == 0, str)
+assert(num_bytes == 0 and str == "")
 
 -- Close the file
-ec, msg = gemdos.Fclose(fud)
-assert(ec == 0, msg)
+ec = gemdos.Fclose(fud)
+assert(ec == 0)
 
 -- Create with directory attribute set must fail
-local ok
-ok, msg = pcall(function() gemdos.Fcreate("TESTFILE",
+local ok = pcall(function() gemdos.Fcreate("TESTFILE",
   gemdos.const.Fattrib.dir) end)
 assert(not ok)
 
 -- If volume attribute is set no other attribute must be set
-ok, msg = pcall(function() gemdos.Fcreate("TESTFILE",
+ok = pcall(function() gemdos.Fcreate("TESTFILE",
   gemdos.const.Fattrib.volume | gemdos.const.Fattrib.archive) end)
 assert(not ok)
 

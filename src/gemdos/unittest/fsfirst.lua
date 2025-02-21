@@ -2,15 +2,15 @@
 gemdos.Cconws("Test gemdos.Fsfirst\r\n")
 
 -- make a directory
-local ec, msg = gemdos.Dcreate("TESTDIR")
-assert(ec, msg)
+local ec = gemdos.Dcreate("TESTDIR")
+assert(ec == 0)
 
 -- Find the directory just created
 local dta
 ec, dta = gemdos.Fsfirst("TESTDIR", gemdos.const.Fattrib.dir);
 
 -- Check name, attribytes and length
-assert(ec == 0, dta)
+assert(ec == 0)
 assert(dta:name() == "TESTDIR")
 assert(dta:attr() & gemdos.const.Fattrib.dir)
 assert(type(dta:length()) == "number")
@@ -32,38 +32,38 @@ for k,v in pairs(gemdos.const.Fattrib) do
     -- Create test file with attribute
     local fud
     ec, fud = gemdos.Fcreate("TESTDIR\\TESTFILE", v)
-    assert(ec == 0, fud)
+    assert(ec == 0)
     fud:close()
 
     -- Find the test file just created
     ec, dta = gemdos.Fsfirst("TESTDIR\\TESTFILE", v);
-    assert(ec == 0, dta)
+    assert(ec == 0)
     assert(dta:name() == "TESTFILE")
     assert(dta:attr() & v)
     assert(dta:length() == 0)
 
     -- If the attribute is read only then deleting must fail
     if k == "readonly" then
-      ec, msg = gemdos.Fdelete("TESTDIR\\TESTFILE")
-      assert(ec == gemdos.const.Error.EACCDN, msg)
+      ec = gemdos.Fdelete("TESTDIR\\TESTFILE")
+      assert(ec == gemdos.const.Error.EACCDN)
 
       -- remove the readonly attribute so it can be deleted later
-      local flags
-      flags, msg = gemdos.Fattrib("TESTDIR\\TESTFILE", 1, 0);
-      assert(flags == 0, msg)
+      local flags = gemdos.Fattrib("TESTDIR\\TESTFILE", 1, 0);
+      assert(flags == 0)
     end
 
     -- No more files in this directory
-    ec, msg = dta:snext()
-    assert(ec == gemdos.const.Error.ENMFIL, msg)
+    ec = dta:snext()
+    assert(ec == gemdos.const.Error.ENMFIL)
 
     -- Delete the test file
-    ec, msg = gemdos.Fdelete("TESTDIR\\TESTFILE")
-    assert(ec == 0, msg)
+    ec = gemdos.Fdelete("TESTDIR\\TESTFILE")
+    assert(ec == 0)
   end
 end
 
 -- Delete the test directory
-ec, msg = gemdos.Ddelete("TESTDIR")
+ec = gemdos.Ddelete("TESTDIR")
+assert(ec == 0)
 
 gemdos.Cconws("Test gemdos.Fsfirst completed\r\n")
