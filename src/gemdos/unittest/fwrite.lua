@@ -1,6 +1,9 @@
 -- Unittest for gemdos.Fwrite
 gemdos.Cconws("Test gemdos.Fwrite\r\n")
 
+local small_block_size = 512    -- see gemdos_f.c SMALL_BLOCK_SIZE
+local large_block_size = 16384  -- see gemdos_f.c LARGE_BLOCK_SIZE
+
 ---------------------------------------------------------------------
 -- Test writing strings into a file ---------------------------------
 ---------------------------------------------------------------------
@@ -62,9 +65,9 @@ fud:close()
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
 assert(ec == 0)
 -- Write a long string
-str = string.rep("01234567", 513)
+str = string.rep("01234567", 1 + large_block_size / 8)
 local count = fud:writes(str)
-assert(count == 4104)
+assert(count == large_block_size + 8)
 fud:close()
 
 -- Read it back
@@ -143,7 +146,8 @@ fud:close()
 -- Test writing and reading a longer table --------------------------
 ---------------------------------------------------------------------
 
--- Write and read 513 bytes. This is just over BLOCK_SIZE in gemdos_f.c.
+-- Write and read small_block_size + 1 bytes. This is just over
+-- SMALL_BLOCK_SIZE in gemdos_f.c.
 
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
@@ -151,7 +155,7 @@ assert(ec == 0)
 assert(fud:handle() >= 6)
 
 tbl = {}
-for i = 0,511 do
+for i = 0,small_block_size - 1 do
   tbl[#tbl + 1] = i % 8
 end
 tbl[#tbl + 1] = 66
@@ -161,13 +165,13 @@ fud:close()
 
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
-ec, tbl = fud:readt(513)
-assert(ec == 513)
+ec, tbl = fud:readt(small_block_size + 1)
+assert(ec == small_block_size + 1)
 fud:close()
-for i = 0,511 do
+for i = 0,small_block_size - 1 do
   assert(tbl[i + 1] == i % 8)
 end
-assert(tbl[513] == 66)
+assert(tbl[small_block_size + 1] == 66)
 tbl = nil
 
 ---------------------------------------------------------------------
@@ -232,33 +236,34 @@ assert(ec == 0)
 -- Create the same file so truncate
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
 assert(ec == 0)
-ec, mud = gemdos.Malloc(4104)
-assert(ec == 4104)
+local large_mem_size = 64 + large_block_size * 2
+ec, mud = gemdos.Malloc(large_mem_size)
+assert(ec == large_mem_size)
 
-for i = 0, 7 do
+for i = 0, 63 do
   mud:poke(i,i)
 end
 
 local src_offset = 0
-for i = 1, 512 do
-  local dst_offset = src_offset + 8
-  mud:copym(dst_offset, mud, src_offset, 8)
+for i = 1, 2 * large_block_size / 64 do
+  local dst_offset = src_offset + 64
+  mud:copym(dst_offset, mud, src_offset, 64)
   src_offset = dst_offset
 end
 
 count = fud:writem(mud, 0, mud:size())
-assert(count == 4104)
+assert(count == large_mem_size)
 fud:close()
 
 -- Read it back
 local mud2
-ec, mud2 = gemdos.Malloc(4104)
-assert(ec == 4104)
+ec, mud2 = gemdos.Malloc(large_mem_size)
+assert(ec == large_mem_size)
 
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0, fud)
 count = fud:readm(mud2, 0, mud2:size())
-assert(count == 4104)
+assert(count == large_mem_size)
 fud:close()
 
 -- Compare both memories

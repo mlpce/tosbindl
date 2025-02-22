@@ -10,7 +10,8 @@
 #include "src/gemdos/gemdos_m.h"
 #include "src/gemdos/gemdos_f.h"
 
-#define BLOCK_SIZE 512
+#define SMALL_BLOCK_SIZE 512
+#define LARGE_BLOCK_SIZE 16384
 
 typedef struct File {
   short valid; /* handle is set to a Gemdos handle */
@@ -298,8 +299,9 @@ int l_Freads(lua_State *L) {
 
   /* While characters remain to be read */
   while (remaining) {
-    /* Read up to BLOCK_SIZE characters at a time */
-    const long amount = remaining > BLOCK_SIZE ? BLOCK_SIZE : remaining;
+    /* Read up to LARGE_BLOCK_SIZE characters at a time */
+    const long amount = remaining > LARGE_BLOCK_SIZE ?
+      LARGE_BLOCK_SIZE : remaining;
     result = Fread(fud->handle, amount, str);
     if (result > 0) {
       /* 'result' characters were read */
@@ -375,8 +377,9 @@ int l_Fwrites(lua_State *L) {
 
   /* Loop until no characters are remaining */
   while (remaining) {
-    /* Write out up to BLOCK_SIZE bytes at a time */
-    const long amount = remaining > BLOCK_SIZE ? BLOCK_SIZE : remaining;
+    /* Write out up to LARGE_BLOCK_SIZE bytes at a time */
+    const long amount = remaining > LARGE_BLOCK_SIZE ?
+      LARGE_BLOCK_SIZE : remaining;
     result = Fwrite(fud->handle, amount, str);
     if (result > 0) {
       /* wrote 'result' bytes, adjust remaining and advance str */
@@ -427,12 +430,13 @@ int l_Freadt(lua_State *L) {
   /* Create table to hold the array */
   lua_createtable(L, count < INT_MAX ? (int) count : INT_MAX, 0);
   /* Userdata for temporary space */
-  buff = lua_newuserdatauv(L, BLOCK_SIZE, 0);
+  buff = lua_newuserdatauv(L, SMALL_BLOCK_SIZE, 0);
 
   /* Loop while bytes are remaining to be read */
   while (remaining) {
-    /* Amount to read up to BLOCK_SIZE */
-    const long amount = remaining > BLOCK_SIZE ? BLOCK_SIZE : remaining;
+    /* Amount to read up to SMALL_BLOCK_SIZE */
+    const long amount = remaining > SMALL_BLOCK_SIZE ?
+      SMALL_BLOCK_SIZE : remaining;
     /* Read into the temporary buffer */
     result = Fread(fud->handle, amount, buff);
     if (result > 0) {
@@ -492,7 +496,7 @@ int l_Fwritet(lua_State *L) {
   const lua_Integer end = j < 0 ? tbl_len + j + 1 : j; /* One based end */
   const lua_Integer count = end - start + 1; /* Number of bytes to write */
   /* Userdata for temporary space */
-  unsigned char *buff = lua_newuserdatauv(L, BLOCK_SIZE, 0);
+  unsigned char *buff = lua_newuserdatauv(L, SMALL_BLOCK_SIZE, 0);
   lua_Integer remaining = count; /* Remaining bytes to write */
   long result = 0;
   long key_base = start; /* Table key base */
@@ -515,8 +519,9 @@ int l_Fwritet(lua_State *L) {
 
   /* Loop while bytes are remaining to write */
   while (remaining) {
-    /* Write at most BLOCK_SIZE bytes at at a time */
-    const long amount = remaining > BLOCK_SIZE ? BLOCK_SIZE : remaining;
+    /* Write at most SMALL_BLOCK_SIZE bytes at at a time */
+    const long amount = remaining > SMALL_BLOCK_SIZE ?
+      SMALL_BLOCK_SIZE : remaining;
     short i;
     for (i = 0; i < amount; ++i) {
       /* Get the integer from the table */
@@ -670,8 +675,9 @@ static int MemoryIO(lua_State *L, short read) {
   ptr = mud->ptr + offset;
   /* Loop while bytes remain to be I/O */
   while (remaining) {
-    /* I/O up to BLOCK_SIZE bytes at a time */
-    const long amount = remaining > BLOCK_SIZE ? BLOCK_SIZE : remaining;
+    /* I/O up to LARGE_BLOCK_SIZE bytes at a time */
+    const long amount = remaining > LARGE_BLOCK_SIZE ?
+      LARGE_BLOCK_SIZE : remaining;
     /* Read or write the data */
     result = read ?
       Fread(fud->handle, amount, ptr) : Fwrite(fud->handle, amount, ptr);
