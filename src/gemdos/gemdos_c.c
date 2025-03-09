@@ -95,7 +95,7 @@ int l_Crawio(lua_State *L) {
     3) integer: Shift key bits (requires conterm)
 */
 int l_Crawcin(lua_State *L) {
-  const unsigned long in = Cconin();
+  const unsigned long in = Crawcin();
   lua_pushinteger(L, in & 0xFF); /* ASCII */
   lua_pushinteger(L, (in >> 16) & 0xFF); /* Scan code*/
   lua_pushinteger(L, (in >> 24) & 0xF); /* Shift (requires conterm) */
@@ -110,7 +110,7 @@ int l_Crawcin(lua_State *L) {
     3) integer: Shift key bits (requires conterm)
 */
 int l_Cnecin(lua_State *L) {
-  const unsigned long in = Cconin();
+  const unsigned long in = Cnecin();
   lua_pushinteger(L, in & 0xFF); /* ASCII */
   lua_pushinteger(L, (in >> 16) & 0xFF); /* Scan code*/
   lua_pushinteger(L, (in >> 24) & 0xF); /* Shift (requires conterm) */
