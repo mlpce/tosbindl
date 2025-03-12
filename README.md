@@ -115,7 +115,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Crawcin ()
-  Cconin. Wait for a keyboard character.
+  Crawcin. Raw input Gemdos handle 0.
 
   ```
   Results
@@ -309,8 +309,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: on success: 0
     1. integer: on failure: -ve gemdos error number
-    2. userdata: on success: file
-    2. string: on failure: gemdos error string
+    2. userdata: on success: file userdata
   ```
 ### gemdos.Freads (file, numbytes)
   Freads. Read bytes from a file into a string.
