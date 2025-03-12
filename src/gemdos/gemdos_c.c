@@ -88,7 +88,7 @@ int l_Crawio(lua_State *L) {
 }
 
 /*
-  Cconin. Wait for a keyboard character.
+  Crawcin. Raw input Gemdos handle 0
   Returns:
     1) integer: ASCII
     2) integer: Scan code
@@ -103,7 +103,7 @@ int l_Crawcin(lua_State *L) {
 }
 
 /*
-  Cconin. Wait for a keyboard character without echo.
+  Cnecin. Wait for a keyboard character without echo.
   Returns:
     1) integer: ASCII
     2) integer: Scan code
