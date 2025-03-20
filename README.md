@@ -1008,3 +1008,13 @@ seek_set, seek_cur, seek_end
   Use B:
     1. table: the GEMDOS environment as a table
   ```
+
+### gemdos.utility.version ()
+  Gets the tosbindl GEMDOS binding version number.
+
+  ```
+  Results
+    1. integer: Major version
+    2. integer: Minor version
+    3. integer: Micro version
+  ```

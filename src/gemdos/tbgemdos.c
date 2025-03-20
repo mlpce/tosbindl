@@ -18,6 +18,10 @@
 #include "src/gemdos/gemdos_s.h"
 #include "src/gemdos/gemdos_t.h"
 
+#define TBGEMDOS_MAJOR_VERSION 0
+#define TBGEMDOS_MINOR_VERSION 1
+#define TBGEMDOS_MICRO_VERSION 2
+
 static const struct luaL_Reg gemdos[] = {
   {"Sversion", l_Sversion},
   {"SuperPeek", l_SuperPeek},
@@ -176,6 +180,22 @@ static int Esc(lua_State *L) {
   return 0;
 }
 
+/*
+  Version. Obtain the binding version.
+  Inputs:
+    None
+  Returns:
+    1) integer: major version
+    2) integer: minor version
+    3) integer: micro version
+*/
+static int Version(lua_State *L) {
+  lua_pushinteger(L, TBGEMDOS_MAJOR_VERSION);
+  lua_pushinteger(L, TBGEMDOS_MINOR_VERSION);
+  lua_pushinteger(L, TBGEMDOS_MICRO_VERSION);
+  return 3;
+}
+
 int luaopen_gemdos(lua_State *L) {
   luaL_newlib(L, gemdos);
 
@@ -306,6 +326,8 @@ int luaopen_gemdos(lua_State *L) {
   lua_setfield(L, -2, "getenv");
   lua_pushcfunction(L, Esc); /* Fn to raise an error if escape key pressed */
   lua_setfield(L, -2, "esc");
+  lua_pushcfunction(L, Version); /* Fn to get binding version */
+  lua_setfield(L, -2, "version");
 
   /* Set field with name utility in Gemdos table to have Utility table as
   value */
