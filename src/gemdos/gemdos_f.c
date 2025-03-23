@@ -1146,12 +1146,7 @@ static int DtaCopydta(lua_State *L) {
 static Dta *PushDtaUserData(lua_State *L) {
   /* DTA userdata */
   Dta *dud = lua_newuserdatauv(L, sizeof(Dta), 0);
-
-#if (defined(__GNUC__) && defined(__atarist__))
-  dud->dta.dta_name[0] = '\0';
-#else
-  dud->dta.d_fname[0] = '\0';
-#endif
+  memset(dud, 0, sizeof(Dta));
 
   /* Push metatable for type TOSBINDL_UD_T_Gemdos_Dta */
   if (luaL_getmetatable(L, TOSBINDL_UD_T_Gemdos_Dta) != LUA_TTABLE) {
