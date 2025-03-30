@@ -34,7 +34,7 @@ static Dta *PushDtaUserData(lua_State *L);
   Inputs:
     1) userdata: TOSBINDL_UD_T_Gemdos_File
 */
-static int FileCloseHandle(struct lua_State *L) {
+static int FileCloseHandle(lua_State *L) {
   File *const fud = (File *) lua_touserdata(L, 1); /* File ud */
   if (fud->valid) {
     /* Close the gemdos file handle */
@@ -56,7 +56,7 @@ static int FileCloseHandle(struct lua_State *L) {
   Inputs:
     1) userdata: TOSBINDL_UD_T_Gemdos_File
 */
-static int FileGC(struct lua_State *L) {
+static int FileGC(lua_State *L) {
   return FileCloseHandle(L);
 }
 
@@ -65,7 +65,7 @@ static int FileGC(struct lua_State *L) {
   Inputs:
     1) userdata: TOSBINDL_UD_T_Gemdos_File
 */
-static int FileClose(struct lua_State *L) {
+static int FileClose(lua_State *L) {
   return FileCloseHandle(L);
 }
 
@@ -76,7 +76,7 @@ static int FileClose(struct lua_State *L) {
   Returns:
     1) string: string representing the userdata
 */
-static int FileToString(struct lua_State *L) {
+static int FileToString(lua_State *L) {
   const File *const fud = (const File *) lua_touserdata(L, 1); /* File ud */
   lua_pushfstring(L, "File: %I", (lua_Integer) fud->handle);
   return 1;
@@ -89,7 +89,7 @@ static int FileToString(struct lua_State *L) {
   Returns:
     1) integer: Handle of the gemdos file
 */
-static int FileGetHandle(struct lua_State *L) {
+static int FileGetHandle(lua_State *L) {
   const File *const fud =
     (const File *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_File);
   lua_pushinteger(L, (lua_Integer) fud->handle);

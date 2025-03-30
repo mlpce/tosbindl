@@ -14,7 +14,7 @@
   Inputs:
     1) userdata: TOSBINDL_UD_T_Gemdos_Memory
 */
-static int MemoryFree(struct lua_State *L) {
+static int MemoryFree(lua_State *L) {
   Memory *const mud = (Memory *) lua_touserdata(L, 1); /* Memory userdata */
   void *memory = mud->ptr;
   if (memory) {
@@ -35,7 +35,7 @@ static int MemoryFree(struct lua_State *L) {
   Inputs:
     1) userdata: TOSBINDL_UD_T_Gemdos_Memory
 */
-static int MemoryGC(struct lua_State *L) {
+static int MemoryGC(lua_State *L) {
   return MemoryFree(L);
 }
 
@@ -44,7 +44,7 @@ static int MemoryGC(struct lua_State *L) {
   Inputs:
     1) userdata: TOSBINDL_UD_T_Gemdos_Memory
 */
-static int MemoryClose(struct lua_State *L) {
+static int MemoryClose(lua_State *L) {
   return MemoryFree(L);
 }
 
@@ -55,7 +55,7 @@ static int MemoryClose(struct lua_State *L) {
   Returns:
     1) string: string representing the userdata
 */
-static int MemoryToString(struct lua_State *L) {
+static int MemoryToString(lua_State *L) {
   const Memory *const mud =
     (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
   lua_pushfstring(L, "p: %p s: %I", mud->ptr, (lua_Integer) mud->size);
@@ -69,7 +69,7 @@ static int MemoryToString(struct lua_State *L) {
   Returns:
     1) integer: Address of allocated memory
 */
-static int MemoryGetAddress(struct lua_State *L) {
+static int MemoryGetAddress(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   lua_pushinteger(L, (lua_Integer) mud->ptr);
@@ -83,7 +83,7 @@ static int MemoryGetAddress(struct lua_State *L) {
   Returns:
     1) integer: Size of memory in bytes
 */
-static int MemoryGetSize(struct lua_State *L) {
+static int MemoryGetSize(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   lua_pushinteger(L, (lua_Integer) mud->size);
@@ -102,7 +102,7 @@ static int MemoryGetSize(struct lua_State *L) {
   Returns:
     1) integer: number of bytes written into the memory
 */
-static int MemoryWritet(struct lua_State *L) {
+static int MemoryWritet(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Offset into memory */
@@ -170,7 +170,7 @@ static int MemoryWritet(struct lua_State *L) {
     1) integer: number of bytes read
     2) table: on array of integers holding bytes read
 */
-static int MemoryReadt(struct lua_State *L) {
+static int MemoryReadt(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Offset into memory */
