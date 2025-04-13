@@ -30,4 +30,7 @@ extern const char *const TOSBINDL_MMF_Names[TOSBINDL_MMFN_Max];
 /* Wrap a table passed on the stack with a read-only proxy */
 void TOSBINDL_ROProxy(lua_State *L);
 
+#define TOSBINDL_LIBNAME "tosbindl"
+LUAMOD_API int (luaopen_tosbindl)(lua_State *L);
+
 #endif

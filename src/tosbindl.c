@@ -3,6 +3,10 @@
 
 #include "tosbindl.h"
 
+#define TOSBINDL_MAJOR_VERSION 0
+#define TOSBINDL_MINOR_VERSION 1
+#define TOSBINDL_MICRO_VERSION 2
+
 /* Error messages */
 const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max] = {
   "Read only",
@@ -96,4 +100,21 @@ void TOSBINDL_ROProxy(lua_State *L) {
   /* Set Proxy's metatable to be the Metatable (pops metatable)*/
   lua_setmetatable(L, -2);
   /* Stack: proxy */
+}
+
+static int l_version(lua_State *L) {
+  lua_pushinteger(L, TOSBINDL_MAJOR_VERSION);
+  lua_pushinteger(L, TOSBINDL_MINOR_VERSION);
+  lua_pushinteger(L, TOSBINDL_MICRO_VERSION);
+  return 3;
+}
+
+static const struct luaL_Reg tosbindl[] = {
+  {"version", l_version},
+  {NULL, NULL}
+};
+
+int luaopen_tosbindl(lua_State *L) {
+  luaL_newlib(L, tosbindl);
+  return 1;
 }
