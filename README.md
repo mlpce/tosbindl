@@ -65,6 +65,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. integer: Scan code
     3. integer: Shift key bits (requires conterm)
   ```
+
 ### gemdos.Cconout (c)
   Cconout. Send character to console.
 
@@ -80,6 +81,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: character received
   ```
+
 ### gemdos.Cauxout (c)
   Cauxout. Send a character to RS232.
 
@@ -87,6 +89,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     c: integer: character to send
   ```
+
 ### gemdos.Cprnout (c)
   Cprnout. Sends a character to parallel port
 
@@ -98,6 +101,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: status code
   ```
+
 ### gemdos.Crawio (c)
   Crawio. Raw I/O to Gemdos handle 0 or 1.
 
@@ -242,6 +246,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success: 0
     1. integer: on failure: -ve gemdos error number
   ```
+
 ### gemdos.Ddelete (path)
   Ddelete. Delete a directory.
 
@@ -254,6 +259,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success: 0
     1. integer: on failure: -ve gemdos error number
   ```
+
 ### gemdos.Dsetpath (path)
   Dsetpath. Set the drive's default path.
 
@@ -266,6 +272,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success: 0
     1. integer: on failure: -ve gemdos error number
   ```
+
 ### gemdos.Dgetpath (drive)
   Dgetpath. Get the drive's default path.
 
@@ -274,11 +281,12 @@ The GEMDOS functions are published through a global table 'gemdos'
     drive: integer: the drive to check (0=current, A:=1, B:=2, C:=3, ...)
   ```
   ```
-  Outputs:
+  Results
     1. integer: on success: 0
     1. integer: on failure: -ve gemdos error number
     2. string: on success: path
   ```
+
 ### gemdos.Fcreate (path, attributes)
   Fcreate. Create a file.
 
@@ -286,7 +294,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     path: string: name
     attributes: integer: attributes
-  
+
   Note: gemdos.const.Fattrib constains attribute constants
   ```
   ```
@@ -295,6 +303,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure: -ve gemdos error number
     2. userdata: on success: file userdata
   ```
+
 ### gemdos.Fopen (path, mode)
   Fopen. Open a file.
 
@@ -311,6 +320,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure: -ve gemdos error number
     2. userdata: on success: file userdata
   ```
+
 ### gemdos.Freads (file, numbytes)
   Freads. Read bytes from a file into a string.
 
@@ -328,6 +338,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Note: Can return less bytes than requested if EOF reached. Will return 0
   bytes and empty string if EOF already reached.
   ```
+
 ### gemdos.Fwrites (file, s [, i [, j]])
   Fwrites. Writes bytes from a string into a file.
 
@@ -346,6 +357,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success:  >= 0 number of bytes written
     1. integer: on failure:  -ve gemdos error number
   ```
+
 ### gemdos.Freadt (file, numbytes)
   Freadt. Read bytes from a file into an array table.
 
@@ -363,6 +375,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Note: Can return less bytes than requested if EOF reached. Will return 0
   bytes and empty table if EOF already reached.
   ```
+
 ### gemdos.Fwritet (file, t [, i [, j]])
   Fwritet. Writes bytes from an array table into a file.
 
@@ -381,6 +394,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success:  >= 0 number of bytes written
     1. integer: on failure:  -ve gemdos error number
   ```
+
 ### gemdos.Fwritei (file, n)
   Fwritei. Writes an integer value representing a byte into a file
 
@@ -394,6 +408,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success:  >= 0 number of bytes written
     1. integer: on failure:  -ve gemdos error number
   ```
+
 ### gemdos.Freadi (file)
   Freadi. Reads a byte from a file into an integer
 
@@ -409,6 +424,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
   Note: Will return 0 bytes and value zero if EOF already reached.
   ```
+
 ### gemdos.Freadm (file, memory, offset, numbytes)
   Freadm. Read bytes from a file userdata into a memory userdata
 
@@ -427,6 +443,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Note: Can read less bytes than requested if EOF reached. Will read 0
   bytes if EOF already reached.
   ```
+
 ### gemdos.Fwritem (file, memory, offset, numbytes)
   Fwritem. Write bytes from a memory userdata into a file userdata
 
@@ -442,6 +459,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success:  >= 0 number of bytes written
     1. integer: on failure:  -ve gemdos error number
   ```
+
 ### gemdos.Fseek (file, relpos, mode)
   Fseek. Seek position within a file.
 
@@ -458,6 +476,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on success:  >= 0 new absolute offset from start of file
     1. integer: on failure:  -ve gemdos error number
   ```
+
 ### gemdos.Fdelete (path)
   Fdelete. Deletes a file
 
@@ -469,6 +488,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: gemdos error code
   ```
+
 ### gemdos.Fclose (file)
   Fclose. Closes a file
 
@@ -480,6 +500,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: gemdos error code
   ```
+
 ### gemdos.Frename (oldname, newname)
   Frename. Renames a file
 
@@ -492,6 +513,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: gemdos error code
   ```
+
 ### gemdos.Fattrib (path, flag, attributes)
   Fattrib. Get and set file attributes.
 
@@ -507,6 +529,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: flags or negtive gemdos error code
   ```
+
 ### gemdos.Fdatime (file [, y, m, d, h, m, s])
   Fdatime. Set or get file timestamp
 
@@ -524,7 +547,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Use B: When only file userdata is passed, get the timestamp
   ```
   ```
-  Outputs:
+  Results
   Use A:
     1. integer: gemdos error code
   Use B:
@@ -536,6 +559,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     5. integer: on success: minutes
     6. integer: on success: seconds
   ```
+
 ### gemdos.Fdup (stdhandle)
   Fdup. Duplicate standard file handle
 
@@ -551,6 +575,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure: -ve gemdos error number
     2. userdata: on success: file userdata
   ```
+
 ### gemdos.Fforce (file, stdhandle)
   Fforce. Force standard file handle to file handle
 
@@ -565,6 +590,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: gemdos error code
   ```
+
 ### gemdos.Fsfirst (path, attributes)
   Fsfirst. Search first entry in a directory
 
@@ -581,6 +607,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure: -ve gemdos error number
     2. userdata: on success: dta userdata
   ```
+
 ### gemdos.Fsnext (dta)
   Fsnext. Search next entry in a directory
 
@@ -592,13 +619,14 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: gemdos error code
   ```
+
 ### gemdos.Malloc (n)
   Malloc. Allocate memory
 
   ```
   Parameters
     n: integer: either -1 or greater than 0
-  
+
   Use A: -1 obtains the size of largest block of free memory
   Use B: >0 allocates memory
   ```
@@ -611,6 +639,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure: gemdos error code
     2. userdata: on success: memory userdata
   ```
+
 ### gemdos.Mfree (memory)
   Mfree. Free memory.
 
@@ -622,6 +651,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: zero on success or -ve gemdos error number
   ```
+
 ### gemdos.Mshrink (memory, keep)
   Mshrink. Shrink memory.
 
@@ -634,6 +664,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: number of bytes kept on success or -ve gemdos error number
   ```
+
 ### gemdos.Pterm0 ()
   Pterm0. Terminate with result code zero.
 
@@ -657,6 +688,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: Return code from child
   ```
+
 ### gemdos.Sversion ()
   Svesion. Get GEMDOS version number.
 
@@ -665,13 +697,14 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: Major version
     2. integer: Minor version
   ```
+
 ### gemdos.SuperPeek (name)
   SuperPeek. Peek a named address in supervisor mode.
 
   ```
   Parameters
     name: string: the named address
-  
+
   Recognised names:
   'conterm' : 0x484
   '_hz_200' : 0x4ba
@@ -688,10 +721,11 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     name: string: the named address
     n: integer: the value to write
-  
+
   Recognised names:
   'conterm' : 0x484
   ```
+
 ### gemdos.Tgetdate ()
   Tgetdate. Get the date.
 
@@ -701,6 +735,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. integer: month
     3. integer: day
   ```
+
 ### gemdos.Tsetdate (year, month, day)
   Tsetdate. Set the date.
 
@@ -714,6 +749,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: zero on success or -ve gemdos error number
   ```
+
 ### gemdos.Tgettime ()
   Tgettime. Get the time.
 
@@ -723,6 +759,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     2. integer: minutes
     3. integer: seconds
   ```
+
 ### gemdos.Tsettime (hours, minutes, seconds)
   Tsettime. Set the time.
 
@@ -736,6 +773,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: zero on success or -ve gemdos error number
   ```
+
 ## File Userdata Functions
 
 ### handle ()
@@ -745,9 +783,10 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: underlying gemdos handle
   ```
+
 ### Self methods
   The following self methods call the equivalent gemdos table file functions. The file userdata parameter is omitted from the parameter list:
-  
+
   reads, writes, readt, writet, readm, writem, readi, writei, seek, close, datime, force. 
 
 ## DTA Userdata Functions
@@ -759,6 +798,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. string: the name of the file 
   ```
+
 ### length ()
   Get the length of the file.
 
@@ -766,6 +806,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: the length of the file
   ```
+
 ### attr ()
   Get the attributes of the file.
 
@@ -773,6 +814,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: the attributes of the file
   ```
+
 ### datime ()
   Get the datime of the file.
 
@@ -785,6 +827,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     5. integer: minute
     6. integer: second
   ```
+
 ### copydta ()
   Copies the DTA into a new Userdata
 
@@ -792,6 +835,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. userdata: Copied dta userdata
   ```
+
 ### Self method
   The following self method calls the equivalent gemdos table Fsnext function. The DTA userdata parameter is omitted from the parameter list:
 
@@ -969,10 +1013,10 @@ The GEMDOS functions are published through a global table 'gemdos'
 conin, conout, aux, prn
 
 ### gemdos.const.Fopen
-readonly, writeonly, readwrite
+  readonly, writeonly, readwrite
 
 ### gemdos.const.Fseek
-seek_set, seek_cur, seek_end
+  seek_set, seek_cur, seek_end
 
 ## Utility functions
   Utility functions are published through the table 'gemdos.utility'
