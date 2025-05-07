@@ -25,8 +25,7 @@ ec = gemdos.Fforce(file_fud, gemdos.const.Fdup.conout)
 assert(ec == 0)
 
 -- Pexec0 some output
-ec = gemdos.Pexec0("lua.ttp", { "-e print(\"HELLO\")" } )
-assert(ec == 0)
+local pexec0_ec = gemdos.Pexec0("lua.ttp", { "-e print(\"HELLO\")" } )
 
 -- Restore conout
 ec = gemdos.Fforce(duplicate_conout_fud, gemdos.const.Fdup.conout)
@@ -41,6 +40,7 @@ assert(ec == 0)
 -- looping the test (with the output check below disabled) will still
 -- eventually fail with ENHNDL.
 ec = gemdos.Fclose(file_fud)
+assert(pexec0_ec == 0)
 assert(ec == gemdos.const.Error.EINTRN)
 
 -- Open the output for checking
