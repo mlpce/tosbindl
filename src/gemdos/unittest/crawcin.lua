@@ -1,3 +1,5 @@
+local force_standard_handle = require("fcestdhd")
+
 -- Unittest for gemdos.Crawcin
 gemdos.Cconws("Test gemdos.Crawcin\r\n")
 
@@ -64,6 +66,56 @@ assert(ascii == 0, "Wrong ascii code: " .. ascii)
 assert(scan_code == 30, "Wrong scan code: " .. scan_code)
 assert(shift == 8, "Wrong shift: " .. shift)
 gemdos.Cconws("\r\n");
+
+-- Check with a file forced to conin
+gemdos.Cconws("Check file forced to conin\r\n")
+
+local fn = function()
+  local ascii, scancode, shift = gemdos.Crawcin()
+
+  -- First character read must be '0'
+  assert(ascii == 48, "Wrong ASCII code: " .. ascii .. " expected 48")
+
+  -- scancode and shift must be zero
+  assert(scancode == 0)
+  assert(shift == 0)
+
+  ascii, scancode, shift = gemdos.Crawcin()
+
+  -- Second character read must be '0'
+  assert(ascii == 49, "Wrong ASCII code: " .. ascii .. " expected 49")
+
+  -- scancode and shift must be zero
+  assert(scancode == 0)
+  assert(shift == 0)
+
+  ascii, scancode, shift = gemdos.Crawcin()
+
+  -- Third character read must be '0'
+  assert(ascii == 50, "Wrong ASCII code: " .. ascii .. " expected 50")
+
+  -- scancode and shift must be zero
+  assert(scancode == 0)
+  assert(shift == 0)
+end
+
+-- Write 012 to coninfce.txt
+local ec, fud <close> = gemdos.Fcreate("coninfce.txt", gemdos.const.Fattrib.none)
+assert(ec == 0)
+
+ec = fud:writes("012")
+assert(ec == 3)
+
+ec = fud:close()
+assert(ec == 0)
+
+-- Force coninfce.txt to conin and call fn
+local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conin,
+  "coninfce.txt", fn)
+assert(result, err)
+
+-- Delete coninfce.txt
+gemdos.Fdelete("coninfce.txt")
 
 -- Completed
 gemdos.Cconws("Test gemdos.Crawcin completed\r\n")
