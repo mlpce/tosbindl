@@ -24,7 +24,7 @@ function ForceStdHandle.ForcedFilenameCall(standard_handle, filename, fn)
   end
 
   -- Call the function
-  local result = table.pack(pcall(fn))
+  local result = table.pack(pcall(fn, standard_handle, fud))
 
   -- Set standard handle back to original handle
   ec = gemdos.Fforce(dupfud, standard_handle)
