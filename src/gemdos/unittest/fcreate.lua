@@ -18,8 +18,6 @@ assert(ec == 0, msg)
 ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
 assert(ec == 0)
 
--- TODO CHECK: Should Fcreate make RO, R/W or WO file handle?
-
 -- Will read zero bytes due to truncation
 local num_bytes, str = gemdos.Freads(fud, 6);
 assert(num_bytes == 0 and str == "")
