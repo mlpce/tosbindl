@@ -30,6 +30,7 @@ end
 
 -- Create output file
 local ec, fud <close> = gemdos.Fcreate("prnoutfc.txt", gemdos.const.Fattrib.none)
+gemdos.Cconws("fud handle " .. fud:handle() .. "\r\n")
 assert(ec == 0)
 
 -- Force prn to the file and call fn
