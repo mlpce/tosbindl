@@ -10,6 +10,7 @@ gemdos.Cconws("Waiting for no room for character\r\n")
 gemdos.Cconws("Press a key to abort\r\n")
 
 -- Loop until output buffer is full or a key is pressed to abort
+-- TODO(mlpce): Find a way to make buffer full for this test (printer?)
 local status
 repeat
 status = gemdos.Cprnos()
