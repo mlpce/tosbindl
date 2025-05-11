@@ -81,7 +81,7 @@ local fn = function()
 
   ascii, scancode, shift = gemdos.Cconin()
 
-  -- Second character read must be '0'
+  -- Second character read must be '1'
   assert(ascii == 49, "Wrong ASCII code: " .. ascii .. " expected 49")
 
   -- scancode and shift must be zero
@@ -90,7 +90,7 @@ local fn = function()
 
   ascii, scancode, shift = gemdos.Cconin()
 
-  -- Third character read must be '0'
+  -- Third character read must be '2'
   assert(ascii == 50, "Wrong ASCII code: " .. ascii .. " expected 50")
 
   -- scancode and shift must be zero
