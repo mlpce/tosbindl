@@ -103,7 +103,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Crawio (c)
-  Crawio. Raw I/O with GEMDOS handle 0 or 1.
+  Crawio. Raw I/O with GEMDOS handle 0 or 1 [^2].
   When used in input mode this function returns three values and operates without echo, waiting, or checking for special characters (e.g. ^C). If no character is available then value one is zero. When used in output mode the function returns no values.
   ```
   Parameters
@@ -1066,3 +1066,4 @@ conin, conout, aux, prn
   ```
 
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
+[^2]: Testing of redirection with Crawio was unsuccessful.
