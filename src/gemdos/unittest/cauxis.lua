@@ -28,6 +28,7 @@ local fn = function()
   assert(c == 97, "Wrong ASCII code: " .. c .. " expected 97")
 end
 
+-- Force aux: to aux, as some runtime libraries use Gemdos handle 2 for stderr
 local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.aux,
   "aux:", fn)
 assert(result, err)
