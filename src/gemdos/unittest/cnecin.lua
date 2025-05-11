@@ -98,6 +98,7 @@ end
 
 -- Write 012 to coninfce.txt
 local ec, fud <close> = gemdos.Fcreate("coninfce.txt", gemdos.const.Fattrib.none)
+gemdos.Cconws("fud handle " .. fud:handle() .. "\r\n")
 assert(ec == 0)
 
 ec = fud:writes("012")
