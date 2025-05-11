@@ -5,5 +5,5 @@ gemdos.Cconws("Test gemdos.Cconos\r\n")
 local available = gemdos.Cconos()
 assert(available == true, "No room for character")
 
--- TODO: complete this test
+-- TODO(mlpce): complete this test
 gemdos.Cconws("Test gemdos.Cconos TODO\r\n");
