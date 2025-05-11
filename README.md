@@ -57,8 +57,7 @@ Tgetdate, Tsetdate, Tgettime, Tsettime
 The GEMDOS functions are published through a global table 'gemdos'
 
 ### gemdos.Cconin ()
-  Cconin. Read a character from GEMDOS handle 0 (normally the keyboard) and echo.
-  This function returns three values. Value one is always valid, value two when the handle is attached to the keyboard, and value three when the handle is attached to the keyboard and conterm is set (see SuperPeek/SuperPoke).
+  Cconin. Read a character from GEMDOS handle 0 (e.g. keyboard) and echo.
 
   ```
   Results
@@ -68,7 +67,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cconout (c)
-  Cconout. Write a character to GEMDOS handle 1 (normally the screen).
+  Cconout. Write a character to GEMDOS handle 1 (e.g. screen).
 
   ```
   Parameters
@@ -76,8 +75,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cauxin ()
-  Cauxin. Read a character from GEMDOS handle 2.
-  The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
+  Cauxin. Read a character from GEMDOS handle 2 (e.g. serial port [^1]).
 
   ```
   Results
@@ -85,8 +83,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cauxout (c)
-  Cauxout. Write a character to GEMDOS handle 2.
-  The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
+  Cauxout. Write a character to GEMDOS handle 2 (e.g. serial port [^1]).
 
   ```
   Parameters
@@ -94,7 +91,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cprnout (c)
-  Cprnout. Write a character to GEMDOS handle 3 (normally the printer).
+  Cprnout. Write a character to GEMDOS handle 3 (e.g. printer).
 
   ```
   Parameters
@@ -107,8 +104,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ### gemdos.Crawio (c)
   Crawio. Raw I/O with GEMDOS handle 0 or 1.
-  When used in input mode this function returns three values and operates without echo, waiting, or checking for special characters (e.g. ^C). Value one is always valid, value two when the handle is attached to the keyboard, and value three when the handle is attached to the keyboard and conterm is set (see SuperPeek/SuperPoke). If no character is available then value one is zero.
-  When used in output mode the function returns no values.
+  When used in input mode this function returns three values and operates without echo, waiting, or checking for special characters (e.g. ^C). If no character is available then value one is zero. When used in output mode the function returns no values.
   ```
   Parameters
     c: integer: character
@@ -117,15 +113,14 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
   ```
   Results (for Use A only)
-    1. integer: Character
-    2. integer: Scan code (attached to keyboard)
-    3. integer: Shift key bits (attached to keyboard and conterm set)
+    1. integer: Character (zero if no char available)
+    2. integer: Scan code
+    3. integer: Shift key bits (conterm set)
   ```
 
 ### gemdos.Crawcin ()
-  Crawcin. Raw input GEMDOS handle 0 (normally the keyboard).
+  Crawcin. Raw input GEMDOS handle 0 (e.g. keyboard).
   Reads a character without echo and does not check for special control keys (e.g. ^C).
-  This function returns three values. Value one is always valid, value two when the handle is attached to the keyboard, and value three when the handle is attached to the keyboard and conterm is set (see SuperPeek/SuperPoke).
 
   ```
   Results
@@ -135,9 +130,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cnecin ()
-  Cnecin. Read a character from GEMDOS handle 0 (normally the keyboard).
+  Cnecin. Read a character from GEMDOS handle 0 (e.g. keyboard).
   Reads a character without echo and checks for special control keys (e.g. ^C).
-  This function returns three values. Value one is always valid, value two when the handle is attached to the keyboard, and value three when the handle is attached to the keyboard and conterm is set (see SuperPeek/SuperPoke).
 
   ```
   Results
@@ -147,7 +141,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cconws (s)
-  Cconws. Write a string to GEMDOS handle 1 (normally the screen).
+  Cconws. Write a string to GEMDOS handle 1 (e.g. screen).
   Checks for special control keys (e.g. ^C).
   ```
   Parameters
@@ -155,7 +149,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cconrs (numchars)
-  Cconrs. Read a string from GEMDOS handle 0 (normally the keyboard).
+  Cconrs. Read a string from GEMDOS handle 0 (e.g. keyboard).
 
   ```
   Parameters
@@ -167,7 +161,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cconis ()
-  Cconis. Check input status of GEMDOS handle 0 (normally the keyboard).
+  Cconis. Check input status of GEMDOS handle 0 (e.g. keyboard).
 
   ```
   Results
@@ -175,7 +169,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cconos ()
-  Cconos. Check output status of GEMDOS handle 1 (normally the screen).
+  Cconos. Check output status of GEMDOS handle 1 (e.g. screen).
 
   ```
   Results
@@ -183,7 +177,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cprnos ()
-  Cprnos. Check output status of GEMDOS handle 3 (normally the printer).
+  Cprnos. Check output status of GEMDOS handle 3 (e.g. printer).
 
   ```
   Results
@@ -191,8 +185,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cauxis ()
-  Cauxis. Check input status of GEMDOS handle 2.
-  The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
+  Cauxis. Check input status of GEMDOS handle 2 (e.g. serial port [^1]).
 
   ```
   Results
@@ -200,8 +193,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Cauxos ()
-  Cauxos. Check output status of GEMDOS handle 2.
-  The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
+  Cauxos. Check output status of GEMDOS handle 2 (e.g. serial port [^1]).
 
   ```
   Results
@@ -1072,3 +1064,5 @@ conin, conout, aux, prn
     2. integer: Minor version
     3. integer: Micro version
   ```
+
+[^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
