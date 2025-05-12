@@ -1,3 +1,5 @@
+local force_standard_handle = require("fcestdhd")
+
 -- Test gemdos.Cconrs
 gemdos.Cconws("Test gemdos.Cconrs\r\n");
 
@@ -41,5 +43,37 @@ assert(not ok)
 ok, m = pcall(function() gemdos.Cconrs(256) end)
 assert(not ok)
 
+gemdos.Cconws("\r\n")
+
+-- Check with a file forced to conin
+gemdos.Cconws("Check file forced to conin\r\n")
+
+local fn = function()
+  gemdos.Cconws("Enter 0123\r\n")
+  local entered_str = gemdos.Cconrs(4)
+  assert(entered_str == "0123", "String did not match")
+  gemdos.Cconws("Got 0123\r\n")
+end
+
+-- Write 012 to coninfce.txt
+local ec, fud <close> = gemdos.Fcreate("coninfce.txt", gemdos.const.Fattrib.none)
+gemdos.Cconws("fud handle " .. fud:handle() .. "\r\n")
+assert(ec == 0)
+
+ec = fud:writes("0123")
+assert(ec == 4)
+
+ec = fud:close()
+assert(ec == 0)
+
+-- Force coninfce.txt to conin and call fn
+local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conin,
+  "coninfce.txt", fn)
+assert(result, err)
+
+-- Delete coninfce.txt
+gemdos.Fdelete("coninfce.txt")
+
 -- Completed
 gemdos.Cconws("Test gemdos.Cconrs completed\r\n");
+
