@@ -97,6 +97,21 @@ static int FileGetHandle(lua_State *L) {
 }
 
 /*
+  File userdata function "detach"
+  Inputs:
+    1) userdata: TOSBINDL_UD_T_Gemdos_File
+*/
+static int FileDetach(lua_State *L) {
+  File *const fud =
+    (File *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_File);
+  /* Mark userdata as no longer valid */
+  fud->valid = 0;
+  fud->handle = 0;
+  fud->mode = 0;
+  return 0;
+}
+
+/*
   Pushes userdata TOSBINDL_UD_T_Gemdos_File
   Returns:
     1) userdata: TOSBINDL_UD_T_Gemdos_File
@@ -115,9 +130,11 @@ static File *PushFileUserData(lua_State *L) {
     luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_File);
 
     /* Table for __index */
-    lua_createtable(L, 0, 13);
+    lua_createtable(L, 0, 14);
     lua_pushcfunction(L, FileGetHandle); /* Fn to push handle from File*/
     lua_setfield(L, -2, "handle");
+    lua_pushcfunction(L, FileDetach); /* Fn to detach the handle from File */
+    lua_setfield(L, -2, "detach");
     lua_pushcfunction(L, l_Freads); /* Fn to read file bytes into a string */
     lua_setfield(L, -2, "reads");
     lua_pushcfunction(L, l_Fwrites); /* Fn to write file bytes from a string */
