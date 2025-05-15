@@ -19,7 +19,7 @@ local fn = function(standard_handle, fud)
   assert(pexec0_ec == 0, "pexec0_ec: " .. pexec0_ec .. "\r\n")
 end
 
--- Force coninfce.txt to conin and call fn
+-- Force conoutfc.txt to conout and call fn
 local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conout,
   "conoutfc.txt", fn)
 assert(result, err)
