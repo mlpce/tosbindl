@@ -787,7 +787,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### detach ()
-  Detach the underlying gemdos handle from the userdata. The gemdos handle will no longer be closed when the userdata is closed or garbage collected, and handle() will return zero. Calling Fclose on a detached userdata will raise an error. Useful after calling Pexec0 with the file userdata redirected to a standard handle as the underlying gemdos handle will get closed when the child exits.
+  Detach the underlying gemdos handle from the userdata. The gemdos handle will no longer be closed when the userdata is closed or garbage collected, and handle() will return zero. Calling gemdos.Fclose on a detached userdata will raise an error. Useful after calling gemdos.Pexec0 with the file userdata redirected to a standard handle as the underlying gemdos handle will be closed when the child exits.
 
 ### Self methods
   The following self methods call the equivalent gemdos table file functions. The file userdata parameter is omitted from the parameter list:
