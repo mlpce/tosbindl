@@ -16,7 +16,7 @@ local fn = function(standard_handle, fud)
     -- fud will have been closed when child exited
     fud:detach()
   end
-  assert(pexec0_ec == 0)
+  assert(pexec0_ec == 0, "pexec0_ec: " .. pexec0_ec .. "\r\n")
 end
 
 -- Force coninfce.txt to conin and call fn
