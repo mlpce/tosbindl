@@ -44,5 +44,8 @@ assert(read_ec == #redirect_str)
 assert(read_str == redirect_str)
 fud:close()
 
+-- Delete conoutfc.txt
+gemdos.Fdelete("prnoutfc.txt")
+
 -- Completed
 gemdos.Cconws("Test gemdos.Cprnout completed\r\n")
