@@ -22,11 +22,21 @@ For the CAUX*.LUA tests, a serial cable was used connected to minicom on linux
 set to 9600 8N1 with flow control turned off, apart from CAUXOS.LUA which was
 run at 300 to fill the buffer quickly.
 
-Some shortcomings:
-CPRNOS.LUA. It attempts to loop until the buffer is full, but I have no printer
-so testing here is incomplete and it's possible that the parallel interface
-runs fast enough that the buffer will not fill. Perhaps it can be tested
+Known Issues
+
+FFORCE.LUA. If this test is looped it will eventually run out of internal
+memory. When using EmuTOS the test will fail with ENHNDL. When using TOS 1.04
+it will cause an "OUT OF INTERNAL MEMORY: USE FOLDR100.PRG TO GET MORE"
+message and the system will hang. The following can be used to demonstrate
+this issue:
+for i=1,100 do print(i) dofile("FFORCE.LUA") end
+
+CPRNOS.LUA. This test attempts to loop until the buffer is full, but I have no
+printer so testing here is incomplete and it's possible that the parallel
+interface runs fast enough that the buffer will not fill. Consider testing
 through redirection to aux which can be run at a low bps to fill the buffer.
+
 CPRNOUT.LUA. I have no printer so output was captured to a file through HATARI.
-CCONOS.LUA. The console is always ready - again perhaps this can be tested
-through redirection.
+
+CCONOS.LUA. This test is incomplete, as the console is always ready - consider
+testing through redirection.
