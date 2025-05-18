@@ -778,6 +778,8 @@ The GEMDOS functions are published through a global table 'gemdos'
 
 ## File Userdata Functions
 
+File userdata include a __close metamethod so they can be used with the \<close> variable name attribute.
+
 ### handle ()
   Get the underlying gemdos handle.
 
@@ -847,6 +849,8 @@ The GEMDOS functions are published through a global table 'gemdos'
   snext.
 
 ## Memory Userdata functions
+
+Memory userdata include a __close metamethod so they can be used with the \<close> variable name attribute.
 
 ### address ()
   Get the address of the memory.
