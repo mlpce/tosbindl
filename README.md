@@ -792,7 +792,7 @@ File userdata include a __close metamethod so they can be used with the \<close>
   Detach the underlying gemdos handle from the userdata. The gemdos handle will no longer be closed when the userdata is closed or garbage collected, and handle() will return zero. Calling gemdos.Fclose on a detached userdata will raise an error. Useful after calling gemdos.Pexec0 with the file userdata redirected to a standard handle as the underlying gemdos handle will be closed when the child exits.
 
 ### Self methods
-  The following self methods call the equivalent gemdos table file functions. The file userdata parameter is omitted from the parameter list:
+  The following self methods call the equivalent gemdos table file functions:
 
   reads, writes, readt, writet, readm, writem, readi, writei, seek, close, datime, force. 
 
@@ -844,7 +844,7 @@ File userdata include a __close metamethod so they can be used with the \<close>
   ```
 
 ### Self method
-  The following self method calls the equivalent gemdos table Fsnext function. The DTA userdata parameter is omitted from the parameter list:
+  The following self method calls the equivalent gemdos table Fsnext function:
 
   snext.
 
@@ -1005,7 +1005,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   ```
 
 ### Self methods
-  The following self methods call the equivalent gemdos table memory functions. The memory userdata parameter is omitted from the parameter list:
+  The following self methods call the equivalent gemdos table memory functions:
 
   free, shrink.
 
