@@ -30,15 +30,19 @@ local fn = function()
   end
 end
 
--- Create output file
-local ec, fud <close> = gemdos.Fcreate("conoutfc.txt", gemdos.const.Fattrib.none)
-gemdos.Cconws("fud handle " .. fud:handle() .. "\r\n")
-assert(ec == 0)
-
 -- Force conout to the file and call fn
-local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conout,
-  "conoutfc.txt", fn)
+local result, err = force_standard_handle.ForcedFileCall(
+  gemdos.const.Fdup.conout,
+  function()
+    return gemdos.Fcreate("conoutfc.txt", gemdos.const.Fattrib.none)
+  end,
+  fn)
 assert(result, err)
+
+-- Open output file
+local ec, fud <close> = gemdos.Fopen("conoutfc.txt",
+  gemdos.const.Fopen.readonly)
+assert(ec == 0)
 
 -- Check contents of the file
 local read_ec, read_str = fud:reads(100)

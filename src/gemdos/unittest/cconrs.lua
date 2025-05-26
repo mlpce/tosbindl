@@ -52,12 +52,12 @@ local fn = function()
   gemdos.Cconws("Enter 0123\r\n")
   local entered_str = gemdos.Cconrs(4)
   assert(entered_str == "0123", "String did not match")
-  gemdos.Cconws("Got 0123\r\n")
+  gemdos.Cconws("\r\nGot 0123\r\n")
 end
 
 -- Write 012 to coninfce.txt
-local ec, fud <close> = gemdos.Fcreate("coninfce.txt", gemdos.const.Fattrib.none)
-gemdos.Cconws("fud handle " .. fud:handle() .. "\r\n")
+local ec, fud <close> = gemdos.Fcreate("coninfce.txt",
+  gemdos.const.Fattrib.none)
 assert(ec == 0)
 
 ec = fud:writes("0123")
@@ -67,8 +67,12 @@ ec = fud:close()
 assert(ec == 0)
 
 -- Force coninfce.txt to conin and call fn
-local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conin,
-  "coninfce.txt", fn)
+local result, err = force_standard_handle.ForcedFileCall(
+  gemdos.const.Fdup.conin,
+  function()
+    return gemdos.Fopen("coninfce.txt", gemdos.const.Fopen.readonly)
+  end,
+  fn)
 assert(result, err)
 
 -- Delete coninfce.txt

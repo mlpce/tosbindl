@@ -87,77 +87,82 @@ assert(scan_code == 30, "Wrong scan code: " .. scan_code)
 assert(shift == 8, "Wrong shift: " .. shift)
 gemdos.Cconws("\r\n");
 
--- TODO(mlpce): The tests for redirection with Crawio are disabled
-if false then
-  -- Check with a file forced to conin.
-  gemdos.Cconws("Check file forced to conin\r\n")
+-- Check with a file forced to conin.
+gemdos.Cconws("Check file forced to conin\r\n")
 
-  local input_fn = function()
-    local ascii, scancode, shift = gemdos.Crawio(255)
-    assert(ascii == 48)
-    assert(scancode == 0)
-    assert(shift == 0)
+local input_fn = function()
+  local ascii, scancode, shift = gemdos.Crawio(255)
+  assert(ascii == 48)
+  assert(scancode == 0)
+  assert(shift == 0)
 
-    ascii, scancode, shift = gemdos.Crawio(255)
-    assert(ascii == 49)
-    assert(scancode == 0)
-    assert(shift == 0)
+  ascii, scancode, shift = gemdos.Crawio(255)
+  assert(ascii == 49)
+  assert(scancode == 0)
+  assert(shift == 0)
 
-    ascii, scancode, shift = gemdos.Crawio(255)
-    assert(ascii == 50)
-    assert(scancode == 0)
-    assert(shift == 0)
-  end
-
-  -- Write 012 to coninfce.txt
-  local ec, fud_in <close> = gemdos.Fcreate("coninfce.txt", gemdos.const.Fattrib.none)
-  gemdos.Cconws("fud_in handle " .. fud_in:handle() .. "\r\n")
-  assert(ec == 0)
-
-  ec = fud_in:writes("012")
-  assert(ec == 3)
-
-  ec = fud_in:close()
-  assert(ec == 0)
-
-  -- Force coninfce.txt to conin and call fn
-  local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conin,
-    "coninfce.txt", input_fn)
-  assert(result, err)
-
-  -- Delete coninfce.txt
-  gemdos.Fdelete("coninfce.txt")
-
-  -- Check with a file forced to conout. It does not work.
-  gemdos.Cconws("Check file forced to conout\r\n")
-
-  local output_fn = function()
-    gemdos.Crawio(48)
-    gemdos.Crawio(49)
-    gemdos.Crawio(50)
-  end
-
-  -- Write 012 to coninfce.txt
-  local ec, fud_out <close> = gemdos.Fcreate("conoutfc.txt", gemdos.const.Fattrib.none)
-  gemdos.Cconws("fud_out handle " .. fud_out:handle() .. "\r\n")
-  assert(ec == 0)
-
-  -- Force coninfce.txt to conin and call fn
-  local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conout,
-    "conoutfc.txt", output_fn)
-  assert(result, err)
-
-  -- Check contents of the file
-  local read_ec, read_str = fud_out:reads(100)
-  assert(read_ec == 3)
-  assert(read_str == "012")
-
-  ec = fud_out:close()
-  assert(ec == 0)
-
-  -- Delete conoutfc.txt
-  gemdos.Fdelete("conoutfc.txt")
+  ascii, scancode, shift = gemdos.Crawio(255)
+  assert(ascii == 50)
+  assert(scancode == 0)
+  assert(shift == 0)
 end
+
+-- Write 012 to coninfce.txt
+local ec, fud_out <close> = gemdos.Fcreate("coninfce.txt",
+  gemdos.const.Fattrib.none)
+assert(ec == 0)
+
+ec = fud_out:writes("012")
+assert(ec == 3)
+
+ec = fud_out:close()
+assert(ec == 0)
+
+-- Force coninfce.txt to conin and call fn
+local result, err = force_standard_handle.ForcedFileCall(
+  gemdos.const.Fdup.conin,
+  function()
+    return gemdos.Fopen("coninfce.txt", gemdos.const.Fopen.readonly)
+  end,
+  input_fn)
+assert(result, err)
+
+-- Delete coninfce.txt
+gemdos.Fdelete("coninfce.txt")
+
+-- Check with a file forced to conout.
+gemdos.Cconws("Check file forced to conout\r\n")
+
+local output_fn = function()
+  gemdos.Crawio(48)
+  gemdos.Crawio(49)
+  gemdos.Crawio(50)
+end
+
+-- Force conoutfc.txt to conout and call fn
+result, err = force_standard_handle.ForcedFileCall(
+  gemdos.const.Fdup.conout,
+  function()
+    return gemdos.Fcreate("conoutfc.txt", gemdos.const.Fattrib.none)
+  end,
+  output_fn)
+assert(result, err)
+
+-- Open output file
+local read_ec, fud_in <close> = gemdos.Fopen("conoutfc.txt",
+  gemdos.const.Fopen.readonly)
+assert(read_ec == 0)
+
+-- Check contents of the file
+local read_ec, read_str = fud_in:reads(100)
+assert(read_ec == 3)
+assert(read_str == "012")
+
+ec = fud_in:close()
+assert(ec == 0)
+
+-- Delete conoutfc.txt
+gemdos.Fdelete("conoutfc.txt")
 
 -- Completed
 gemdos.Cconws("Test gemdos.Crawio completed\r\n")

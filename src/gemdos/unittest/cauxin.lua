@@ -14,8 +14,12 @@ local fn = function()
 end
 
 -- Force aux: to aux, as some runtime libraries use Gemdos handle 2 for stderr
-local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.aux,
-  "aux:", fn)
+local result, err = force_standard_handle.ForcedFileCall(
+  gemdos.const.Fdup.aux,
+  function()
+    return gemdos.Fopen("aux:", gemdos.const.Fopen.readonly)
+  end,
+  fn)
 assert(result, err)
 
 -- Completed

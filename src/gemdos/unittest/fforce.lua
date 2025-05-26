@@ -3,12 +3,6 @@ local force_standard_handle = require("fcestdhd")
 -- Test gemdos.Fforce
 gemdos.Cconws("Test gemdos.Fforce\r\n")
 
--- Create output file
-local ec, fud <close> = gemdos.Fcreate("conoutfc.txt", gemdos.const.Fattrib.none)
-gemdos.Cconws("fud handle " .. fud:handle() .. "\r\n")
-assert(ec == 0)
-fud:close()
-
 local fn = function(standard_handle, fud)
   -- Pexec0 some output
   local pexec0_ec = gemdos.Pexec0("lua.ttp", { "-e print(\"HELLO\")" } )
@@ -19,13 +13,18 @@ local fn = function(standard_handle, fud)
   assert(pexec0_ec == 0, "pexec0_ec: " .. pexec0_ec .. "\r\n")
 end
 
--- Force conoutfc.txt to conout and call fn
-local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.conout,
-  "conoutfc.txt", fn)
+-- Force conout to the file and call fn
+local result, err = force_standard_handle.ForcedFileCall(
+  gemdos.const.Fdup.conout,
+  function()
+    return gemdos.Fcreate("conoutfc.txt", gemdos.const.Fattrib.none)
+  end,
+  fn)
 assert(result, err)
 
 -- Open the output for checking
-local ec, check_fud <close> = gemdos.Fopen("conoutfc.txt", gemdos.const.Fopen.readonly)
+local ec, check_fud <close> = gemdos.Fopen("conoutfc.txt",
+  gemdos.const.Fopen.readonly)
 assert(ec == 0)
 
 -- Read string

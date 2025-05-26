@@ -28,15 +28,19 @@ local fn = function()
   end
 end
 
--- Create output file
-local ec, fud <close> = gemdos.Fcreate("prnoutfc.txt", gemdos.const.Fattrib.none)
-gemdos.Cconws("fud handle " .. fud:handle() .. "\r\n")
-assert(ec == 0)
-
 -- Force prn to the file and call fn
-local result, err = force_standard_handle.ForcedFilenameCall(gemdos.const.Fdup.prn,
-  "prnoutfc.txt", fn)
+local result, err = force_standard_handle.ForcedFileCall(
+  gemdos.const.Fdup.prn,
+  function()
+    return gemdos.Fcreate("prnoutfc.txt", gemdos.const.Fattrib.none)
+  end,
+  fn)
 assert(result, err)
+
+-- Open output file
+local ec, fud <close> = gemdos.Fopen("prnoutfc.txt",
+  gemdos.const.Fopen.readonly)
+assert(ec == 0)
 
 -- Check contents of the file
 local read_ec, read_str = fud:reads(100)
@@ -44,7 +48,7 @@ assert(read_ec == #redirect_str)
 assert(read_str == redirect_str)
 fud:close()
 
--- Delete conoutfc.txt
+-- Delete prnoutfc.txt
 gemdos.Fdelete("prnoutfc.txt")
 
 -- Completed

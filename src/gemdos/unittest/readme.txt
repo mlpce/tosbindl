@@ -40,6 +40,3 @@ CPRNOUT.LUA. I have no printer so output was captured to a file through HATARI.
 
 CCONOS.LUA. This test is incomplete, as the console is always ready - consider
 testing through redirection.
-
-CRAWIO.LUA. The redirection tests are disabled as they are unsuccessful. The
-tests remain in the file but are within an 'if false then' block.
