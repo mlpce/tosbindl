@@ -21,9 +21,9 @@ static int MemoryFree(lua_State *L) {
     /* Free the Gemdos memory */
     const long result = Mfree(memory);
     if (result < 0) {
-      Cconws("MemoryFree: ");
-      Cconws(TOSBINDL_GEMDOS_ErrMess(result));
-      Cconws("\r\n");
+      (void) Cconws("MemoryFree: ");
+      (void) Cconws(TOSBINDL_GEMDOS_ErrMess(result));
+      (void) Cconws("\r\n");
     }
     mud->ptr = NULL;
     mud->size = 0;
