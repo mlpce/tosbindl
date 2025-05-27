@@ -92,17 +92,17 @@ gemdos.Cconws("Check file forced to conin\r\n")
 
 local input_fn = function()
   local ascii, scancode, shift = gemdos.Crawio(255)
-  assert(ascii == 48)
+  assert(ascii == 48, "Expected ascii 48 got " .. ascii .. "\r\n")
   assert(scancode == 0)
   assert(shift == 0)
 
   ascii, scancode, shift = gemdos.Crawio(255)
-  assert(ascii == 49)
+  assert(ascii == 49, "Expected ascii 49 got " .. ascii .. "\r\n")
   assert(scancode == 0)
   assert(shift == 0)
 
   ascii, scancode, shift = gemdos.Crawio(255)
-  assert(ascii == 50)
+  assert(ascii == 50, "Expected ascii 50 got " .. ascii .. "\r\n")
   assert(scancode == 0)
   assert(shift == 0)
 end
@@ -155,8 +155,8 @@ assert(read_ec == 0)
 
 -- Check contents of the file
 local read_ec, read_str = fud_in:reads(100)
-assert(read_ec == 3)
-assert(read_str == "012")
+assert(read_ec == 3, "Expected read_ec 3 got " .. read_ec .. "\r\n")
+assert(read_str == "012", "Expected read_str 012 got " .. read_str .. "\r\n")
 
 ec = fud_in:close()
 assert(ec == 0)

@@ -31,6 +31,8 @@ message and the system will hang. The following can be used to demonstrate
 this issue:
 for i=1,100 do print(i) dofile("FFORCE.LUA") end
 
+CRAWIO.LUA. The redirection tests pass on TOS 1.04 but fail on EmuTOS 1.3.0.
+
 CPRNOS.LUA. This test attempts to loop until the buffer is full, but I have no
 printer so testing here is incomplete and it's possible that the parallel
 interface runs fast enough that the buffer will not fill. Consider testing
