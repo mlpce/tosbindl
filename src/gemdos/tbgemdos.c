@@ -197,27 +197,67 @@ static int Version(lua_State *L) {
 }
 
 int luaopen_gemdos(lua_State *L) {
+  static const TOSBINDL_RegInt attrib_ints[] = {
+    {"none", 0},
+    {"readonly", TOSBINDL_GEMDOS_FA_READONLY},
+    {"hidden", TOSBINDL_GEMDOS_FA_HIDDEN},
+    {"system", TOSBINDL_GEMDOS_FA_SYSTEM},
+    {"volume", TOSBINDL_GEMDOS_FA_VOLUME},
+    {"dir", TOSBINDL_GEMDOS_FA_DIR},
+    {"archive", TOSBINDL_GEMDOS_FA_ARCHIVE}
+  };
+
+  static const TOSBINDL_RegInt seek_ints[] = {
+    {"seek_set", SEEK_SET},
+    {"seek_cur", SEEK_CUR},
+    {"seek_end", SEEK_END}
+  };
+
+  static const TOSBINDL_RegInt open_ints[] = {
+    {"readonly", TOSBINDL_GEMDOS_FO_READ},
+    {"writeonly", TOSBINDL_GEMDOS_FO_WRITE},
+    {"readwrite", TOSBINDL_GEMDOS_FO_RW}
+  };
+
+  static const TOSBINDL_RegInt fdup_ints[] = {
+    {"conin", TOSBINDL_GEMDOS_SH_CONIN},
+    {"conout", TOSBINDL_GEMDOS_SH_CONOUT},
+    {"aux", TOSBINDL_GEMDOS_SH_AUX},
+    {"prn", TOSBINDL_GEMDOS_SH_PRN}
+  };
+
+  static const int error_ints[] = {
+    0,
+    TOSBINDL_GEMDOS_ERROR_EINVFN,
+    TOSBINDL_GEMDOS_ERROR_EFILNF,
+    TOSBINDL_GEMDOS_ERROR_EPTHNF,
+    TOSBINDL_GEMDOS_ERROR_ENHNDL,
+    TOSBINDL_GEMDOS_ERROR_EACCDN,
+    TOSBINDL_GEMDOS_ERROR_EIHNDL,
+    TOSBINDL_GEMDOS_ERROR_ENSMEM,
+    TOSBINDL_GEMDOS_ERROR_EIMBA,
+    TOSBINDL_GEMDOS_ERROR_EDRIVE,
+    TOSBINDL_GEMDOS_ERROR_ENMFIL,
+    TOSBINDL_GEMDOS_ERROR_ERANGE,
+    TOSBINDL_GEMDOS_ERROR_EINTRN,
+    TOSBINDL_GEMDOS_ERROR_EPLFMT,
+    TOSBINDL_GEMDOS_ERROR_EGSBF
+  };
+
+  static const luaL_Reg util_funcs[] = {
+    {"getenv", GetEnv},
+    {"esc", Esc},
+    {"version", Version},
+    {NULL, NULL}
+  };
+
   luaL_newlib(L, gemdos);
 
   /* Table to hold Constant tables */
   lua_newtable(L);
 
   /* Attribute constants */
-  lua_createtable(L, 0, 7);
-  lua_pushinteger(L, 0);
-  lua_setfield(L, -2, "none");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FA_READONLY);
-  lua_setfield(L, -2, "readonly");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FA_HIDDEN);
-  lua_setfield(L, -2, "hidden");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FA_SYSTEM);
-  lua_setfield(L, -2, "system");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FA_VOLUME);
-  lua_setfield(L, -2, "volume");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FA_DIR);
-  lua_setfield(L, -2, "dir");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FA_ARCHIVE);
-  lua_setfield(L, -2, "archive");
+  TOSBINDL_newinttable(L, attrib_ints);
   /* Make the table readonly */
   TOSBINDL_ROProxy(L);
 
@@ -226,13 +266,7 @@ int luaopen_gemdos(lua_State *L) {
   lua_setfield(L, -2, "Fattrib");
 
   /* Seek mode constants */
-  lua_createtable(L, 0, 3);
-  lua_pushinteger(L, SEEK_SET);
-  lua_setfield(L, -2, "seek_set");
-  lua_pushinteger(L, SEEK_CUR);
-  lua_setfield(L, -2, "seek_cur");
-  lua_pushinteger(L, SEEK_END);
-  lua_setfield(L, -2, "seek_end");
+  TOSBINDL_newinttable(L, seek_ints);
   /* Make the table readonly */
   TOSBINDL_ROProxy(L);
 
@@ -241,13 +275,7 @@ int luaopen_gemdos(lua_State *L) {
   lua_setfield(L, -2, "Fseek");
 
   /* Open mode constants */
-  lua_createtable(L, 0, 3);
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FO_READ);
-  lua_setfield(L, -2, "readonly");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FO_WRITE);
-  lua_setfield(L, -2, "writeonly");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_FO_RW);
-  lua_setfield(L, -2, "readwrite");
+  TOSBINDL_newinttable(L, open_ints);
   /* Make the table readonly */
   TOSBINDL_ROProxy(L);
 
@@ -256,15 +284,7 @@ int luaopen_gemdos(lua_State *L) {
   lua_setfield(L, -2, "Fopen");
 
   /* Fdup standard handles */
-  lua_createtable(L, 0, 4);
-  lua_pushinteger(L, TOSBINDL_GEMDOS_SH_CONIN);
-  lua_setfield(L, -2, "conin");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_SH_CONOUT);
-  lua_setfield(L, -2, "conout");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_SH_AUX);
-  lua_setfield(L, -2, "aux");
-  lua_pushinteger(L, TOSBINDL_GEMDOS_SH_PRN);
-  lua_setfield(L, -2, "prn");
+  TOSBINDL_newinttable(L, fdup_ints);
   /* Make the table readonly */
   TOSBINDL_ROProxy(L);
 
@@ -273,38 +293,7 @@ int luaopen_gemdos(lua_State *L) {
   lua_setfield(L, -2, "Fdup");
 
   /* Errors */
-  lua_createtable(L, 0, 15);
-  lua_pushinteger(L, 0);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(0));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EINVFN);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EINVFN));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EFILNF);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EFILNF));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EPTHNF);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EPTHNF));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_ENHNDL);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_ENHNDL));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EACCDN);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EACCDN));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EIHNDL);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EIHNDL));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_ENSMEM);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_ENSMEM));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EIMBA);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EIMBA));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EDRIVE);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EDRIVE));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_ENMFIL);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_ENMFIL));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_ERANGE);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_ERANGE));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EINTRN);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EINTRN));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EPLFMT);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EPLFMT));
-  lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_EGSBF);
-  lua_setfield(L, -2, TOSBINDL_GEMDOS_ErrMess(TOSBINDL_GEMDOS_ERROR_EGSBF));
-
+  TOSBINDL_newinttable_fn(L, error_ints, TOSBINDL_GEMDOS_ErrMess);
   /* Make the table readonly */
   TOSBINDL_ROProxy(L);
 
@@ -320,15 +309,7 @@ int luaopen_gemdos(lua_State *L) {
   lua_setfield(L, -2, "const");
 
   /* Table to hold utility functions */
-  lua_newtable(L);
-
-  lua_pushcfunction(L, GetEnv); /* Fn to get environment variable or table */
-  lua_setfield(L, -2, "getenv");
-  lua_pushcfunction(L, Esc); /* Fn to raise an error if escape key pressed */
-  lua_setfield(L, -2, "esc");
-  lua_pushcfunction(L, Version); /* Fn to get binding version */
-  lua_setfield(L, -2, "version");
-
+  luaL_newlib(L, util_funcs);
   /* Set field with name utility in Gemdos table to have Utility table as
   value */
   lua_setfield(L, -2, "utility");

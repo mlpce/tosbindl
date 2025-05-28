@@ -114,6 +114,21 @@ static const struct luaL_Reg tosbindl[] = {
   {NULL, NULL}
 };
 
+void TOSBINDL_setints(lua_State *L, int numints, const TOSBINDL_RegInt *l) {
+  for (; numints; numints--) {
+    lua_pushinteger(L, l->value);
+    lua_setfield(L, -2, l++->name);
+  }
+}
+
+void TOSBINDL_setints_fn(lua_State *L, int numints, const int *l,
+    const char *(*fn)(long)) {
+  for (; numints; numints--) {
+    lua_pushinteger(L, *l);
+    lua_setfield(L, -2, (*fn)(*l++));
+  }
+}
+
 int luaopen_tosbindl(lua_State *L) {
   luaL_newlib(L, tosbindl);
   return 1;

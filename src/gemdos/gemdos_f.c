@@ -128,39 +128,29 @@ static File *PushFileUserData(lua_State *L) {
 
   /* Push new metatable for type TOSBINDL_UD_T_Gemdos_File */
   if (luaL_getmetatable(L, TOSBINDL_UD_T_Gemdos_File) != LUA_TTABLE) {
+    static const luaL_Reg funcs[] = {
+      {"handle", FileGetHandle},
+      {"detach", FileDetach},
+      {"reads", l_Freads},
+      {"writes", l_Fwrites},
+      {"readt", l_Freadt},
+      {"writet", l_Fwritet},
+      {"readm", l_Freadm},
+      {"writem", l_Fwritem},
+      {"readi", l_Freadi},
+      {"writei", l_Fwritei},
+      {"seek", l_Fseek},
+      {"close", l_Fclose},
+      {"datime", l_Fdatime},
+      {"force", l_Fforce},
+      {NULL, NULL}
+    };
+
     lua_pop(L, 1); 
     luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_File);
 
     /* Table for __index */
-    lua_createtable(L, 0, 14);
-    lua_pushcfunction(L, FileGetHandle); /* Fn to push handle from File*/
-    lua_setfield(L, -2, "handle");
-    lua_pushcfunction(L, FileDetach); /* Fn to detach the handle from File */
-    lua_setfield(L, -2, "detach");
-    lua_pushcfunction(L, l_Freads); /* Fn to read file bytes into a string */
-    lua_setfield(L, -2, "reads");
-    lua_pushcfunction(L, l_Fwrites); /* Fn to write file bytes from a string */
-    lua_setfield(L, -2, "writes");
-    lua_pushcfunction(L, l_Freadt); /* Fn to read file bytes into a table */
-    lua_setfield(L, -2, "readt");
-    lua_pushcfunction(L, l_Fwritet); /* Fn to write file bytes from a table */
-    lua_setfield(L, -2, "writet");
-    lua_pushcfunction(L, l_Freadm); /* Fn to read file bytes into a memory */
-    lua_setfield(L, -2, "readm");
-    lua_pushcfunction(L, l_Fwritem); /* Fn to write file bytes from a memory */
-    lua_setfield(L, -2, "writem");
-    lua_pushcfunction(L, l_Fwritei); /* Fn to write file byte from an integer */
-    lua_setfield(L, -2, "writei");
-    lua_pushcfunction(L, l_Freadi); /* Fn to read file byte into an integer */
-    lua_setfield(L, -2, "readi");
-    lua_pushcfunction(L, l_Fseek); /* Fn to seek within the file */
-    lua_setfield(L, -2, "seek");
-    lua_pushcfunction(L, l_Fclose); /* Fn to close the file */
-    lua_setfield(L, -2, "close");
-    lua_pushcfunction(L, l_Fdatime); /* Fn to set and get file datime */
-    lua_setfield(L, -2, "datime");
-    lua_pushcfunction(L, l_Fforce); /* Fn to force standard handle to file */
-    lua_setfield(L, -2, "force");
+    luaL_newlib(L, funcs);
     lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
 
     /* Garbage collection function */
@@ -1169,23 +1159,21 @@ static Dta *PushDtaUserData(lua_State *L) {
 
   /* Push metatable for type TOSBINDL_UD_T_Gemdos_Dta */
   if (luaL_getmetatable(L, TOSBINDL_UD_T_Gemdos_Dta) != LUA_TTABLE) {
+    static const luaL_Reg funcs[] = {
+      {"name", DtaName},
+      {"length", DtaLength},
+      {"attr", DtaAttr},
+      {"datime", DtaDatime},
+      {"copydta", DtaCopydta},
+      {"snext", l_Fsnext},
+      {NULL, NULL}
+    };
+
     lua_pop(L, 1); 
     luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_Dta);
 
     /* Table for __index */
-    lua_createtable(L, 0, 5);
-    lua_pushcfunction(L, DtaName); /* Fn to push name from DTA */
-    lua_setfield(L, -2, "name");
-    lua_pushcfunction(L, DtaLength); /* Fn to push length from DTA */
-    lua_setfield(L, -2, "length");
-    lua_pushcfunction(L, DtaAttr); /* Fn to push attributes from DTA */
-    lua_setfield(L, -2, "attr");
-    lua_pushcfunction(L, DtaDatime); /* Fn to push datime from DTA */
-    lua_setfield(L, -2, "datime");
-    lua_pushcfunction(L, DtaCopydta); /* Fn to copy DTA userdata */
-    lua_setfield(L, -2, "copydta");
-    lua_pushcfunction(L, l_Fsnext); /* Fn to search next extry */
-    lua_setfield(L, -2, "snext");
+    luaL_newlib(L, funcs);
     /* Set __index on metatable */
     lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
 

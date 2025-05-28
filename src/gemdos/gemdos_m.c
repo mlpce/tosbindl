@@ -519,37 +519,28 @@ int l_Malloc(lua_State *L) {
 
   /* Push metatable for type TOSBINDL_UD_T_Gemdos_Memory */
   if (luaL_getmetatable(L, TOSBINDL_UD_T_Gemdos_Memory) != LUA_TTABLE) {
+    static const luaL_Reg funcs[] = {
+      {"address", MemoryGetAddress},
+      {"size", MemoryGetSize},
+      {"writet", MemoryWritet},
+      {"readt", MemoryReadt},
+      {"writes", MemoryWrites},
+      {"reads", MemoryReads},
+      {"poke", MemoryPoke},
+      {"peek", MemoryPeek},
+      {"comparem", MemoryComparem},
+      {"copym", MemoryCopym},
+      {"set", MemorySet},
+      {"free", l_Mfree},
+      {"shrink", l_Mshrink},
+      {NULL, NULL}
+    };
+
     lua_pop(L, 1); 
     luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_Memory);
 
     /* Table for __index */
-    lua_createtable(L, 0, 12);
-    lua_pushcfunction(L, MemoryGetAddress);
-    lua_setfield(L, -2, "address");
-    lua_pushcfunction(L, MemoryGetSize);
-    lua_setfield(L, -2, "size");
-    lua_pushcfunction(L, MemoryWritet);
-    lua_setfield(L, -2, "writet");
-    lua_pushcfunction(L, MemoryReadt);
-    lua_setfield(L, -2, "readt");
-    lua_pushcfunction(L, MemoryWrites);
-    lua_setfield(L, -2, "writes");
-    lua_pushcfunction(L, MemoryReads);
-    lua_setfield(L, -2, "reads");
-    lua_pushcfunction(L, MemoryPoke);
-    lua_setfield(L, -2, "poke");
-    lua_pushcfunction(L, MemoryPeek);
-    lua_setfield(L, -2, "peek");
-    lua_pushcfunction(L, MemoryComparem);
-    lua_setfield(L, -2, "comparem");
-    lua_pushcfunction(L, MemoryCopym);
-    lua_setfield(L, -2, "copym");
-    lua_pushcfunction(L, MemorySet);
-    lua_setfield(L, -2, "set");
-    lua_pushcfunction(L, l_Mfree);
-    lua_setfield(L, -2, "free");
-    lua_pushcfunction(L, l_Mshrink);
-    lua_setfield(L, -2, "shrink");
+    luaL_newlib(L, funcs);
     lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
 
     /* Garbage collection function */
