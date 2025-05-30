@@ -197,6 +197,7 @@ static int Version(lua_State *L) {
 }
 
 int luaopen_gemdos(lua_State *L) {
+  /* gemdos.const.Fattrib table keys and values */
   static const TOSBINDL_RegInt attrib_ints[] = {
     {"none", 0},
     {"readonly", TOSBINDL_GEMDOS_FA_READONLY},
@@ -207,18 +208,21 @@ int luaopen_gemdos(lua_State *L) {
     {"archive", TOSBINDL_GEMDOS_FA_ARCHIVE}
   };
 
+  /* gemdos.const.Fseek table keys and values */
   static const TOSBINDL_RegInt seek_ints[] = {
     {"seek_set", SEEK_SET},
     {"seek_cur", SEEK_CUR},
     {"seek_end", SEEK_END}
   };
 
+  /* gemdos.const.Fopen table keys and values */
   static const TOSBINDL_RegInt open_ints[] = {
     {"readonly", TOSBINDL_GEMDOS_FO_READ},
     {"writeonly", TOSBINDL_GEMDOS_FO_WRITE},
     {"readwrite", TOSBINDL_GEMDOS_FO_RW}
   };
 
+  /* gemdos.const.Fdup table keys and values */
   static const TOSBINDL_RegInt fdup_ints[] = {
     {"conin", TOSBINDL_GEMDOS_SH_CONIN},
     {"conout", TOSBINDL_GEMDOS_SH_CONOUT},
@@ -226,6 +230,7 @@ int luaopen_gemdos(lua_State *L) {
     {"prn", TOSBINDL_GEMDOS_SH_PRN}
   };
 
+  /* gemdos.const.Error table values */
   static const int error_ints[] = {
     0,
     TOSBINDL_GEMDOS_ERROR_EINVFN,
@@ -244,6 +249,7 @@ int luaopen_gemdos(lua_State *L) {
     TOSBINDL_GEMDOS_ERROR_EGSBF
   };
 
+  /* gemdos.utility table keys and functions */
   static const luaL_Reg util_funcs[] = {
     {"getenv", GetEnv},
     {"esc", Esc},
@@ -251,6 +257,7 @@ int luaopen_gemdos(lua_State *L) {
     {NULL, NULL}
   };
 
+  /* Gemdos table */
   luaL_newlib(L, gemdos);
 
   /* Table to hold Constant tables */
