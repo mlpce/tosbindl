@@ -146,24 +146,22 @@ static File *PushFileUserData(lua_State *L) {
       {NULL, NULL}
     };
 
+    static const luaL_Reg meta_funcs[] = {
+      {"__gc", FileGC},
+      {"__close", FileClose},
+      {"__tostring", FileToString},
+      {NULL, NULL}
+    };
+
     lua_pop(L, 1); 
     luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_File);
 
     /* Table for __index */
     luaL_newlib(L, funcs);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
+    lua_setfield(L, -2, "__index");
 
-    /* Garbage collection function */
-    lua_pushcfunction(L, FileGC);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_gc]);
-
-    /* Close function */
-    lua_pushcfunction(L, FileClose);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_close]);
-
-    /* To string function */
-    lua_pushcfunction(L, FileToString);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_tostring]);
+    /* Meta functions */
+    luaL_setfuncs(L, meta_funcs, 0);
   }
 
   /* Set the metatable on the userdata */
@@ -1175,11 +1173,11 @@ static Dta *PushDtaUserData(lua_State *L) {
     /* Table for __index */
     luaL_newlib(L, funcs);
     /* Set __index on metatable */
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
+    lua_setfield(L, -2, "__index");
 
     lua_pushcfunction(L, DtaToString); /* To string function */
     /* Set __tostring on metatable */
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_tostring]);
+    lua_setfield(L, -2, "__tostring");
   }
 
   /* Set the metatable on the userdata */

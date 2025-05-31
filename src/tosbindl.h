@@ -14,19 +14,6 @@ enum {
 
 extern const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max];
 
-/* Metamethod names */
-enum {
-  TOSBINDL_MMFN_gc,
-  TOSBINDL_MMFN_close,
-  TOSBINDL_MMFN_tostring,
-  TOSBINDL_MMFN_index,
-  TOSBINDL_MMFN_newindex,
-  TOSBINDL_MMFN_pairs,
-  TOSBINDL_MMFN_Max
-};
-
-extern const char *const TOSBINDL_MMF_Names[TOSBINDL_MMFN_Max];
-
 /* Wrap a table passed on the stack with a read-only proxy */
 void TOSBINDL_ROProxy(lua_State *L);
 

@@ -536,24 +536,22 @@ int l_Malloc(lua_State *L) {
       {NULL, NULL}
     };
 
+    static const luaL_Reg meta_funcs[] = {
+      {"__gc", MemoryGC},
+      {"__close", MemoryClose},
+      {"__tostring", MemoryToString},
+      {NULL, NULL}
+    };
+
     lua_pop(L, 1); 
     luaL_newmetatable(L, TOSBINDL_UD_T_Gemdos_Memory);
 
     /* Table for __index */
     luaL_newlib(L, funcs);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
+    lua_setfield(L, -2, "__index");
 
-    /* Garbage collection function */
-    lua_pushcfunction(L, MemoryGC);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_gc]);
-
-    /* Close function */
-    lua_pushcfunction(L, MemoryClose);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_close]);
-
-    /* To string function */
-    lua_pushcfunction(L, MemoryToString);
-    lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_tostring]);
+    /* Meta functions */
+    luaL_setfuncs(L, meta_funcs, 0);
   }
 
   /* Set the metatable on the userdata */

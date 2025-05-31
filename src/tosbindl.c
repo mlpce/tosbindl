@@ -17,16 +17,6 @@ const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max] = {
   "Invalid value"
 };
 
-/* Metamethod names */
-const char *const TOSBINDL_MMF_Names[TOSBINDL_MMFN_Max] = {
-  "__gc",
-  "__close",
-  "__tostring",
-  "__index",
-  "__newindex",
-  "__pairs"
-};
-
 /* Error function when attempting to alter readonly table */
 static int ROErrorFn(lua_State *L) {
   luaL_error(L, TOSBINDL_ErrMess[TOSBINDL_EM_ReadOnly], 2);
@@ -82,11 +72,11 @@ void TOSBINDL_ROProxy(lua_State *L) {
   /* Stack: proxy, metatable, target, closure */
 
   /* Metatable __pairs set to pushed c closure (pops closure) */
-  lua_setfield(L, -3, TOSBINDL_MMF_Names[TOSBINDL_MMFN_pairs]);
+  lua_setfield(L, -3, "__pairs");
   /* Stack: proxy, metatable, target */
 
   /* Metatable __index set to target table (pops target)*/
-  lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_index]);
+  lua_setfield(L, -2, "__index");
   /* Stack: proxy, metatable */
 
   /* Push error function for __newindex */
@@ -94,7 +84,7 @@ void TOSBINDL_ROProxy(lua_State *L) {
   /* Stack: proxy, metatable, function */
 
   /* Metatable __newindex set to pushed c function (pops function) */
-  lua_setfield(L, -2, TOSBINDL_MMF_Names[TOSBINDL_MMFN_newindex]); 
+  lua_setfield(L, -2, "__newindex"); 
   /* Stack: proxy, metatable */
 
   /* Set Proxy's metatable to be the Metatable (pops metatable)*/
