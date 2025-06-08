@@ -875,6 +875,19 @@ int l_Fattrib(lua_State *L) {
   return 1;
 }
 
+#if (defined(__GNUC__) && defined(__atarist__))
+static void PushDatimeIntegers(lua_State *L, const _DATETIME *dt) {
+#else
+static void PushDatimeIntegers(lua_State *L, const DATETIME *dt) {
+#endif
+  lua_pushinteger(L, dt->year + 1980);
+  lua_pushinteger(L, dt->month);
+  lua_pushinteger(L, dt->day);
+  lua_pushinteger(L, dt->hour);
+  lua_pushinteger(L, dt->minute);
+  lua_pushinteger(L, dt->second << 1);
+}
+
 /*
   Fdatime. Set or get file timestamp
   Inputs:
@@ -963,12 +976,7 @@ int l_Fdatime(lua_State *L) {
 
   /* Push the success result and the datime as integers */
   lua_pushinteger(L, result);
-  lua_pushinteger(L, dt.year + 1980);
-  lua_pushinteger(L, dt.month);
-  lua_pushinteger(L, dt.day);
-  lua_pushinteger(L, dt.hour);
-  lua_pushinteger(L, dt.minute);
-  lua_pushinteger(L, dt.second << 1);
+  PushDatimeIntegers(L, &dt);
   return 7;
 }
 
@@ -1126,13 +1134,7 @@ static int DtaDatime(lua_State *L) {
 #else
   const DATETIME *dt = (const DATETIME *)&dud->dta.d_time; /* datime */
 #endif
-
-  lua_pushinteger(L, dt->year + 1980);
-  lua_pushinteger(L, dt->month);
-  lua_pushinteger(L, dt->day);
-  lua_pushinteger(L, dt->hour);
-  lua_pushinteger(L, dt->minute);
-  lua_pushinteger(L, dt->second << 1);
+  PushDatimeIntegers(L, dt);
   return 6;
 }
 
