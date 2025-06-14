@@ -18,9 +18,10 @@
 #include "src/gemdos/gemdos_s.h"
 #include "src/gemdos/gemdos_t.h"
 
-#define TBGEMDOS_MAJOR_VERSION 0
-#define TBGEMDOS_MINOR_VERSION 1
-#define TBGEMDOS_MICRO_VERSION 2
+/* GEMDOS binding version */
+#define TBGEMDOS_MAJOR_VERSION 1
+#define TBGEMDOS_MINOR_VERSION 0
+#define TBGEMDOS_MICRO_VERSION 0
 
 static const struct luaL_Reg gemdos[] = {
   {"Sversion", l_Sversion},

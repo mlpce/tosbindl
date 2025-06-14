@@ -3,9 +3,10 @@
 
 #include "tosbindl.h"
 
-#define TOSBINDL_MAJOR_VERSION 0
-#define TOSBINDL_MINOR_VERSION 1
-#define TOSBINDL_MICRO_VERSION 2
+/* TOSBINDL binding version */
+#define TOSBINDL_MAJOR_VERSION 1
+#define TOSBINDL_MINOR_VERSION 0
+#define TOSBINDL_MICRO_VERSION 0
 
 /* Error messages */
 const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max] = {
