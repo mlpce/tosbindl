@@ -875,6 +875,7 @@ int l_Fattrib(lua_State *L) {
   return 1;
 }
 
+/* Push the date and time as six integers */
 #if (defined(__GNUC__) && defined(__atarist__))
 static void PushDatimeIntegers(lua_State *L, const _DATETIME *dt) {
 #else
