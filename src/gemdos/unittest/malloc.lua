@@ -225,17 +225,17 @@ num_bytes, new = mud:readt(0)
 assert(string.char(table.unpack(new)) == "cool computing is retro Atari ST")
 
 ---------------------------------------------------------------------
--- Test string positions that are out of bounds for the source string
+-- Test table positions that are out of bounds for the source table
 ---------------------------------------------------------------------
 
 tbl = table.pack(string.byte("word", 1, -1))
-ok = pcall(function() mud:writes(0, tbl, 0, -1) end)
+ok = pcall(function() mud:writet(0, tbl, 0, -1) end)
 assert(not ok)
-ok = pcall(function() mud:writes(0, tbl, 4, 5) end)
+ok = pcall(function() mud:writet(0, tbl, 4, 5) end)
 assert(not ok)
-ok = pcall(function() mud:writes(0, tbl, 3, 2) end)
+ok = pcall(function() mud:writet(0, tbl, 3, 2) end)
 assert(not ok)
-ok = pcall(function() mud:writes(0, tbl, -5, -1) end)
+ok = pcall(function() mud:writet(0, tbl, -5, -1) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
