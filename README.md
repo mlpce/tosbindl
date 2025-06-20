@@ -2,7 +2,7 @@
 
 ## Atari ST GEMDOS binding for Lua 5.4.
 
-This is a Lua binding to low level GEMDOS functions. The functions available in TOS 1.X have been implemented. EmuTOS 1.3 and TOS 1.04 have been used during development, no other TOS versions have been tried or tested.
+This is a Lua binding to TOS GEMDOS functions. The functions available in TOS 1.X have been implemented. EmuTOS 1.3 and TOS 1.04 have been used during development, no other TOS versions have been tried or tested.
 
 ## Lua API
 
@@ -297,7 +297,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     path: string: name
     attributes: integer: attributes
 
-  Note: gemdos.const.Fattrib constains attribute constants
+  Note: gemdos.const.Fattrib contains attribute constants
   ```
   ```
   Results
