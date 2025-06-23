@@ -83,18 +83,16 @@ static const struct luaL_Reg gemdos[] = {
 };
 
 /*
-  GetEnvStr
-  Inputs:
-    1) string: name of env var to get
+  GetEnvStr. Obtains an environment variable string.
   Returns:
-    1) string: on success: env var
-    1) nil: on failure: the env var was not found
+    1) string: on success: obtained environment variable string
+    1) nil: on failure: the environment variable was not found
 */
 static int GetEnvStr(lua_State *L, const char *env_var,
     size_t env_var_len, const char *const *gemdos_envp) {
   while (*gemdos_envp) {
     const char *const gemdos_env_var = *gemdos_envp;
-    if (memcmp(gemdos_env_var, env_var, env_var_len) == 0 &&
+    if (strncmp(gemdos_env_var, env_var, env_var_len) == 0 &&
         gemdos_env_var[env_var_len] == '=') {
       lua_pushstring(L, &gemdos_env_var[env_var_len + 1]);
       break;
@@ -109,7 +107,7 @@ static int GetEnvStr(lua_State *L, const char *env_var,
 }
 
 /*
-  GetEnvTble
+  GetEnvTbl. Obtains all environment variables into a table.
   Returns:
     1) table: GEMDOS environment
 */
