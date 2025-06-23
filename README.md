@@ -692,7 +692,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Sversion ()
-  Svesion. Get GEMDOS version number.
+  Sversion. Get GEMDOS version number.
 
   ```
   Results
@@ -935,7 +935,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   ```
 
 ### poke (offset, n)
-  Writes byte from integer into a memory.
+  Writes a byte from an integer into a memory.
 
   ```
   Parameters
@@ -948,7 +948,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   ```
 
 ### peek (offset)
-  Reads a byte from memory into an integer.
+  Reads a byte from a memory into an integer.
 
   ```
   Parameters
@@ -990,7 +990,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   ```
 
 ### set (offset, n [, numbytes])
-  Sets memory to a byte value.
+  Sets a memory to a byte value.
 
   ```
   Parameters
