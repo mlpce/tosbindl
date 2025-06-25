@@ -146,7 +146,7 @@ static int GetEnvTbl(lua_State *L, const char *const *gemdos_envp) {
 */
 static int GetEnv(lua_State *L) {
   size_t env_var_len;
-  const char *env_var = luaL_optlstring(L, 1, NULL, &env_var_len);
+  const char *const env_var = luaL_optlstring(L, 1, NULL, &env_var_len);
   const char *const *gemdos_envp = TOSBINDL_GEMDOS_EnvP(L);
   if (env_var)
     return GetEnvStr(L, env_var, env_var_len, gemdos_envp);

@@ -113,12 +113,12 @@ int l_Pexec0(lua_State *L) {
   const char *args_ptr;
   const char *args_end_ptr;
   size_t args_len;
-  const char *argv_ptr = "ARGV=";
+  const char *const argv_ptr = "ARGV=";
   long result;
   size_t child_path_len;
 
   /* Path to child process */
-  const char *child_path = luaL_checklstring(L, 1, &child_path_len);
+  const char *const child_path = luaL_checklstring(L, 1, &child_path_len);
 
   /* Argument 2 can be a table, nil, or absent */
   const int arg_2_type = lua_type(L, 2);

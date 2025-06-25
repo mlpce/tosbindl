@@ -28,7 +28,7 @@ int l_Sversion(lua_State *L) {
     1) integer: the value
 */
 int l_SuperPeek(lua_State *L) {
-  const char *value_name = luaL_checkstring(L, 1);
+  const char *const value_name = luaL_checkstring(L, 1);
   const unsigned char *uchar_address = NULL;
   const unsigned long *ulong_address = NULL;
   lua_Integer value;
@@ -66,7 +66,7 @@ int l_SuperPeek(lua_State *L) {
     Nothing
 */
 int l_SuperPoke(lua_State *L) {
-  const char *value_name = luaL_checkstring(L, 1);
+  const char *const value_name = luaL_checkstring(L, 1);
   const lua_Integer value = luaL_checkinteger(L, 2);
   unsigned char *uchar_address = NULL;
   void *save_ssp;

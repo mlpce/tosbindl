@@ -351,7 +351,7 @@ int l_Freads(lua_State *L) {
     1) integer: on failure:  -ve gemdos error number
 */
 int l_Fwrites(lua_State *L) {
-  const File *const fud = (File *) luaL_checkudata(L, 1,
+  const File *const fud = (const File *) luaL_checkudata(L, 1,
     TOSBINDL_UD_T_Gemdos_File); /* File ud */
   size_t str_len;
   const char *str = luaL_checklstring(L, 2, &str_len); /* String to write */
@@ -417,7 +417,7 @@ int l_Fwrites(lua_State *L) {
     Will return 0 bytes and empty table if EOF already reached.
 */
 int l_Freadt(lua_State *L) {
-  const File *const fud = (File *) luaL_checkudata(L, 1,
+  const File *const fud = (const File *) luaL_checkudata(L, 1,
     TOSBINDL_UD_T_Gemdos_File); /* File ud */
   const lua_Integer count = luaL_checkinteger(L, 2); /* Num bytes to read */
   lua_Integer remaining = count; /* Remaining bytes to read */
