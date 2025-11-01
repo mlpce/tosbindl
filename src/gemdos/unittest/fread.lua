@@ -65,6 +65,29 @@ assert(fud:readt(1) == 0)
 assert(fud:readm(mud, 0, 1) == 0)
 assert(fud:readi(1) == 0)
 
+-- Seek back to beginning
+assert(gemdos.Fseek(fud, 0, gemdos.const.Fseek.seek_set) == 0)
+-- Max number of readi values is 16 so 17 must fail
+-- See TOSBINDL_GEMDOS_MAX_MULTIVAL
+local ok = pcall(function() fud:readi(17) end)
+assert(not ok)
+local v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12
+-- Attempt to read 16 values, only 11 will be produced
+ec, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 = fud:readi(16)
+assert(ec == 11)
+assert(v1 == string.byte("0"))
+assert(v2 == string.byte("1"))
+assert(v3 == string.byte("2"))
+assert(v4 == string.byte("3"))
+assert(v5 == string.byte("4"))
+assert(v6 == string.byte("5"))
+assert(v7 == string.byte("6"))
+assert(v8 == string.byte("7"))
+assert(v9 == string.byte("8"))
+assert(v10 == string.byte("9"))
+assert(v11 == string.byte("A"))
+assert(v12 == nil)
+
 -- Close the file
 ec = gemdos.Fclose(fud)
 assert(ec)

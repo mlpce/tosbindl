@@ -38,10 +38,33 @@ assert(mud:size() == 32)
 ---------------------------------------------------------------------
 
 -- Test poke and peek. Mud offsets start from zero.
-mud:poke(0,40)
-assert(mud:peek(0) == 40, "Poke and peek failed")
-mud:poke(0,42)
-assert(mud:peek(0) == 42, "Poke and peek failed")
+assert(mud:poke(0, 40) == 1, "Poke failed")
+assert(mud:peek(0) == 40, "Peek failed")
+assert(mud:poke(0, 42) == 1, "Poke failed")
+assert(mud:peek(0) == 42, "Peek failed")
+-- Multivalue poke
+assert(mud:poke(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+  18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32) == 32,
+  "Poke failed")
+ok = pcall(function() mud:poke(-1, 0) end) -- Negative offset must fail
+assert(not ok)
+ok = pcall(function() mud:poke(31, 1, 2) end) -- Poke beyond end must fail
+assert(not ok)
+ok = pcall(function() mud:poke(32, 2) end) -- Poke beyond end must fail
+assert(not ok)
+-- Multivalue peek
+local t1 = table.pack(mud:peek(0, 16))
+assert(#t1 == 16)
+table.move(table.pack(mud:peek(16, 16)),1,16,17,t1)
+assert(#t1 == 32)
+for k,v in ipairs(t1) do
+  assert(k == v)
+end
+
+-- Max number of peek values is 16 so 17 must fail
+-- See TOSBINDL_GEMDOS_MAX_MULTIVAL
+ok = pcall(function() mud:peek(0, 17) end)
+assert(not ok)
 
 -- Set memory from offset 0 to value '69', for the whole size
 mud:set(0, 69, mud:size())

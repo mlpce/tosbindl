@@ -289,6 +289,11 @@ ec = fud:writei(string.byte("1"))
 -- One byte written
 assert(ec == 1)
 
+-- Write multple values
+ec = fud:writei(string.byte("2"), string.byte("3"), string.byte("4"))
+-- Three bytes written
+assert(ec == 3)
+
 -- Writing an integer value out of range of a byte must fail
 ok = pcall(function() fud:writei(-1) end)
 assert(not ok)
@@ -314,6 +319,20 @@ ec, val = fud:readi()
 -- One byte read
 assert(ec == 1)
 assert(val == string.byte("1"))
+
+-- Read multiple values
+local a, b, c, d
+ec, a, b, c, d = fud:readi(4) -- Ask for 4, only 3 are available
+assert(ec == 3)
+assert(a == string.byte("2"))
+assert(b == string.byte("3"))
+assert(c == string.byte("4"))
+assert(d == nil)
+
+-- No more data produces zero values
+ec, val = fud:readi()
+assert(ec == 0)
+assert(val == nil)
 
 -- Close the file
 fud:close()

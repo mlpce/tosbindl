@@ -16,10 +16,9 @@
 */
 static int MemoryFree(lua_State *L) {
   Memory *const mud = (Memory *) lua_touserdata(L, 1); /* Memory userdata */
-  void *memory = mud->ptr;
-  if (memory) {
+  if (mud && mud->ptr) {
     /* Free the Gemdos memory */
-    const long result = Mfree(memory);
+    const long result = Mfree(mud->ptr);
     if (result < 0) {
       (void) Cconws("MemoryFree: ");
       (void) Cconws(TOSBINDL_GEMDOS_ErrMess(result));
@@ -307,65 +306,89 @@ static int MemoryReads(lua_State *L) {
 
 /*
   Memory userdata function "poke"
-  Writes byte from integer into a memory.
+  Poke one or more bytes from integers into a memory.
   Inputs:
     1) userdata: memory
     2) integer: offset
-    3) integer: the byte
+    3) integer: the first byte
+    4) ..., n
   Returns:
-    1) integer: the old byte value
+    1) integer: the number of bytes poked
 */
 static int MemoryPoke(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
-  const lua_Integer i = luaL_checkinteger(L, 3); /* Value to poke */
+  /* One or more integers to poke */
+  const int top_index = (luaL_checkinteger(L, 3), lua_gettop(L));
+  int index = 2;
+  const int num_poked = top_index - index;
   unsigned char *dest; /* Destination pointer within memory */
 
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
-  luaL_argcheck(L, i >= 0 && i <= 255, 3,
+  /* Check offset */
+  luaL_argcheck(L,
+    offset >= 0 && offset + num_poked <= mud->size, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   dest = mud->ptr + offset;
 
-  /* Push old value */
-  lua_pushinteger(L, *dest);
+  while (++index <= top_index) {
+    const lua_Integer value = luaL_checkinteger(L, index); /* Value */ 
+    luaL_argcheck(L, value >= 0 && value <= 255, index,
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+    *dest++ = (unsigned char) value;
+  }
 
-  /* Set new value */
-  *dest = (unsigned char) i;
+  /* Push number of values poked */
+  lua_pushinteger(L, (lua_Integer) num_poked);
 
-  /* Return old value */
+  /* Return number of values poked */
   return 1;
 }
 
 /*
   Memory userdata function "peek".
-  Reads a byte from memory into an integer.
+  Peek one or more bytes from a memory.
   Inputs:
     1) userdata: memory
     2) integer: offset
+    3) integer: number of values to peek (default 1 maximum 16)
   Returns:
-    1) integer: the byte value
+    1) integer: the first byte value
+    X) ..., n
 */
 static int MemoryPeek(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
+  const lua_Integer num_values = luaL_optinteger(L, 3, 1); /* Num values */
+  int remaining = (int) num_values;
+  const unsigned char *ptr;
 
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
+  /* Check offset */
   luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Push byte as an integer value */
-  lua_pushinteger(L, *(mud->ptr + offset));
+  /* Check num values */
+  luaL_argcheck(L, num_values >= 1 &&
+    num_values <= TOSBINDL_GEMDOS_MAX_MULTIVAL &&
+    offset + num_values <= mud->size, 3,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  return 1;
+  ptr = mud->ptr + offset;
+
+  /* Push the integer(s) from the memory */
+  luaL_checkstack(L, (int) num_values, "not enough stack");
+  while (remaining--)
+    lua_pushinteger(L, *ptr++);
+
+  return (int) num_values;
 }
 
 static int MemoryOp(lua_State *L, short copy) {

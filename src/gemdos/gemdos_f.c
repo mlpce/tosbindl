@@ -36,7 +36,7 @@ static Dta *PushDtaUserData(lua_State *L);
 */
 static int FileCloseHandle(lua_State *L) {
   File *const fud = (File *) lua_touserdata(L, 1); /* File ud */
-  if (fud->valid) {
+  if (fud && fud->valid) {
     /* Close the gemdos file handle */
     const long result = Fclose(fud->handle);
     if (result < 0) {
@@ -566,10 +566,11 @@ int l_Fwritet(lua_State *L) {
 }
 
 /*
-  Fwritei. Writes an integer value representing a byte into a file
+  Fwritei. Write one or more bytes from integers into a file
   Inputs:
     1) userdata: file
-    2) integer: the value to write
+    2) integer: the first byte to write
+    3) ..., n
   Returns:
     1) integer: on success:  >= 0 number of bytes written
     1) integer: on failure:  -ve gemdos error number
@@ -577,11 +578,11 @@ int l_Fwritet(lua_State *L) {
 int l_Fwritei(lua_State *L) {
   const File *const fud = (const File *) luaL_checkudata(L, 1,
     TOSBINDL_UD_T_Gemdos_File); /* File ud */
-  const lua_Integer value_integer =
-    luaL_checkinteger(L, 2); /* Check value is an integer */
-  const unsigned char value_uchar =
-    (const unsigned char) value_integer;   /* The byte to write */
-  long result;
+  /* One or more integers to write */
+  const int top_index = (luaL_checkinteger(L, 2), lua_gettop(L));
+  int index = 1;
+  int num_written = 0;
+  long result = 0;
 
   /* Check file */
   luaL_argcheck(L, fud && fud->valid, 1,
@@ -589,35 +590,48 @@ int l_Fwritei(lua_State *L) {
   /* Check that mode is not read only */
   luaL_argcheck(L, fud->mode != TOSBINDL_GEMDOS_FO_READ, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_ReadOnly]);
-  /* Check the integer is in range of a byte */
-  luaL_argcheck(L, value_integer >= 0 && value_integer <= 255, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Write the byte */
-  result = Fwrite(fud->handle, 1, &value_uchar);
+  while (++index <= top_index) {
+    const lua_Integer value = luaL_checkinteger(L, index); /* Value */ 
+    const unsigned char value_uchar =
+      (const unsigned char) value;   /* The byte to write */
+    /* Check the integer is in range of a byte */
+    luaL_argcheck(L, value >= 0 && value <= 255, index,
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Result (-ve error, 0 EOF, 1 byte written) */
-  lua_pushinteger(L, result);
+    /* Write the byte */
+    result = Fwrite(fud->handle, 1, &value_uchar);
+    if (result <= 0)
+      break;
+    ++num_written;
+  }
+
+  /* Result (-ve error, otherwise num bytes written) */
+  lua_pushinteger(L, result < 0 ? result : num_written);
 
   return 1;
 }
 
 /*
-  Freadi. Reads a value from a file
+  Freadi. Read one or more bytes from a file into integers
   Inputs:
     1) userdata: file
+    2) integer: number of bytes to read (default 1 maximum 16)
   Returns:
-    1) integer: on success:  >= 0 number of bytes read (zero or one)
+    1) integer: on success:  >= 0 number of bytes read
     1) integer: on failure:  -ve gemdos error number
-    2) integer: on success: value holding byte read
+    X) ..., n
   Note:
-    Will return 0 bytes and value zero if EOF already reached.
+    Will return less than number of bytes if EOF already reached.
 */
 int l_Freadi(lua_State *L) {
   const File *const fud = (const File *) luaL_checkudata(L, 1,
     TOSBINDL_UD_T_Gemdos_File); /* File ud */
-  unsigned char value; /* Holds the byte read */
-  long result;
+  const lua_Integer num_values = luaL_optinteger(L, 2, 1); /* Num values */
+  const int top_index = lua_gettop(L);
+  int remaining = (int) num_values;
+  long result = 0;
+  int num_read;
 
   /* Check file */
   luaL_argcheck(L, fud && fud->valid, 1,
@@ -625,21 +639,30 @@ int l_Freadi(lua_State *L) {
   /* Check that mode is not write only */
   luaL_argcheck(L, fud->mode != TOSBINDL_GEMDOS_FO_WRITE, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_WriteOnly]);
+  /* Check num values */
+  luaL_argcheck(L, num_values >= 1 &&
+    num_values <= TOSBINDL_GEMDOS_MAX_MULTIVAL, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Read the byte */
-  result = Fread(fud->handle, 1, &value);
+  /* Push the integer(s) from the file */
+  luaL_checkstack(L, remaining + 1, "not enough stack");
+  while (remaining--) {
+    unsigned char value; /* Holds the byte read */
+    /* Read the byte */
+    result = Fread(fud->handle, 1, &value);
+    if (result <= 0)
+      break;
 
-  /* Result (-ve error, 0 EOF, 1 byte read) */
-  lua_pushinteger(L, result);
-  if (result < 0)
-    /* An error occurred */
-    lua_pushnil(L);
-  else {
-    /* Success - push the byte read or zero if EOF */
-    lua_pushinteger(L, result ? value : 0);
+    lua_pushinteger(L, (lua_Integer) value);
   }
 
-  return 2;
+  num_read = lua_gettop(L) - top_index;
+  /* Result (-ve error, otherwise number of bytes read) */
+  lua_pushinteger(L, result < 0 ? result : num_read);
+  lua_rotate(L, top_index + 1, 1); /* rotate result infront of data */
+
+  /* Return result code and bytes read as integers */
+  return num_read + 1;
 }
 
 static int MemoryIO(lua_State *L, short read) {

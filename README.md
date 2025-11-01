@@ -397,13 +397,14 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure:  -ve gemdos error number
   ```
 
-### gemdos.Fwritei (file, n)
-  Fwritei. Writes an integer value representing a byte into a file
+### gemdos.Fwritei (file, i1, ...)
+  Fwritei. Writes one or more bytes from integers into a file.
 
   ```
   Parameters
     file: userdata: file userdata
-    n: integer: the value to write
+    i1: integer: the first byte to write
+    ...: optional integer(s): the subsequent bytes
   ```
   ```
   Results
@@ -411,20 +412,21 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure:  -ve gemdos error number
   ```
 
-### gemdos.Freadi (file)
-  Freadi. Reads a byte from a file into an integer
+### gemdos.Freadi (file, n)
+  Freadi. Read one or more bytes from a file into integers.
 
   ```
   Parameters
     file: userdata: file userdata
+    n: integer: the number of bytes to read (default 1 maximum 16)
   ```
   ```
   Results
-    1. integer: on success:  >= 0 number of bytes read (zero or one)
+    1. integer: on success:  >= 0 number of bytes read (zero or more)
     1. integer: on failure:  -ve gemdos error number
-    2. integer: on success: value holding byte read
+    ...: optional integer(s): the bytes read
 
-  Note: Will return 0 bytes and value zero if EOF already reached.
+  Note: Will return less than n bytes if EOF already reached.
   ```
 
 ### gemdos.Freadm (file, memory, offset, numbytes)
@@ -934,29 +936,30 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
     2. string: bytes read
   ```
 
-### poke (offset, n)
-  Writes a byte from an integer into a memory.
-
+### poke (offset, i1, ...)
+  Write one or more bytes from integers into a memory.
   ```
   Parameters
     offset: integer: offset
-    n: integer: the byte
+    i1: integer: the first byte
+    ...: optional integer(s): the subsequent bytes
   ```
   ```
   Results
-    1. integer: the old byte value
+    1. integer: the number of bytes poked
   ```
 
-### peek (offset)
-  Reads a byte from a memory into an integer.
-
+### peek (offset, n)
+  Read one or more bytes from a memory into integers.
   ```
   Parameters
     offset: integer: offset
+    n: integer: the number of bytes to peek (default 1 maxmium 16)
   ```
   ```
   Results
-    1. integer: the byte value
+    1. integer: the first byte
+    ...: optional integer(s): the subsequent bytes
   ```
 
 ### comparem (offset, other_memory, other_offset, n)
