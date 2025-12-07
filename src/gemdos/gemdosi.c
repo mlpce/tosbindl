@@ -3,6 +3,21 @@
 
 #include "src/gemdos/gemdosi.h"
 
+/* Rotate for converting between byte size and number of imode integers */
+const unsigned char TOSBINDL_GEMDOS_imode_sz_r[TOSBINDL_GEMDOS_IMODE_NUM] = {
+  0, 0, 1, 1, 2
+};
+
+/* Minimum value of an imode integer */
+const long TOSBINDL_GEMDOS_imode_min_val[TOSBINDL_GEMDOS_IMODE_NUM] = {
+  -128L, 0L, -32768L, 0L, -2147483647L - 1
+};
+
+/* Maximum value of an imode integer */
+const long TOSBINDL_GEMDOS_imode_max_val[TOSBINDL_GEMDOS_IMODE_NUM] = {
+  127L, 255L, 32767L, 65535L, 2147483647L
+};
+
 /* Map a GEMDOS negative error value to a string. */
 typedef struct ErrorEntry {
   short err;

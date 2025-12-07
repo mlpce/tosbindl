@@ -10,8 +10,8 @@ assert(largest_free_block >= 0)
 ---------------------------------------------------------------------
 -- Test allocating too much memory ----------------------------------
 ---------------------------------------------------------------------
-local mud = gemdos.Malloc(1024*1024*1024)
-assert(mud == gemdos.const.Error.ENSMEM)
+local ec, mud = gemdos.Malloc(1024*1024*1024)
+assert(ec == gemdos.const.Error.ENSMEM and mud == nil)
 
 ---------------------------------------------------------------------
 -- Test parameter errors --------------------------------------------
@@ -27,7 +27,6 @@ assert(not ok)
 ---------------------------------------------------------------------
 -- Allocate 32 bytes ------------------------------------------------
 ---------------------------------------------------------------------
-local ec
 ec, mud = gemdos.Malloc(32)
 assert(ec > 0)
 assert(mud:address() ~= 0)
@@ -38,24 +37,27 @@ assert(mud:size() == 32)
 ---------------------------------------------------------------------
 
 -- Test poke and peek. Mud offsets start from zero.
-assert(mud:poke(0, 40) == 1, "Poke failed")
-assert(mud:peek(0) == 40, "Peek failed")
-assert(mud:poke(0, 42) == 1, "Poke failed")
-assert(mud:peek(0) == 42, "Peek failed")
+local Imode = gemdos.const.Imode
+local s8, u8, s16, u16, s32 =
+  Imode.s8, Imode.u8, Imode.s16, Imode.u16, Imode.s32
+assert(mud:poke(u8, 0, 40) == 1, "Poke failed")
+assert(mud:peek(u8, 0) == 40, "Peek failed")
+assert(mud:poke(u8, 0, 42) == 1, "Poke failed")
+assert(mud:peek(u8, 0) == 42, "Peek failed")
 -- Multivalue poke
-assert(mud:poke(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+assert(mud:poke(u8, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
   18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32) == 32,
   "Poke failed")
-ok = pcall(function() mud:poke(-1, 0) end) -- Negative offset must fail
+ok = pcall(function() mud:poke(u8, -1, 0) end) -- Negative offset must fail
 assert(not ok)
-ok = pcall(function() mud:poke(31, 1, 2) end) -- Poke beyond end must fail
+ok = pcall(function() mud:poke(u8, 31, 1, 2) end) -- Poke beyond end must fail
 assert(not ok)
-ok = pcall(function() mud:poke(32, 2) end) -- Poke beyond end must fail
+ok = pcall(function() mud:poke(u8, 32, 2) end) -- Poke beyond end must fail
 assert(not ok)
 -- Multivalue peek
-local t1 = table.pack(mud:peek(0, 16))
+local t1 = table.pack(mud:peek(u8, 0, 16))
 assert(#t1 == 16)
-table.move(table.pack(mud:peek(16, 16)),1,16,17,t1)
+table.move(table.pack(mud:peek(u8, 16, 16)), 1, 16, 17, t1)
 assert(#t1 == 32)
 for k,v in ipairs(t1) do
   assert(k == v)
@@ -63,7 +65,7 @@ end
 
 -- Max number of peek values is 16 so 17 must fail
 -- See TOSBINDL_GEMDOS_MAX_MULTIVAL
-ok = pcall(function() mud:peek(0, 17) end)
+ok = pcall(function() mud:peek(u8, 0, 17) end)
 assert(not ok)
 
 -- Set memory from offset 0 to value '69', for the whole size
@@ -71,13 +73,13 @@ mud:set(0, 69, mud:size())
 
 -- Each byte must now be 69
 for i=0, mud:size() - 1 do
-  assert(mud:peek(i) == 69)
+  assert(mud:peek(u8, i) == 69)
 end
 
 -- Poke ASCII for 'A' to offset 2
 -- Poke ASCII for 'B' to offset 3
-mud:poke(2, 65)
-mud:poke(3, 66)
+mud:poke(u8, 2, 65)
+mud:poke(u8, 3, 66)
 
 ---------------------------------------------------------------------
 -- Test reading the memory into a string ----------------------------
@@ -179,7 +181,7 @@ mud:set(0, 69, mud:size())
 -- Read memory into a table. Second parameter is number of bytes to
 -- read, if it is missing will read the whole memory.
 local tbl
-num_bytes, tbl = mud:readt(0)
+num_bytes, tbl = mud:readt(u8, 0)
 assert(num_bytes == mud:size() and type(tbl) == "table")
 
 -- Check all values are correct
@@ -188,11 +190,11 @@ for i=1,#tbl do
 end
 
 -- Poke some changes
-mud:poke(2, 65)
-mud:poke(3, 66)
+mud:poke(u8, 2, 65)
+mud:poke(u8, 3, 66)
 
 -- Read four bytes from offset two
-num_bytes, tbl = mud:readt(2, 4)
+num_bytes, tbl = mud:readt(u8, 2, 4)
 assert(num_bytes == 4)
 
 -- Check the table values. The tables use one based indices.
@@ -208,10 +210,10 @@ assert(string.char(table.unpack(tbl)) == "ABEE")
 -- offsets are still zero based. Parameters three and four are
 -- optional and if present specify the start table position and the
 -- end table position (one based indices).
-num_bytes = mud:writet(16, {79, 114, 97, 110, 103, 101, 115})
+num_bytes = mud:writet(u8, 16, {79, 114, 97, 110, 103, 101, 115})
 assert(num_bytes == 7)
 
-num_bytes, tbl = mud:readt(0)
+num_bytes, tbl = mud:readt(u8, 0)
 assert(num_bytes == 32)
 assert(string.char(table.unpack(tbl)) == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
 
@@ -220,15 +222,15 @@ assert(string.char(table.unpack(tbl)) == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
 ---------------------------------------------------------------------
 
 -- Writing before the beginning
-num_bytes, old = mud:readt(0)
-ok = pcall(function() mud:writet(-1, {1, 2}) end)
-num_bytes, new = mud:readt(0)
+num_bytes, old = mud:readt(u8, 0)
+ok = pcall(function() mud:writet(u8, -1, {1, 2}) end)
+num_bytes, new = mud:readt(u8, 0)
 assert(not ok and table.concat(old) == table.concat(new))
 
 -- Writing beyond the end
-num_bytes, old = mud:readt(0)
-ok = pcall(function() mud:writet(31, {1, 2}) end)
-num_bytes, new = mud:readt(0)
+num_bytes, old = mud:readt(u8, 0)
+ok = pcall(function() mud:writet(u8, 31, {1, 2}) end)
+num_bytes, new = mud:readt(u8, 0)
 assert(not ok and table.concat(old) == table.concat(new))
 
 ---------------------------------------------------------------------
@@ -238,13 +240,13 @@ assert(not ok and table.concat(old) == table.concat(new))
 -- positive values are positions from the start of the table
 -- negative values are positions from the end of the table
 tbl = table.pack(string.byte("retro computing is cool", 1, -1))
-assert(mud:writet(0, tbl, -4, -1) == 4)  -- 'cool'
-assert(mud:writet(4, tbl, -5, -5) == 1)  -- ' '
-assert(mud:writet(5, tbl, 7, -9) == 9)   -- 'computing'
-assert(mud:writet(14, tbl, 16, 19) == 4) -- ' is '
-assert(mud:writet(18, tbl, 1, 5) == 5)   -- 'retro'
-mud:writet(23, table.pack(string.byte(' Atari ST', 1, -1)))
-num_bytes, new = mud:readt(0)
+assert(mud:writet(u8, 0, tbl, -4, -1) == 4)  -- 'cool'
+assert(mud:writet(u8, 4, tbl, -5, -5) == 1)  -- ' '
+assert(mud:writet(u8, 5, tbl, 7, -9) == 9)   -- 'computing'
+assert(mud:writet(u8, 14, tbl, 16, 19) == 4) -- ' is '
+assert(mud:writet(u8, 18, tbl, 1, 5) == 5)   -- 'retro'
+mud:writet(u8, 23, table.pack(string.byte(' Atari ST', 1, -1)))
+num_bytes, new = mud:readt(u8, 0)
 assert(string.char(table.unpack(new)) == "cool computing is retro Atari ST")
 
 ---------------------------------------------------------------------
@@ -252,13 +254,13 @@ assert(string.char(table.unpack(new)) == "cool computing is retro Atari ST")
 ---------------------------------------------------------------------
 
 tbl = table.pack(string.byte("word", 1, -1))
-ok = pcall(function() mud:writet(0, tbl, 0, -1) end)
+ok = pcall(function() mud:writet(u8, 0, tbl, 0, -1) end)
 assert(not ok)
-ok = pcall(function() mud:writet(0, tbl, 4, 5) end)
+ok = pcall(function() mud:writet(u8, 0, tbl, 4, 5) end)
 assert(not ok)
-ok = pcall(function() mud:writet(0, tbl, 3, 2) end)
+ok = pcall(function() mud:writet(u8, 0, tbl, 3, 2) end)
 assert(not ok)
-ok = pcall(function() mud:writet(0, tbl, -5, -1) end)
+ok = pcall(function() mud:writet(u8, 0, tbl, -5, -1) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
@@ -282,15 +284,15 @@ assert(num_bytes == 1)
 num_bytes = mud:set(31, 4, 1)
 assert(num_bytes == 1)
 
-assert(mud:peek(0) == 1)
+assert(mud:peek(u8, 0) == 1)
 for i=0,15 do
-  assert(mud:peek(i) == 1)
+  assert(mud:peek(u8, i) == 1)
 end
 for i=16,29 do
-  assert(mud:peek(i) == 2)
+  assert(mud:peek(u8, i) == 2)
 end
-assert(mud:peek(30) == 3)
-assert(mud:peek(31) == 4)
+assert(mud:peek(u8, 30) == 3)
+assert(mud:peek(u8, 31) == 4)
 
 ---------------------------------------------------------------------
 -- Some memory sets out of bounds -----------------------------------
@@ -327,11 +329,11 @@ assert(num_bytes == 16)
 num_bytes, str = mud:reads(0)
 assert(str == "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
-mud:poke(0, 42)
+mud:poke(u8, 0, 42)
 num_bytes = mud16:copym(15, mud, 0, 1)
 assert(num_bytes == 1)
 
-assert(mud16:peek(15) == 42)
+assert(mud16:peek(u8, 15) == 42)
 
 ---------------------------------------------------------------------
 -- Check copying memory out of bounds -------------------------------
@@ -353,6 +355,636 @@ assert(num_bytes == 20)
 
 num_bytes, str = mud:reads(0)
 assert(num_bytes == 32 and str == "Copy memories with copym. copym.")
+
+---------------------------------------------------------------------
+-- Test imodes with poke and peek -----------------------------------
+---------------------------------------------------------------------
+-- signed 8 bit max value
+assert(mud:poke(s8, 0, 127) == 1)
+assert(mud:peek(s8, 0) == 127)
+ok = pcall(function() mud:poke(s8, 0, 128) end)
+assert(not ok)
+-- signed 8 bit min value
+assert(mud:poke(s8, 0, -128) == 1)
+assert(mud:peek(s8, 0) == -128)
+ok = pcall(function() mud:poke(s8, 0, -129) end)
+assert(not ok)
+
+-- unsigned 8 bit max value
+assert(mud:poke(u8, 0, 255) == 1)
+assert(mud:peek(u8, 0) == 255)
+ok = pcall(function() mud:poke(u8, 0, 256) end)
+assert(not ok)
+-- unsigned 8 bit min value
+assert(mud:poke(u8, 0, 0) == 1)
+assert(mud:peek(u8, 0) == 0)
+ok = pcall(function() mud:poke(u8, 0, -1) end)
+assert(not ok)
+
+-- signed 16 bit max value
+assert(mud:poke(s16, 0, 32767) == 2)
+assert(mud:peek(s16, 0) == 32767)
+ok = pcall(function() mud:poke(s16, 0, 32768) end)
+assert(not ok)
+-- signed 16 bit min value
+assert(mud:poke(s16, 0, -32768) == 2)
+assert(mud:peek(s16, 0) == -32768)
+ok = pcall(function() mud:poke(s16, 0, -32769) end)
+assert(not ok)
+
+-- unsigned 16 bit max value
+assert(mud:poke(u16, 0, 65535) == 2)
+assert(mud:peek(u16, 0) == 65535)
+ok = pcall(function() mud:poke(u16, 0, 65536) end)
+assert(not ok)
+-- unsigned 16 bit min value
+assert(mud:poke(u16, 0, 0) == 2)
+assert(mud:peek(u16, 0) == 0)
+ok = pcall(function() mud:poke(u16, 0, -1) end)
+assert(not ok)
+
+-- signed 32 bit max value
+assert(mud:poke(s32, 0, 2147483647) == 4)
+assert(mud:peek(s32, 0) == 2147483647)
+-- signed 32 bit min value
+assert(mud:poke(s32, 0, -2147483648) == 4)
+assert(mud:peek(s32, 0) == -2147483648)
+
+-- Multiple signed 16 bit values on the stack
+local t = {}
+for v = 32767,32760,-1 do
+  t[#t + 1] = v
+end
+
+mud:poke(s16, 0, table.unpack(t))
+local r = table.pack(mud:peek(s16, 0, 8))
+for i=1,#t do
+  assert(t[i] == r[i])
+end
+
+-- Multiple unsigned 16 bit values on the stack
+t = {}
+for v = 65535,65528,-1 do
+  t[#t + 1] = v
+end
+mud:poke(u16, 0, table.unpack(t))
+r = table.pack(mud:peek(u16, 0, 8))
+for i=1,#t do
+  assert(t[i] == r[i])
+end
+
+-- multiple signed 32 bit values on the stack
+t = {}
+for v = 2147483647, 2147483644, -1 do
+  t[#t + 1] = v
+end
+
+mud:poke(s32, 0, table.unpack(t))
+r = table.pack(mud:peek(s32, 0, 4))
+for i=1,#t do
+  assert(t[i] == r[i])
+end
+
+-- odd offsets for signed 16 bit values must fail
+ok = pcall(function() mud:poke(s16, 1, 0) end)
+assert(not ok)
+ok = pcall(function() mud:peek(s16, 1) end)
+assert(not ok)
+
+-- odd offsets for unsigned 16 bit values must fail
+ok = pcall(function() mud:poke(u16, 1, 0) end)
+assert(not ok)
+ok = pcall(function() mud:peek(u16, 1) end)
+assert(not ok)
+
+-- odd offsets for signed 32 bit values must fail
+ok = pcall(function() mud:poke(s32, 1, 0) end)
+assert(not ok)
+ok = pcall(function() mud:peek(s32, 1) end)
+assert(not ok)
+
+-- Offset checks (assuming s16 native endian is bigendian)
+mud:set(0, 0)
+assert(mud:poke(s16, 14, 32767) == 2)
+assert(mud:peek(s16, 14) == 32767)
+for k = 1, 13 do
+  assert(mud:peek(u8, k) == 0)
+end
+assert(mud:peek(u8, 14) == 0x7f)
+assert(mud:peek(u8, 15) == 0xff)
+
+-- Offset checks (assuming u16 native endian is bigendian)
+mud:set(0, 0)
+assert(mud:poke(u16, 14, 32768) == 2)
+assert(mud:peek(u16, 14) == 32768)
+for k = 1, 13 do
+  assert(mud:peek(u8, k) == 0)
+end
+assert(mud:peek(u8, 14) == 0x80)
+assert(mud:peek(u8, 15) == 0x00)
+
+-- Offset checks (assuming s32 native endian is bigendian)
+mud:set(0, 0)
+assert(mud:poke(s32, 12, 2147483647) == 4)
+assert(mud:peek(s32, 12) == 2147483647)
+for k = 1, 11 do
+  assert(mud:peek(u8, k) == 0)
+end
+assert(mud:peek(u8, 12) == 0x7f)
+assert(mud:peek(u8, 13) == 0xff)
+assert(mud:peek(u8, 14) == 0xff)
+assert(mud:peek(u8, 15) == 0xff)
+
+-- Writing and reading beyond the end must fail (s16)
+assert(mud:poke(s16, 30, 42) == 2)
+ok = pcall(function() mud:poke(s16, 30, 1, 2) end)
+assert(not ok)
+assert(mud:peek(s16, 30) == 42)
+ok = pcall(function() mud:peek(s16, 30, 2) end)
+assert(not ok)
+
+-- Writing and reading beyond the end must fail (u16)
+assert(mud:poke(u16, 30, 43) == 2)
+ok = pcall(function() mud:poke(u16, 30, 1, 2) end)
+assert(not ok)
+assert(mud:peek(u16, 30) == 43)
+ok = pcall(function() mud:peek(u16, 30, 2) end)
+assert(not ok)
+
+-- Writing and reading beyond the end must fail (s32)
+assert(mud:poke(s32, 28, 44) == 4)
+ok = pcall(function() mud:poke(s32, 28, 1, 2) end)
+assert(not ok)
+assert(mud:peek(s32, 28) == 44)
+ok = pcall(function() mud:peek(s32, 28, 2) end)
+assert(not ok)
+
+---------------------------------------------------------------------
+-- Test imodes with writet and readt --------------------------------
+---------------------------------------------------------------------
+--- Writing and reading s16
+mud:set(0, 0)
+t = {}
+for v=1,16 do
+  t[v] = v
+end
+assert(mud:writet(s16, 0, t) == 32)
+local num, t2 = mud:readt(s16, 0)
+assert(num == 32)
+for k=1,16 do
+  assert(t2[k] == t[k])
+end
+
+-- Writing and reading u16
+t = {}
+for v=1,16 do
+  t[v] = v
+end
+assert(mud:writet(u16, 0, t) == 32)
+num, t2 = mud:readt(u16, 0)
+assert(num == 32)
+for k=1,16 do
+  assert(t2[k] == t[k])
+end
+
+-- Writing and reading s32
+t = {}
+for v=1,8 do
+  t[v] = v
+end
+assert(mud:writet(s32, 0, t) == 32)
+num, t2 = mud:readt(s32, 0)
+assert(num == 32)
+for k=1,8 do
+  assert(t2[k] == t[k])
+end
+
+-- signed 8 bit max value
+t = { 127 }
+assert(mud:writet(s8, 0, t) == 1)
+num, t2 = mud:readt(s8, 0, 1)
+assert(num == 1 and t2[1] == t[1])
+t[1] = 128
+ok = pcall(function() mud:writet(s8, 0, t) end)
+assert(not ok)
+
+-- signed 8 bit min value
+t = { -128 }
+assert(mud:writet(s8, 0, t) == 1)
+num, t2 = mud:readt(s8, 0, 1)
+assert(num == 1 and t2[1] == t[1])
+t[1] = -129
+ok = pcall(function() mud:writet(s8, 0, t) end)
+assert(not ok)
+
+-- unsigned 8 bit max value
+t = { 255 }
+assert(mud:writet(u8, 0, t) == 1)
+num, t2 = mud:readt(u8, 0, 1)
+assert(num == 1 and t2[1] == t[1])
+t[1] = 256
+ok = pcall(function() mud:writet(u8, 0, t) end)
+assert(not ok)
+
+-- unsigned 8 bit min value
+t = { 0 }
+assert(mud:writet(u8, 0, t) == 1)
+num, t2 = mud:readt(u8, 0, 1)
+assert(num == 1 and t2[1] == t[1])
+t[1] = -1
+ok = pcall(function() mud:writet(u8, 0, t) end)
+assert(not ok)
+
+-- signed 16 bit max value
+t = { 32767 }
+assert(mud:writet(s16, 0, t) == 2)
+num, t2 = mud:readt(s16, 0, 1)
+assert(num == 2 and t2[1] == t[1])
+t[1] = 32768
+ok = pcall(function() mud:writet(s16, 0, t) end)
+assert(not ok)
+
+-- signed 16 bit min value
+t = { -32768 }
+assert(mud:writet(s16, 0, t) == 2)
+num, t2 = mud:readt(s16, 0, 1)
+assert(num == 2 and t2[1] == t[1])
+t[1] = -32769
+ok = pcall(function() mud:writet(s16, 0, t) end)
+assert(not ok)
+
+-- unsigned 16 bit max value
+t = { 65535 }
+assert(mud:writet(u16, 0, t) == 2)
+num, t2 = mud:readt(u16, 0, 1)
+assert(num == 2 and t2[1] == t[1])
+t[1] = 65536
+ok = pcall(function() mud:writet(u16, 0, t) end)
+assert(not ok)
+
+-- unsigned 16 bit min value
+t = { 0 }
+assert(mud:writet(u16, 0, t) == 2)
+num, t2 = mud:readt(u16, 0, 1)
+assert(num == 2 and t2[1] == t[1])
+t[1] = -1
+ok = pcall(function() mud:writet(u16, 0, t) end)
+assert(not ok)
+
+-- signed 32 bit max value
+t = { 2147483647 }
+assert(mud:writet(s32, 0, t) == 4)
+num, t2 = mud:readt(s32, 0, 1)
+assert(num == 4 and t2[1] == t[1])
+
+-- signed 32 bit min value
+t = { -2147483648 }
+assert(mud:writet(s32, 0, t) == 4)
+num, t2 = mud:readt(s32, 0, 1)
+assert(num == 4 and t2[1] == t[1])
+
+-- odd offsets for signed 16 bit values must fail
+t = { 0 }
+ok = pcall(function() mud:writet(s16, 1, t) end)
+assert(not ok)
+ok = pcall(function() mud:readt(s16, 1) end)
+assert(not ok)
+
+-- odd offsets for unsigned 16 bit values must fail
+ok = pcall(function() mud:writet(u16, 1, t) end)
+assert(not ok)
+ok = pcall(function() mud:readt(u16, 1) end)
+assert(not ok)
+
+-- odd offsets for signed 32 bit values must fail
+ok = pcall(function() mud:writet(s32, 1, 0) end)
+assert(not ok)
+ok = pcall(function() mud:readt(s32, 1) end)
+assert(not ok)
+
+-- Offset checks (assuming s16 native endian is bigendian)
+mud:set(0, 0)
+t = { 32767 }
+assert(mud:writet(s16, 14, t) == 2)
+ec, t2 = mud:readt(s16, 14, 1)
+assert(ec == 2 and t2[1] == t[1])
+for k = 1, 13 do
+  assert(mud:peek(u8, k) == 0)
+end
+assert(mud:peek(u8, 14) == 0x7f)
+assert(mud:peek(u8, 15) == 0xff)
+
+-- Offset checks (assuming u16 native endian is bigendian)
+mud:set(0, 0)
+t = { 32768 }
+assert(mud:writet(u16, 14, t) == 2)
+ec, t2 = mud:readt(u16, 14, 1)
+assert(ec == 2 and t2[1] == t[1])
+for k = 1, 13 do
+  assert(mud:peek(u8, k) == 0)
+end
+assert(mud:peek(u8, 14) == 0x80)
+assert(mud:peek(u8, 15) == 0x00)
+
+-- Offset checks (assuming s32 native endian is bigendian)
+mud:set(0, 0)
+t = { 2147483647 }
+assert(mud:writet(s32, 12, t) == 4)
+ec, t2 = mud:readt(s32, 12, 1)
+assert(ec == 4 and t2[1] == t[1])
+for k = 1, 11 do
+  assert(mud:peek(u8, k) == 0)
+end
+assert(mud:peek(u8, 12) == 0x7f)
+assert(mud:peek(u8, 13) == 0xff)
+assert(mud:peek(u8, 14) == 0xff)
+assert(mud:peek(u8, 15) == 0xff)
+
+-- Writing and reading beyond the end must fail (s16)
+mud:set(0, 0)
+t = { 42, 43 }
+assert(mud:writet(s16, 30, t, 1, 1) == 2)
+ok = pcall(function() mud:writet(s16, 30, t, 1) end)
+assert(not ok)
+ec, t2 = mud:readt(s16, 30, 1)
+assert(ec == 2 and t2[1] == t[1])
+ok = pcall(function() mud:readt(s16, 30, 2) end)
+assert(not ok)
+
+-- Writing and reading beyond the end must fail (u16)
+t = { 44, 45 }
+assert(mud:writet(u16, 30, t, 1, 1) == 2)
+ok = pcall(function() mud:writet(u16, 30, t, 1) end)
+assert(not ok)
+ec, t2 = mud:readt(u16, 30, 1)
+assert(ec == 2 and t2[1] == t[1])
+ok = pcall(function() mud:readt(u16, 30, 2) end)
+assert(not ok)
+
+-- Writing and reading beyond the end must fail (s32)
+t = { 46, 47 }
+assert(mud:writet(s32, 28, t, 1, 1) == 4)
+ok = pcall(function() mud:writet(s32, 28, t, 1) end)
+assert(not ok)
+ec, t2 = mud:readt(s32, 28, 1)
+assert(ec == 4 and t2[1] == t[1])
+ok = pcall(function() mud:readt(s32, 28, 2) end)
+assert(not ok)
+
+---------------------------------------------------------------------
+-- imode with odd memory sizes and poke/peek ------------------------
+---------------------------------------------------------------------
+mud:free()
+-- Allocate 15 byte mud
+ec, mud = gemdos.Malloc(15)
+assert(ec > 0)
+assert(mud:address() ~= 0)
+assert(mud:size() == 15)
+mud:set(0, 0)
+
+-- Poking seven values for imode s16 must succeed
+t = { 1, 2, 3, 4, 5, 6, 7 }
+assert(mud:poke(s16, 0, table.unpack(t)) == 14)
+-- Poking eight values for imode s16 must fail
+ok = pcall(function() mud:poke(s16, 0, 0, table.unpack(t)) end)
+assert(not ok)
+-- Peeking seven values for imode s16 must succeed
+t2 = table.pack(mud:peek(s16, 0, 7))
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Peeking eight values for imode s16 must fail
+ok = pcall(function() mud:peek(s16, 0, 8) end)
+assert(not ok)
+
+-- Also check with a non-zero offset
+-- Poking six values for imode s16 with offset 2 must succeed
+t = { 1, 2, 3, 4, 5, 6 }
+assert(mud:poke(s16, 2, table.unpack(t)) == 12)
+-- Poking seven values at offset 2 for imode s16 must fail
+ok = pcall(function() mud:poke(s16, 2, 0, table.unpack(t)) end)
+assert(not ok)
+-- Peeking six values for imode s16 with offset 2 must succeed
+t2 = table.pack(mud:peek(s16, 2, 6))
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Peeking seven values at offset 2 for imode s16 must fail
+ok = pcall(function() mud:peek(s16, 2, 7) end)
+assert(not ok)
+
+-- Poking seven values for imode u16 must succeed
+t = { 1, 2, 3, 4, 5, 6, 7 }
+assert(mud:poke(u16, 0, table.unpack(t)) == 14)
+-- Poking eight values for imode u16 must fail
+ok = pcall(function() mud:poke(u16, 0, 0, table.unpack(t)) end)
+assert(not ok)
+-- Peeking seven values for imode u16 must succeed
+t2 = table.pack(mud:peek(u16, 0, 7))
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Peeking eight values for imode u16 must fail
+ok = pcall(function() mud:peek(u16, 0, 8) end)
+assert(not ok)
+
+-- Also check with a non-zero offset
+-- Poking six values for imode u16 with offset 2 must succeed
+t = { 1, 2, 3, 4, 5, 6 }
+assert(mud:poke(u16, 2, table.unpack(t)) == 12)
+-- Poking seven values at offset 2 for imode u16 must fail
+ok = pcall(function() mud:poke(u16, 2, 0, table.unpack(t)) end)
+assert(not ok)
+-- Peeking six values for imode u16 with offset 2 must succeed
+t2 = table.pack(mud:peek(u16, 2, 6))
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Peeking seven values at offset 2 for imode u16 must fail
+ok = pcall(function() mud:peek(u16, 2, 7) end)
+assert(not ok)
+
+-- Poking three values for imode s32 must succeed
+t = { 1, 2, 3 }
+assert(mud:poke(s32, 0, table.unpack(t)) == 12)
+-- Poking four values for imode s32 must fail
+ok = pcall(function() mud:poke(s32, 0, 0, table.unpack(t)) end)
+assert(not ok)
+-- Peeking three values for imode s32 must succeed
+t2 = table.pack(mud:peek(s32, 0, 3))
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Peeking four values for imode s32 must fail
+ok = pcall(function() mud:peek(s32, 0, 4) end)
+assert(not ok)
+
+-- Also check with a non-zero offset
+-- Poking two values for imode s32 with offset 4 must succeed
+t = { 1, 2 }
+assert(mud:poke(s32, 4, table.unpack(t)) == 8)
+-- Poking three values at offset 4 for imode s32 must fail
+ok = pcall(function() mud:poke(s32, 4, 0, table.unpack(t)) end)
+assert(not ok)
+-- Peeking two values for imode s32 with offset 4 must succeed
+t2 = table.pack(mud:peek(s32, 4, 2))
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Peeking three values at offset 4 for imode s32 must fail
+ok = pcall(function() mud:peek(s32, 4, 3) end)
+assert(not ok)
+
+---------------------------------------------------------------------
+-- imode with odd memory sizes and writet/readt ---------------------
+---------------------------------------------------------------------
+
+-- Writing seven values for imode s16 must succeed
+t = { 1, 2, 3, 4, 5, 6, 7 }
+assert(mud:writet(s16, 0, t) == 14)
+-- Writing eight values for imode s16 must fail
+t2 = table.move(t, 1, #t, 1, {})
+table.insert(t2, 8)
+ok = pcall(function() mud:writet(s16, 0, t2) end)
+assert(not ok)
+-- Reading seven values for imode s16 must succeed
+num, t2 = mud:readt(s16, 0, 7)
+assert(num == 14)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Without num values, must only read complete values
+num, t2 = mud:readt(s16, 0)
+assert(num == 14)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Reading eight values for imode s16 must fail
+ok = pcall(function() mud:readt(s16, 0, 8) end)
+assert(not ok)
+
+-- Also check with a non-zero offset
+-- Writing six values for imode s16 with offset 2 must succeed
+t = { 1, 2, 3, 4, 5, 6 }
+assert(mud:writet(s16, 2, t) == 12)
+-- Writing seven values at offset 2 for imode s16 must fail
+t2 = table.move(t, 1, #t, 1, {})
+table.insert(t2, 7)
+ok = pcall(function() mud:writet(s16, 2, t2) end)
+assert(not ok)
+-- Reading six values for imode s16 with offset 2 must succeed
+num, t2 = mud:readt(s16, 2, 6)
+assert(num == 12)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Without num values, must only read complete values
+num, t2 = mud:readt(s16, 2)
+assert(num == 12)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Reading seven values for imode s16 with offset 2 must fail
+ok = pcall(function() mud:readt(s16, 2, 7) end)
+assert(not ok)
+
+-- Writing seven values for imode u16 must succeed
+t = { 1, 2, 3, 4, 5, 6, 7 }
+assert(mud:writet(u16, 0, t) == 14)
+-- Writing eight values for imode u16 must fail
+t2 = table.move(t, 1, #t, 1, {})
+table.insert(t2, 8)
+ok = pcall(function() mud:writet(u16, 0, t2) end)
+assert(not ok)
+-- Reading seven values for imode u16 must succeed
+num, t2 = mud:readt(u16, 0, 7)
+assert(num == 14)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Without num values, must only read complete values
+num, t2 = mud:readt(u16, 0)
+assert(num == 14)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Reading eight values for imode u16 must fail
+ok = pcall(function() mud:readt(u16, 0, 8) end)
+assert(not ok)
+
+-- Also check with a non-zero offset
+-- Writing six values for imode u16 with offset 2 must succeed
+t = { 1, 2, 3, 4, 5, 6 }
+assert(mud:writet(u16, 2, t) == 12)
+-- Writing seven values at offset 2 for imode u16 must fail
+t2 = table.move(t, 1, #t, 1, {})
+table.insert(t2, 7)
+ok = pcall(function() mud:writet(u16, 2, t2) end)
+assert(not ok)
+-- Reading six values for imode u16 with offset 2 must succeed
+num, t2 = mud:readt(u16, 2, 6)
+assert(num == 12)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Without num values, must only read complete values
+num, t2 = mud:readt(u16, 2)
+assert(num == 12)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Reading seven values for imode s16 with offset 2 must fail
+ok = pcall(function() mud:readt(u16, 2, 7) end)
+assert(not ok)
+
+-- Writing three values for imode s32 must succeed
+t = { 1, 2, 3 }
+assert(mud:writet(s32, 0, t) == 12)
+-- Writing four values for imode s32 must fail
+t2 = table.move(t, 1, #t, 1, {})
+table.insert(t2, 4)
+ok = pcall(function() mud:writet(s32, 0, t2) end)
+assert(not ok)
+-- Reading three values for imode s32 must succeed
+num, t2 = mud:readt(s32, 0, 3)
+assert(num == 12)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Without num values, must only read complete values
+num, t2 = mud:readt(s32, 0)
+assert(num == 12)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Reading four values for imode s32 must fail
+ok = pcall(function() mud:readt(s32, 0, 4) end)
+assert(not ok)
+
+-- Also check with a non-zero offset
+-- Writing two values for imode s32 with offset 4 must succeed
+t = { 1, 2 }
+assert(mud:writet(s32, 4, t) == 8)
+-- Writing three values at offset 4 for imode s32 must fail
+t2 = table.move(t, 1, #t, 1, {})
+table.insert(t2, 3)
+ok = pcall(function() mud:writet(s32, 4, t2) end)
+assert(not ok)
+-- Reading two values for imode s32 with offset 4 must succeed
+num, t2 = mud:readt(s32, 4, 2)
+assert(num == 8)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Without num values, must only read complete values
+num, t2 = mud:readt(s32, 4)
+assert(num == 8)
+for k,v in ipairs(t2) do
+  assert(v == t[k])
+end
+-- Reading three values for imode s32 with offset 4 must fail
+ok = pcall(function() mud:readt(s32, 4, 3) end)
+assert(not ok)
 
 ---------------------------------------------------------------------
 -- Compare memory ---------------------------------------------------

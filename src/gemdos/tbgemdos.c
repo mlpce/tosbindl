@@ -20,7 +20,7 @@
 
 /* GEMDOS binding version */
 #define TBGEMDOS_MAJOR_VERSION 1
-#define TBGEMDOS_MINOR_VERSION 0
+#define TBGEMDOS_MINOR_VERSION 1
 #define TBGEMDOS_MICRO_VERSION 0
 
 static const struct luaL_Reg gemdos[] = {
@@ -248,6 +248,15 @@ int luaopen_gemdos(lua_State *L) {
     TOSBINDL_GEMDOS_ERROR_EGSBF
   };
 
+  /* gemdos.const.imode values */
+  static const TOSBINDL_RegInt imode_ints[] = {
+    {"s8", TOSBINDL_GEMDOS_IMODE_S8},
+    {"u8", TOSBINDL_GEMDOS_IMODE_U8},
+    {"s16", TOSBINDL_GEMDOS_IMODE_S16},
+    {"u16", TOSBINDL_GEMDOS_IMODE_U16},
+    {"s32", TOSBINDL_GEMDOS_IMODE_S32},
+  };
+
   /* gemdos.utility table keys and functions */
   static const luaL_Reg util_funcs[] = {
     {"getenv", GetEnv},
@@ -306,6 +315,16 @@ int luaopen_gemdos(lua_State *L) {
   /* Set field with name Error in Constant table to have Proxy table as
   value */
   lua_setfield(L, -2, "Error");
+
+  /* "imode" integer modes for TOSBINDL_UD_T_Gemdos_File and
+  TOSBINDL_UD_T_Gemdos_Memory. */
+  TOSBINDL_newinttable(L, imode_ints);
+  /* Make the table readonly */
+  TOSBINDL_ROProxy(L);
+
+  /* Set field with name imode in Constant table to have Proxy table as
+  value */
+  lua_setfield(L, -2, "Imode");
 
   /* Make the Constant table readonly */
   TOSBINDL_ROProxy(L);
