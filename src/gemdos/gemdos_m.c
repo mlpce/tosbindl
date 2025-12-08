@@ -10,23 +10,31 @@
 #include "src/gemdos/gemdos_m.h"
 
 /*
+  Mark the memory userdata as invalid.
+*/
+static void InvalidateMemoryUserData(Memory *mud) {
+  mud->ptr = NULL;
+  mud->size = 0;
+}
+
+/*
   Free memory
   Inputs:
     1) userdata: TOSBINDL_UD_T_Gemdos_Memory
 */
 static int MemoryFree(lua_State *L) {
   Memory *const mud = (Memory *) lua_touserdata(L, 1); /* Memory userdata */
-  void *memory = mud->ptr;
-  if (memory) {
+  if (mud && mud->ptr) {
     /* Free the Gemdos memory */
-    const long result = Mfree(memory);
+    const long result = Mfree(mud->ptr);
     if (result < 0) {
       (void) Cconws("MemoryFree: ");
       (void) Cconws(TOSBINDL_GEMDOS_ErrMess(result));
       (void) Cconws("\r\n");
     }
-    mud->ptr = NULL;
-    mud->size = 0;
+
+    /* userdata is no longer valid */
+    InvalidateMemoryUserData(mud);
   }
  
   return 0;
@@ -94,106 +102,144 @@ static int MemoryGetSize(lua_State *L) {
 
 /*
   Memory userdata function "writet"
-  Writes bytes from an array table into a memory.
+  Writes values from an array table into a memory.
   Inputs:
     1) userdata: memory
-    2) integer: destination offset into the memory
-    3) table: the table containing the bytes as integers
-    4) optional integer: position of the first value to write
-    5) optional integer: position of the last value to write
+    2) integer: imode controlling Lua integer conversion
+    3) integer: destination offset into the memory
+    4) table: the table containing the values as integers
+    5) optional integer: position of the first value to write
+    6) optional integer: position of the last value to write
   Returns:
     1) integer: number of bytes written into the memory
 */
 static int MemoryWritet(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
-  const lua_Integer offset = luaL_checkinteger(L, 2); /* Offset into memory */
+  const lua_Integer imode = luaL_checkinteger(L, 2); /* Integer mode */
+  const lua_Integer offset = luaL_checkinteger(L, 3); /* Offset into memory */
   const lua_Integer tbl_len =
-    (luaL_checktype(L, 3, LUA_TTABLE), luaL_len(L, 3)); /* Length of table */
-  const lua_Integer i = luaL_optinteger(L, 4, 1); /* Start */
-  const lua_Integer j = luaL_optinteger(L, 5, -1); /* End */
+    (luaL_checktype(L, 4, LUA_TTABLE), luaL_len(L, 4)); /* Length of table */
+  const lua_Integer i = luaL_optinteger(L, 5, 1); /* Start */
+  const lua_Integer j = luaL_optinteger(L, 6, -1); /* End */
   const lua_Integer start_key = i < 0 ? tbl_len + i + 1 : i; /* One based */
   const lua_Integer end_key = j < 0 ? tbl_len + j + 1 : j; /* One based end */
-  const lua_Integer count = end_key - start_key + 1; /* Number of bytes */
+  const lua_Integer count = end_key - start_key + 1; /* Number of values */
+  lua_Integer num_bytes; /* Number of bytes written */
   lua_Integer key;
   unsigned char *dest; /* Destination write pointer */
 
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  /* Offset must not be negative and offset must be within the memory size */
-  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+  /* Check integer mode */
+  luaL_argcheck(L, imode >= TOSBINDL_GEMDOS_IMODE_S8 &&
+    imode <= TOSBINDL_GEMDOS_IMODE_S32, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+
+  /* Offset must not be negative, must be within the memory size
+  and must be aligned according to imode */
+  luaL_argcheck(L,
+    offset >= 0 && offset < mud->size &&
+    IMODE_OFFSET_CHECK_ALIGNED(imode, offset),
+    3, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Table start key must be in the array */
-  luaL_argcheck(L, start_key > 0 && start_key <= tbl_len, 4,
+  luaL_argcheck(L, start_key > 0 && start_key <= tbl_len, 5,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Table end key must be in the array */
-  luaL_argcheck(L, end_key > 0 && end_key <= tbl_len, 5,
+  luaL_argcheck(L, end_key > 0 && end_key <= tbl_len, 6,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Start key must not be after the end key */
-  luaL_argcheck(L, start_key <= end_key, 4,
+  luaL_argcheck(L, start_key <= end_key, 5,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
+  /* Number of bytes to be written */
+  num_bytes = IMODE_NVAL_TO_SIZE(imode, count);
+
   /* Check write fits into memory */
-  luaL_argcheck(L, offset + count <= mud->size, 2,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+  luaL_argcheck(L,
+    offset + num_bytes <= mud->size,
+    3, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Destination write pointer starts at memory plus offset */
   dest = mud->ptr + offset;
   /* Loop through each key */
   for (key = start_key; key <= end_key; ++key) {
     /* Get the value for the table key */
-    lua_Integer integer = 0;
-    lua_rawgeti(L, 3, key);
-    /* The value must be an integer and be within byte range */
-    luaL_argcheck(L, lua_isinteger(L, -1) &&
-      (integer = lua_tointeger(L, -1)) >= 0 && integer <= 255, 3,
+    int isnum;
+    lua_Integer integer;
+    lua_rawgeti(L, 4, key);
+    /* The value must be an integer or convertable to an integer
+    and be within imode value range */
+    integer = lua_tointegerx(L, -1, &isnum);
+    luaL_argcheck(L, isnum &&
+      integer >= IMODE_VALUE_MIN(imode) &&
+      integer <= IMODE_VALUE_MAX(imode), 4,
       TOSBINDL_ErrMess[TOSBINDL_EM_InvalidArrayValue]);
 
-    /* Copy the byte to the destination */
-    *dest++ = (unsigned char) integer;
+    /* Copy the value to the destination */
+    IMODE_WRITE_VALUE_MEM(imode, integer, dest)
+
     /* Pop the value */
     lua_pop(L, 1);
   }
 
-  lua_pushinteger(L, count); /* Number of bytes written */
+  /* Number of bytes written */
+  lua_pushinteger(L, num_bytes);
   return 1;
 }
 
 /*
   Memory userdata function "readt".
-  Read bytes from a memory into an array table.
+  Read values from a memory into an array table.
   Inputs:
     1) userdata: memory
-    2) integer: offset
-    3) optional integer: number of bytes to read (offset to end if missing)
+    2) integer: imode controlling Lua integer conversion
+    3) integer: offset
+    4) optional integer: number of values to read (offset to end if missing)
   Returns:
     1) integer: number of bytes read
-    2) table: on array of integers holding bytes read
+    2) table: an array of integers holding values read
 */
 static int MemoryReadt(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
-  const lua_Integer offset = luaL_checkinteger(L, 2); /* Offset into memory */
-  lua_Integer count; /* Number of bytes read */
+  const lua_Integer imode = luaL_checkinteger(L, 2); /* Integer mode */
+  const lua_Integer offset = luaL_checkinteger(L, 3); /* Offset into memory */
+  lua_Integer count; /* Number of values read */
+  lua_Integer num_bytes; /* Number of bytes read */
   const unsigned char *src; /* Source read pointer */
   lua_Integer key;
 
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  /* Offset must not be negative and must fit within the memory size */
-  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+  /* Check integer mode */
+  luaL_argcheck(L, imode >= TOSBINDL_GEMDOS_IMODE_S8 &&
+    imode <= TOSBINDL_GEMDOS_IMODE_S32, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
-  /* Number of bytes to read */
-  count = luaL_optinteger(L, 3, mud->size - offset);
+
+  /* Offset must not be negative, must be within the memory size
+  and must be aligned according to imode */
+  luaL_argcheck(L,
+    offset >= 0 && offset < mud->size &&
+    IMODE_OFFSET_CHECK_ALIGNED(imode, offset), 3,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+
+  /* Number of values to read */
+  count = luaL_optinteger(L, 4,
+    IMODE_SIZE_TO_NVAL(imode, mud->size - offset));
+  /* Number of bytes read */
+  num_bytes = IMODE_NVAL_TO_SIZE(imode, count);
+
   /* Count must not be negative and check read is within the memory */
-  luaL_argcheck(L, count >= 0 && offset + count <= mud->size, 3,
+  luaL_argcheck(L,
+    count >= 0 && offset + num_bytes <= mud->size, 4,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Push number of bytes read */
-  lua_pushinteger(L, count);
+  lua_pushinteger(L, num_bytes);
   /* Push table to hold the array */
   lua_createtable(L, count < INT_MAX ? (int) count : INT_MAX, 0);
 
@@ -202,8 +248,11 @@ static int MemoryReadt(lua_State *L) {
 
   /* Loop key through the count */
   for (key = 1; key <= count; ++key) {
-    /* Read the byte and push as an integer */
-    lua_pushinteger(L, *src++);
+    /* Read the value and push as an integer */
+    lua_Integer integer_value = 0;
+    IMODE_READ_VALUE_MEM(imode, src, &integer_value)
+    lua_pushinteger(L, integer_value);
+
     /* Set the value for the table key */
     lua_rawseti(L, -2, key);
   }
@@ -307,65 +356,113 @@ static int MemoryReads(lua_State *L) {
 
 /*
   Memory userdata function "poke"
-  Writes byte from integer into a memory.
+  Poke one or more values from integers into a memory.
   Inputs:
     1) userdata: memory
-    2) integer: offset
-    3) integer: the byte
+    2) integer: imode controlling Lua integer conversion
+    3) integer: offset
+    4) integer: the first value
+    5) ..., n
   Returns:
-    1) integer: the old byte value
+    1) integer: the number of bytes written
 */
-static int MemoryPoke(lua_State *L) {
+int MemoryPoke(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
-  const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
-  const lua_Integer i = luaL_checkinteger(L, 3); /* Value to poke */
+  const lua_Integer imode = luaL_checkinteger(L, 2); /* Integer mode */
+  const lua_Integer offset = luaL_checkinteger(L, 3); /* Memory offset */
+  /* One or more integers to poke */
+  const int top_index = (luaL_checkinteger(L, 4), lua_gettop(L));
+  int index = 3;
+  const int num_poked = top_index - index;
+  lua_Integer num_bytes; /* Number of bytes written */
   unsigned char *dest; /* Destination pointer within memory */
 
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+  /* Check integer mode */
+  luaL_argcheck(L, imode >= TOSBINDL_GEMDOS_IMODE_S8 &&
+    imode <= TOSBINDL_GEMDOS_IMODE_S32, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
-  luaL_argcheck(L, i >= 0 && i <= 255, 3,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+
+  /* Number of bytes to be written */
+  num_bytes = IMODE_NVAL_TO_SIZE(imode, num_poked);
+
+  /* Check offset. */
+  luaL_argcheck(L,
+    offset >= 0 && offset + num_bytes <= mud->size &&
+    IMODE_OFFSET_CHECK_ALIGNED(imode, offset),
+    3, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   dest = mud->ptr + offset;
 
-  /* Push old value */
-  lua_pushinteger(L, *dest);
+  while (++index <= top_index) {
+    const lua_Integer value = luaL_checkinteger(L, index); /* Value */ 
+    luaL_argcheck(L,
+      value >= IMODE_VALUE_MIN(imode) && value <= IMODE_VALUE_MAX(imode),
+      index, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+    IMODE_WRITE_VALUE_MEM(imode, value, dest)
+  }
 
-  /* Set new value */
-  *dest = (unsigned char) i;
+  /* Push number of bytes written */
+  lua_pushinteger(L, num_bytes);
 
-  /* Return old value */
+  /* Return number of bytes written */
   return 1;
 }
 
 /*
   Memory userdata function "peek".
-  Reads a byte from memory into an integer.
+  Peek one or more values from a memory.
   Inputs:
     1) userdata: memory
-    2) integer: offset
+    2) integer: imode controlling Lua integer conversion
+    3) integer: offset
+    4) integer: number of values to peek (default 1 maximum 16)
   Returns:
-    1) integer: the byte value
+    1) integer: the first value
+    X) ..., n
 */
-static int MemoryPeek(lua_State *L) {
+int MemoryPeek(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
-  const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
+  const lua_Integer imode = luaL_checkinteger(L, 2); /* Integer mode */
+  const lua_Integer offset = luaL_checkinteger(L, 3); /* Memory offset */
+  const lua_Integer num_values = luaL_optinteger(L, 4, 1); /* Num values */
+  int remaining = (int) num_values;
+  const unsigned char *ptr;
 
   /* Check memory */
   luaL_argcheck(L, mud && mud->ptr, 1,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
-  luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
+  /* Check integer mode */
+  luaL_argcheck(L, imode >= TOSBINDL_GEMDOS_IMODE_S8 &&
+    imode <= TOSBINDL_GEMDOS_IMODE_S32, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+  /* Check offset. */
+  luaL_argcheck(L,
+    offset >= 0 && offset < mud->size &&
+    IMODE_OFFSET_CHECK_ALIGNED(imode, offset), 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Push byte as an integer value */
-  lua_pushinteger(L, *(mud->ptr + offset));
+  /* Check num values */
+  luaL_argcheck(L, num_values >= 1 &&
+    num_values <= TOSBINDL_GEMDOS_MAX_MULTIVAL &&
+    offset + IMODE_NVAL_TO_SIZE(imode, num_values) <= mud->size, 4,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  return 1;
+  ptr = mud->ptr + offset;
+
+  /* Push the integer(s) from the memory */
+  luaL_checkstack(L, (int) num_values, "not enough stack");
+  while (remaining--) {
+    lua_Integer integer_value = 0;
+    IMODE_READ_VALUE_MEM(imode, ptr, &integer_value)
+    lua_pushinteger(L, integer_value);
+  }
+
+  return (int) num_values;
 }
 
 static int MemoryOp(lua_State *L, short copy) {
@@ -514,8 +611,8 @@ int l_Malloc(lua_State *L) {
 
   /* Create userdata to hold the Memory */
   mud = lua_newuserdatauv(L, sizeof(Memory), 0);
-  mud->ptr = NULL;
-  mud->size = 0;
+  /* userdata is not yet valid */
+  InvalidateMemoryUserData(mud);
 
   /* Push metatable for type TOSBINDL_UD_T_Gemdos_Memory */
   if (luaL_getmetatable(L, TOSBINDL_UD_T_Gemdos_Memory) != LUA_TTABLE) {
@@ -592,8 +689,7 @@ int l_Mfree(lua_State *L) {
 
   /* Free the memory */
   result = Mfree(mud->ptr); 
-  mud->ptr = NULL;
-  mud->size = 0;
+  InvalidateMemoryUserData(mud);
 
   lua_pushinteger(L, result); /* Error code */
 

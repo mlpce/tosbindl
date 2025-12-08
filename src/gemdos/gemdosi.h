@@ -8,6 +8,103 @@
 #include <tos.h>
 #endif
 
+/*
+  Imode integer modes. Controls conversion between Lua integers
+  and File or Memory data for the following userdata:
+  TOSBINDL_UD_T_Gemdos_File: used for writet/readt/writei/readi functions.
+  TOSBINDL_UD_T_Gemdos_Memory: used for writet/readt/poke/peek functions.
+*/
+#define TOSBINDL_GEMDOS_IMODE_S8 0    /* Signed 8 bit */
+#define TOSBINDL_GEMDOS_IMODE_U8 1    /* Unsigned 8 bit */
+#define TOSBINDL_GEMDOS_IMODE_S16 2   /* Signed 16 bit native endian */
+#define TOSBINDL_GEMDOS_IMODE_U16 3   /* Unsigned 16 bit native endian */
+#define TOSBINDL_GEMDOS_IMODE_S32 4   /* Signed 32 bit native endian */
+#define TOSBINDL_GEMDOS_IMODE_NUM 5   /* Total number of imodes */
+
+/* Convert total size in bytes to number of imode integer values */
+#define IMODE_SIZE_TO_NVAL(imode, sz) \
+  ((sz) >> TOSBINDL_GEMDOS_imode_sz_r[(imode)])
+/* Convert number of imode integer values to total size in bytes */
+#define IMODE_NVAL_TO_SIZE(imode, nv) \
+  (((lua_Integer)(nv)) << TOSBINDL_GEMDOS_imode_sz_r[(imode)])
+/* The minimum value of an integer for an imode */
+#define IMODE_VALUE_MIN(imode) \
+  (TOSBINDL_GEMDOS_imode_min_val[(imode)])
+/* The maximum value of an integer for an imode */
+#define IMODE_VALUE_MAX(imode) \
+  (TOSBINDL_GEMDOS_imode_max_val[(imode)])
+
+extern const unsigned char TOSBINDL_GEMDOS_imode_sz_r[
+  TOSBINDL_GEMDOS_IMODE_NUM];
+extern const long TOSBINDL_GEMDOS_imode_min_val[
+  TOSBINDL_GEMDOS_IMODE_NUM];
+extern const long TOSBINDL_GEMDOS_imode_max_val[
+  TOSBINDL_GEMDOS_IMODE_NUM];
+
+/* word and long access must use an even offset */
+#define IMODE_OFFSET_CHECK_ALIGNED(imode, offset) \
+  ((imode) <= TOSBINDL_GEMDOS_IMODE_U8 || !((offset) & 1))
+
+/* Writes from lua_Integer to memory using imode.
+NOTE(mlpce): only supports native endian. */
+#define IMODE_WRITE_VALUE_MEM(imode, integer_value, char_ptr) \
+  switch (imode) { \
+    case TOSBINDL_GEMDOS_IMODE_S32: \
+      *(long *) (char_ptr) = (long) (integer_value); \
+      (char_ptr) += sizeof(long); \
+      break; \
+    case TOSBINDL_GEMDOS_IMODE_U16: \
+    case TOSBINDL_GEMDOS_IMODE_S16: \
+      *(short *) (char_ptr) = (short) (integer_value); \
+      (char_ptr) += sizeof(short); \
+      break; \
+    case TOSBINDL_GEMDOS_IMODE_U8: \
+    case TOSBINDL_GEMDOS_IMODE_S8: \
+      *(char *) (char_ptr) = (char) (integer_value); \
+      (char_ptr) += sizeof(char); \
+      break; \
+  }
+
+/* Reads from memory into lua_Integer using imode.
+NOTE(mlpce): only supports native endian. */
+#define IMODE_READ_VALUE_MEM(imode, char_ptr, integer_value) \
+  switch (imode) { \
+    case TOSBINDL_GEMDOS_IMODE_S32: \
+      *(integer_value) = *(const long *) (char_ptr); \
+      (char_ptr) += sizeof(long); \
+      break; \
+    case TOSBINDL_GEMDOS_IMODE_U16: \
+      *(integer_value) = *(const unsigned short *) (char_ptr); \
+      (char_ptr) += sizeof(unsigned short); \
+      break; \
+    case TOSBINDL_GEMDOS_IMODE_S16: \
+      *(integer_value) = *(const short *) (char_ptr); \
+      (char_ptr) += sizeof(short); \
+      break; \
+    case TOSBINDL_GEMDOS_IMODE_U8: \
+      *(integer_value) = *(const unsigned char *) (char_ptr); \
+      (char_ptr) += sizeof(char); \
+      break; \
+    case TOSBINDL_GEMDOS_IMODE_S8: \
+      *(integer_value) = *(const signed char *) (char_ptr); \
+      (char_ptr) += sizeof(char); \
+      break; \
+  }
+
+/* Writes from lua_Integer value to file using imode.
+NOTE(mlpce): only supports native endian. */
+#define IMODE_WRITE_VALUE_FILE(imode, value, handle) \
+  (Fwrite((handle), \
+  IMODE_NVAL_TO_SIZE((imode), 1), \
+  ((const char *) &(value)) + sizeof(long) - IMODE_NVAL_TO_SIZE((imode), \
+  1)))
+
+/* Reads from file to buffer using imode to determine number of bytes. */
+#define IMODE_READ_BUFF_FILE(imode, handle, buffer_ptr) \
+  (Fread((handle), \
+  IMODE_NVAL_TO_SIZE((imode), 1), \
+  (buffer_ptr)))
+
 #define TOSBINDL_GEMDOS_SH_CONIN 0
 #define TOSBINDL_GEMDOS_SH_CONOUT 1
 #define TOSBINDL_GEMDOS_SH_AUX 2
@@ -23,6 +120,8 @@
 #define TOSBINDL_GEMDOS_FO_READ 0
 #define TOSBINDL_GEMDOS_FO_WRITE 1
 #define TOSBINDL_GEMDOS_FO_RW 2
+
+#define TOSBINDL_GEMDOS_MAX_MULTIVAL 16
 
 #if (defined(ATARI) && defined(LATTICE))
 #include <dos.h>

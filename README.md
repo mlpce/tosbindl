@@ -335,7 +335,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: on success:  >= 0 number of bytes read
     1. integer: on failure:  -ve gemdos error number
-    2. string: on success: bytes read
+    2. string: on success: the bytes read
 
   Note: Can return less bytes than requested if EOF reached. Will return 0
   bytes and empty string if EOF already reached.
@@ -348,11 +348,12 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     file: userdata: file userdata
     s: string: the string containing the bytes
-    i: integer: position of the first byte in the string (default is first)
-    j: integer: position of the last byte in the string (default is last)
+    i: integer: position of the first byte in the string (default first)
+    j: integer: position of the last byte in the string (default last)
 
-  Note: The first byte is at position 1. Negative positions count from end
-  of string with -1 being the last byte.
+  Note: Positive positions count from the start of the string with the first
+  byte at position 1. Negative positions count from the end of string with -1
+  being the last byte.
   ```
   ```
   Results
@@ -360,36 +361,41 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure:  -ve gemdos error number
   ```
 
-### gemdos.Freadt (file, numbytes)
-  Freadt. Read bytes from a file into an array table.
+### gemdos.Freadt (file, imode, numvalues)
+  Freadt. Read values from a file into an array table.
 
   ```
   Parameters
     file: userdata: file
-    numbytes: integer: number of bytes to read
+    imode: integer: mode for integer value conversion
+    numvalues: integer: number of values to read
+
+  Note: gemdos.const.Imode contains integer mode constants.
   ```
   ```
   Results
-    1. integer: on success:  >= 0 number of bytes read
+    1. integer: on success:  >= 0 number of bytes read from file
     1. integer: on failure:  -ve gemdos error number
-    2. table: on success: array of integers holding bytes read
+    2. table: on success: array of integers holding values read
 
-  Note: Can return less bytes than requested if EOF reached. Will return 0
-  bytes and empty table if EOF already reached.
+  Note: Can return less values than requested if EOF reached. Will return 0
+  values and empty table if EOF already reached.
   ```
 
-### gemdos.Fwritet (file, t [, i [, j]])
-  Fwritet. Writes bytes from an array table into a file.
+### gemdos.Fwritet (file, imode, t [, i [, j]])
+  Fwritet. Writes values from an array table into a file.
 
   ```
   Parameters
     file: userdata: file
-    t: table: the table containing the bytes as integers
-    i: integer: position of the first byte to write (default first)
-    j: integer: position of the last byte to write (default last)
+    imode: integer: mode for integer value conversion
+    t: table: the table containing the values as integers
+    i: integer: position of the first value to write (default first)
+    j: integer: position of the last value to write (default last)
 
-  Note: The first byte is at position 1. Negative positions count from end
-  of the table with -1 being the last byte.
+  Note: The first value is at position 1. Negative positions count from end
+  of the table with -1 being the last value.
+  Note: gemdos.const.Imode contains integer mode constants.
   ```
   ```
   Results
@@ -397,13 +403,17 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure:  -ve gemdos error number
   ```
 
-### gemdos.Fwritei (file, n)
-  Fwritei. Writes an integer value representing a byte into a file
+### gemdos.Fwritei (file, imode, i1, ...)
+  Fwritei. Writes one or more values from integers into a file.
 
   ```
   Parameters
     file: userdata: file userdata
-    n: integer: the value to write
+    imode: integer: mode for integer value conversion
+    i1: integer: the first value to write
+    ...: optional integer(s): the subsequent values
+
+  Note: gemdos.const.Imode contains integer mode constants.
   ```
   ```
   Results
@@ -411,20 +421,24 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure:  -ve gemdos error number
   ```
 
-### gemdos.Freadi (file)
-  Freadi. Reads a byte from a file into an integer
+### gemdos.Freadi (file, imode, n)
+  Freadi. Read one or more values from a file into integers.
 
   ```
   Parameters
     file: userdata: file userdata
+    imode: integer: mode for integer value conversion
+    n: integer: the number of values to read (default 1 maximum 16)
+
+  Note: gemdos.const.Imode contains integer mode constants.
   ```
   ```
   Results
-    1. integer: on success:  >= 0 number of bytes read (zero or one)
+    1. integer: on success:  >= 0 number of bytes read (zero or more)
     1. integer: on failure:  -ve gemdos error number
-    2. integer: on success: value holding byte read
+    ...: optional integer(s): the values read
 
-  Note: Will return 0 bytes and value zero if EOF already reached.
+  Note: Can return less values than requested if EOF reached.
   ```
 
 ### gemdos.Freadm (file, memory, offset, numbytes)
@@ -868,37 +882,45 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
     1. integer: the memory size
   ```
 
-### writet (offset, t [, i [, j]])
-  Writes bytes from an array table into a memory.
+### writet (imode, offset, t [, i [, j]])
+  Writes integer values from an array table into a memory.
 
   ```
   Parameters
-    offset: integer: destination offset into the memory
-    t: table: the table containing the bytes as integers
-    i: optional integer: position of the first byte to write (default first)
-    j: optional integer: position of the last byte to write (default last)
+    imode: integer: mode for integer value conversion
+    offset: integer: destination offset into the memory in bytes
+    t: table: the table containing the values as integers
+    i: optional integer: position of the first value to write (default first)
+    j: optional integer: position of the last value to write (default last)
 
-  Note: The first byte is at position 1. Negative positions count from end
-  of table with -1 being the last byte.
+  Note: Positive positions count from the start of the table with the first
+  value at position 1. Negative positions count from end of table with -1
+  being the last value.
+  Note: gemdos.const.Imode contains integer mode constants. For 16 or 32 bit
+  modes offset must be even.
   ```
   ```
   Results
-    1. integer: number of bytes written into the memory
+    1. integer: the total number of bytes written into the memory
   ```
 
-### readt (offset [, numbytes])
-  Read bytes from a memory into an array table.
+### readt (imode, offset [, numvalues])
+  Read integer values from a memory into an array table.
 
   ```
   Parameters
-    offset: integer: offset
-    numbytes: optional integer: number of bytes to read (offset to end if
+    imode: integer: mode for integer value conversion
+    offset: integer: source offset in the memory in bytes
+    numvalues: optional integer: number of values to read (offset to end if
     missing)
+
+  Note: gemdos.const.Imode contains integer mode constants. For 16 or 32 bit
+  modes offset must be even.
   ```
   ```
   Results
-    1. integer: number of bytes read
-    2. table: on array of integers holding bytes read
+    1. integer: the total number of bytes read from the memory
+    2. table: an array of integers holding the values read
   ```
 
 ### writes (offset, s [, i [, j]])
@@ -906,17 +928,20 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
 
   ```
   Parameters
-    offset: integer: offset
+    offset: integer: destination offset into the memory in bytes
     s: string: the string containing the bytes
     i: integer: position of the first byte in the string (default first)
     j: integer: position of the last byte in the string (default last)
 
-  Note: The first byte is at position 1. Negative positions count from end
-  of string with -1 being the last byte.
+  Note: Positive positions count from the start of the string with the first
+  byte at position 1. Negative positions count from the end of string with -1
+  being the last byte.
+  Note: The write does not include a null terminator. Any required null
+  terminator must be written explicitly e.g. mud:writes(0, "example\0")
   ```
   ```
   Results
-    1. integer: the number of bytes written
+    1. integer: the total number of bytes written into the memory
   ```
 
 ### reads (offset [, numbytes])
@@ -924,39 +949,48 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
 
   ```
   Parameters
-    offset: integer: offset
+    offset: integer: source offset in the memory in bytes
     numbytes: optional integer: number of bytes to read (offset to end if
     missing)
   ```
   ```
   Results
-    1. integer: number of bytes read
-    2. string: bytes read
+    1. integer: the total number of bytes read from the memory
+    2. string: the bytes read
   ```
 
-### poke (offset, n)
-  Writes a byte from an integer into a memory.
-
+### poke (imode, offset, i1, ...)
+  Write one or more values from integers into a memory.
   ```
   Parameters
-    offset: integer: offset
-    n: integer: the byte
+    imode: integer: mode for integer value conversion
+    offset: integer: destination offset into the memory in bytes
+    i1: integer: the first value
+    ...: optional integer(s): the subsequent values
+
+  Note: gemdos.const.Imode contains integer mode constants. For 16 or 32 bit
+  modes offset must be even.
   ```
   ```
   Results
-    1. integer: the old byte value
+    1. integer: the total number of bytes written into the memory
   ```
 
-### peek (offset)
-  Reads a byte from a memory into an integer.
-
+### peek (imode, offset, n)
+  Read one or more values from a memory into integers.
   ```
   Parameters
-    offset: integer: offset
+    imode: integer: mode for integer value conversion
+    offset: integer: source offset in the memory in bytes
+    n: integer: the number of values to peek (default 1 maximum 16)
+
+  Note: gemdos.const.Imode contains integer mode constants. For 16 or 32 bit
+  modes offset must be even.
   ```
   ```
   Results
-    1. integer: the byte value
+    1. integer: the first value
+    ...: optional integer(s): the subsequent values
   ```
 
 ### comparem (offset, other_memory, other_offset, n)
@@ -1027,6 +1061,14 @@ conin, conout, aux, prn
 ### gemdos.const.Fseek
   seek_set, seek_cur, seek_end
 
+### gemdos.const.Imode
+  s8, u8, s16, u16, s32
+
+  Imode integer modes control conversion between Lua integers
+  and File or Memory data. The imode is passed as parameter to file
+  writet/readt/writei/readi functions and memory writet/readt/poke/peek
+  functions. These modes are native endian (i.e. big endian on Atari ST).
+
 ## Utility functions
   Utility functions are published through the table 'gemdos.utility'
 
@@ -1071,5 +1113,16 @@ conin, conout, aux, prn
     2. integer: Minor version
     3. integer: Micro version
   ```
+
+## Version history
+
+### 1.0.0 Initial version
+  1) Initial version.
+
+### 1.1.0 Memory and File userdata API changes
+  1) File userdata writei and readi support writing and reading multiple values.
+  2) Memory userdata poke and peek support writing and reading multiple values.
+  3) File userdata writet/readt/writei/readi now support integer modes controlling conversion between Lua integers and file data. Each function takes an extra imode parameter.
+  4) Memory userdata writet/readt/poke/peek now support integer modes controlling conversion between Lua integers and memory data. Each function takes an extra imode parameter.
 
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
