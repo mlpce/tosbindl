@@ -205,9 +205,9 @@ assert(string.char(table.unpack(tbl)) == "ABEE")
 -- Test writing a table into the memory -----------------------------
 ---------------------------------------------------------------------
 
--- mud:writet takes four parameters, the first two parameters are the
--- memory offset and the table to write and are required. Memory
--- offsets are still zero based. Parameters three and four are
+-- mud:writet takes five parameters, the first three parameters are
+-- the Imode, memory offset and the table to write and are required.
+-- Memory offsets are still zero based. Parameters four and five are
 -- optional and if present specify the start table position and the
 -- end table position (one based indices).
 num_bytes = mud:writet(u8, 16, {79, 114, 97, 110, 103, 101, 115})
