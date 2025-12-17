@@ -70,24 +70,24 @@ NOTE(mlpce): only supports native endian. */
 #define IMODE_READ_VALUE_MEM(imode, char_ptr, integer_value) \
   switch (imode) { \
     case TOSBINDL_GEMDOS_IMODE_S32: \
-      *(integer_value) = *(const long *) (char_ptr); \
-      (char_ptr) += sizeof(long); \
+      *(integer_value) = *(const signed long *) (char_ptr); \
+      (char_ptr) += sizeof(signed long); \
       break; \
     case TOSBINDL_GEMDOS_IMODE_U16: \
       *(integer_value) = *(const unsigned short *) (char_ptr); \
       (char_ptr) += sizeof(unsigned short); \
       break; \
     case TOSBINDL_GEMDOS_IMODE_S16: \
-      *(integer_value) = *(const short *) (char_ptr); \
-      (char_ptr) += sizeof(short); \
+      *(integer_value) = *(const signed short *) (char_ptr); \
+      (char_ptr) += sizeof(signed short); \
       break; \
     case TOSBINDL_GEMDOS_IMODE_U8: \
       *(integer_value) = *(const unsigned char *) (char_ptr); \
-      (char_ptr) += sizeof(char); \
+      (char_ptr) += sizeof(unsigned char); \
       break; \
     case TOSBINDL_GEMDOS_IMODE_S8: \
       *(integer_value) = *(const signed char *) (char_ptr); \
-      (char_ptr) += sizeof(char); \
+      (char_ptr) += sizeof(signed char); \
       break; \
   }
 
