@@ -96,7 +96,7 @@ NOTE(mlpce): only supports native endian. */
 #define IMODE_WRITE_VALUE_FILE(imode, value, handle) \
   (Fwrite((handle), \
   IMODE_NVAL_TO_SIZE((imode), 1), \
-  ((const char *) &(value)) + sizeof(long) - IMODE_NVAL_TO_SIZE((imode), \
+  ((const char *) &(value)) + sizeof(value) - IMODE_NVAL_TO_SIZE((imode), \
   1)))
 
 /* Reads from file to buffer using imode to determine number of bytes. */
