@@ -1,6 +1,6 @@
 # tosbindl
 
-## Atari ST GEMDOS binding for Lua 5.4.
+## Atari ST GEMDOS binding for Lua 5.5, Lua 5.4
 
 This is a Lua binding to TOS GEMDOS functions. The functions available in TOS 1.X have been implemented. EmuTOS 1.3 and TOS 1.04 have been used during development, no other TOS versions have been tried or tested.
 
