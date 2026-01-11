@@ -264,6 +264,35 @@ ok = pcall(function() mud:writet(u8, 0, tbl, -5, -1) end)
 assert(not ok)
 
 ---------------------------------------------------------------------
+-- Test reads early termination byte --------------------------------
+---------------------------------------------------------------------
+for _, term_byte in ipairs( { 0, 127, 128, 255} ) do
+  num_bytes = mud:set(0, 49)
+  assert(num_bytes == 32)
+  assert(mud:poke(u8, 31, term_byte) == 1)
+  num_bytes, str = mud:reads(0, nil, term_byte)
+  assert(num_bytes == 31)
+  assert(str == '1111111111111111111111111111111')
+  assert(mud:poke(u8, 8, term_byte) == 1)
+  num_bytes, str = mud:reads(0, mud:size(), term_byte)
+  assert(num_bytes == 8)
+  assert(str == '11111111')
+  assert(mud:poke(u8, 0, term_byte) == 1)
+  num_bytes, str = mud:reads(0, nil, term_byte)
+  assert(num_bytes == 0)
+  assert(str == '')
+  num_bytes, str = mud:reads(1, nil, term_byte)
+  assert(num_bytes == 7)
+  assert(str == '1111111')
+  num_bytes, str = mud:reads(1, 7, term_byte)
+  assert(num_bytes == 7)
+  assert(str == '1111111')
+  num_bytes, str = mud:reads(1, 6, term_byte)
+  assert(num_bytes == 6)
+  assert(str == '111111')
+end
+
+---------------------------------------------------------------------
 -- Some memory sets -------------------------------------------------
 ---------------------------------------------------------------------
 

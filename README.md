@@ -944,7 +944,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
     1. integer: the total number of bytes written into the memory
   ```
 
-### reads (offset [, numbytes])
+### reads (offset [, numbytes, termbyte])
   Reads bytes from a memory into a string.
 
   ```
@@ -952,6 +952,10 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
     offset: integer: source offset in the memory in bytes
     numbytes: optional integer: number of bytes to read (offset to end if
     missing)
+    termbyte: optional integer: early termination byte
+  NOTE: The 'termbyte' argument can be used to terminate the read before
+  'numbytes' have been read. If a byte being read matches the termbyte,
+  the returned string will include bytes up to but excluding the termbyte.
   ```
   ```
   Results

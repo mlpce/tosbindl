@@ -316,11 +316,13 @@ static int MemoryWrites(lua_State *L) {
 
 /*
   Memory userdata function reads.
-  Reads bytes from a memory into a string.
+  Reads bytes from a memory into a string, optionally ending early when an
+  arbitary termination byte is encountered.
   Inputs:
     1) userdata: memory
     2) integer: offset
     3) optional integer: number of bytes to read (offset to end if missing)
+    4) optional integer: early termination byte (e.g. 0 for c string memory)
   Returns:
     1) integer: number of bytes read
     2) string: bytes read
@@ -329,6 +331,8 @@ static int MemoryReads(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer offset = luaL_checkinteger(L, 2); /* Memory offset */
+  const int arg_4_type = lua_type(L, 4); /* Early termination argument */
+  const unsigned char *src_ptr; /* Source pointer */
   lua_Integer count; /* Number of bytes read */
   luaL_Buffer b; /* Buffer for string */
   char *str; /* Pointer to string within buffer */
@@ -338,15 +342,41 @@ static int MemoryReads(lua_State *L) {
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
   luaL_argcheck(L, offset >= 0 && offset < mud->size, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+  src_ptr = mud->ptr + offset;
+
+  /* Read count */
   count = luaL_optinteger(L, 3, mud->size - offset);
   luaL_argcheck(L, count >= 0 && offset + count <= mud->size, 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+
+  /* Check for read early termination byte if specified */
+  if (arg_4_type != LUA_TNIL &&
+      arg_4_type != LUA_TNONE) {
+    const lua_Integer term = luaL_checkinteger(L, 4);
+    const unsigned char *check_ptr = src_ptr;
+    const unsigned char *end_ptr = check_ptr + count; 
+    unsigned char tc;
+
+    luaL_argcheck(L, term >= -128 && term <= 255, 4,
+      TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+    tc = (unsigned char) term;
+
+    /* Scan for early termination byte */
+    while (check_ptr < end_ptr) {
+      if (*check_ptr == tc) {
+        /* Change count to end before the termination byte */
+        count = check_ptr - src_ptr;
+        break;
+      }
+      ++check_ptr;
+    }
+  }
 
   /* Number of bytes read */
   lua_pushinteger(L, count);
   /* Copy bytes into string buffer */
   str = luaL_buffinitsize(L, &b, (size_t) count);
-  memcpy(str, mud->ptr + offset, (size_t) count);
+  memcpy(str, src_ptr, (size_t) count);
 
   /* Push string */
   luaL_pushresultsize(&b, (size_t) count);
