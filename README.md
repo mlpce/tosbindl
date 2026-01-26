@@ -1128,4 +1128,9 @@ conin, conout, aux, prn
   3) File userdata writet/readt/writei/readi now support integer modes controlling conversion between Lua integers and file data. Each function takes an extra imode parameter.
   4) Memory userdata writet/readt/poke/peek now support integer modes controlling conversion between Lua integers and memory data. Each function takes an extra imode parameter.
 
+### 1.1.1 Memory and File userdata API changes
+  1) File userdata readi no longer raises an error when parameter n=0, instead reading zero values.
+  2) Memory userdata peek no longer raises an error when parameter n=0, instead peeking zero values.
+  3) Memory userdata reads function takes an optional third parameter, termbyte, allowing the read to be terminated early.
+
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
