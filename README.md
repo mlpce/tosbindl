@@ -422,7 +422,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   ```
 
 ### gemdos.Freadi (file, imode, n)
-  Freadi. Read one or more values from a file into integers.
+  Freadi. Read zero or more values from a file into integers.
 
   ```
   Parameters
@@ -436,7 +436,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Results
     1. integer: on success:  >= 0 number of bytes read (zero or more)
     1. integer: on failure:  -ve gemdos error number
-    ...: optional integer(s): the values read
+    X. zero or more integers: the values read
 
   Note: Can return less values than requested if EOF reached.
   ```

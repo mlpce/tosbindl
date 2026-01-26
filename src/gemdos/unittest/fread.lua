@@ -2,7 +2,8 @@
 gemdos.Cconws("Test gemdos.Fread\r\n")
 
 local Imode = gemdos.const.Imode
-local u8 = Imode.u8
+local s8, u8, s16, u16, s32 =
+  Imode.s8, Imode.u8, Imode.s16, Imode.u16, Imode.s32
 
 -- Create a new file named TESTFILE
 local ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
@@ -57,6 +58,18 @@ assert(tbl[1] == string.byte("8"))
 ec = fud:readm(mud, 0, 1)
 assert(ec == 1)
 assert(mud:peek(u8, 0) == string.byte("9"))
+
+-- Reading zero values using self
+ec, val = fud:readi(s8, 0)
+assert(ec == 0, val == nil)
+ec, val = fud:readi(u8, 0)
+assert(ec == 0, val == nil)
+ec, val = fud:readi(s16, 0)
+assert(ec == 0, val == nil)
+ec, val = fud:readi(u16, 0)
+assert(ec == 0, val == nil)
+ec, val = fud:readi(s32, 0)
+assert(ec == 0, val == nil)
 
 -- Read value using self
 ec, val = fud:readi(u8, 1)

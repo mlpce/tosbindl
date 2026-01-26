@@ -682,15 +682,15 @@ int l_Fwritei(lua_State *L) {
 }
 
 /*
-  Freadi. Read one or more values from a file into integers
+  Freadi. Read zero or more values from a file into integers
   Inputs:
     1) userdata: file
     2) integer: imode controlling Lua integer conversion
-    3) integer: number of values to read (default 1 maximum 16)
+    3) integer: number of values to read (default 1 maximum 16 minimum 0)
   Returns:
     1) integer: on success:  >= 0 number of bytes read
     1) integer: on failure:  -ve gemdos error number
-    X) ..., n
+    X) integers: the values read
   Note:
     Will return less than number of values if EOF already reached.
 */
@@ -715,7 +715,7 @@ int l_Freadi(lua_State *L) {
     imode <= TOSBINDL_GEMDOS_IMODE_S32, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
   /* Check num values */
-  luaL_argcheck(L, num_values >= 1 &&
+  luaL_argcheck(L, num_values >= 0 &&
     num_values <= TOSBINDL_GEMDOS_MAX_MULTIVAL, 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
