@@ -981,7 +981,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   ```
 
 ### peek (imode, offset, n)
-  Read one or more values from a memory into integers.
+  Read zero or more values from a memory into integers.
   ```
   Parameters
     imode: integer: mode for integer value conversion
@@ -993,8 +993,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   ```
   ```
   Results
-    1. integer: the first value
-    ...: optional integer(s): the subsequent values
+    X. zero or more integers: the values read
   ```
 
 ### comparem (offset, other_memory, other_offset, n)

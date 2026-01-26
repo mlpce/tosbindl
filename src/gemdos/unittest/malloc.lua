@@ -62,6 +62,12 @@ assert(#t1 == 32)
 for k,v in ipairs(t1) do
   assert(k == v)
 end
+-- Peeking zero values produces no values
+assert(mud:peek(s8, 0, 0) == nil)
+assert(mud:peek(u8, 0, 0) == nil)
+assert(mud:peek(s16, 0, 0) == nil)
+assert(mud:peek(u16, 0, 0) == nil)
+assert(mud:peek(s32, 0, 0) == nil)
 
 -- Max number of peek values is 16 so 17 must fail
 -- See TOSBINDL_GEMDOS_MAX_MULTIVAL

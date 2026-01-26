@@ -444,15 +444,14 @@ int MemoryPoke(lua_State *L) {
 
 /*
   Memory userdata function "peek".
-  Peek one or more values from a memory.
+  Peek zero or more values from a memory.
   Inputs:
     1) userdata: memory
     2) integer: imode controlling Lua integer conversion
     3) integer: offset
-    4) integer: number of values to peek (default 1 maximum 16)
+    4) integer: number of values to peek (default 1 maximum 16 minimum 0)
   Returns:
-    1) integer: the first value
-    X) ..., n
+    X) integers: the values peeked
 */
 int MemoryPeek(lua_State *L) {
   const Memory *const mud =
@@ -477,7 +476,7 @@ int MemoryPeek(lua_State *L) {
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
   /* Check num values */
-  luaL_argcheck(L, num_values >= 1 &&
+  luaL_argcheck(L, num_values >= 0 &&
     num_values <= TOSBINDL_GEMDOS_MAX_MULTIVAL &&
     offset + IMODE_NVAL_TO_SIZE(imode, num_values) <= mud->size, 4,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
