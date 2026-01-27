@@ -61,15 +61,15 @@ assert(mud:peek(u8, 0) == string.byte("9"))
 
 -- Reading zero values using self
 ec, val = fud:readi(s8, 0)
-assert(ec == 0, val == nil)
+assert(ec == 0 and val == nil)
 ec, val = fud:readi(u8, 0)
-assert(ec == 0, val == nil)
+assert(ec == 0 and val == nil)
 ec, val = fud:readi(s16, 0)
-assert(ec == 0, val == nil)
+assert(ec == 0 and val == nil)
 ec, val = fud:readi(u16, 0)
-assert(ec == 0, val == nil)
+assert(ec == 0 and val == nil)
 ec, val = fud:readi(s32, 0)
-assert(ec == 0, val == nil)
+assert(ec == 0 and val == nil)
 
 -- Read value using self
 ec, val = fud:readi(u8, 1)
