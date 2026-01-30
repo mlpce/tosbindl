@@ -959,8 +959,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   ```
   ```
   Results
-    1. integer: the total number of bytes read from the memory
-    2. string: the bytes read
+    1. string: the bytes read
   ```
 
 ### poke (imode, offset, i1, ...)
@@ -1132,5 +1131,8 @@ conin, conout, aux, prn
   1) File userdata readi no longer raises an error when parameter n=0, instead reading zero values.
   2) Memory userdata peek no longer raises an error when parameter n=0, instead peeking zero values.
   3) Memory userdata reads function takes an optional third parameter, termbyte, allowing the read to be terminated early.
+
+### 1.2.0 Memory and File userdata API changes
+  1) Memory userdata reads function now returns a single value, the string read, instead of the number of bytes and the string. The length operator can be used on the string value if the number of bytes is required.
 
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.

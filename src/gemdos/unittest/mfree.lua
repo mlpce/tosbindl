@@ -13,8 +13,8 @@ assert(mud:size() == 32)
 
 mud:set(0, 69)
 
-local num_bytes, str = mud:reads(0)
-assert(num_bytes == mud:size() and type(str) == "string")
+local str = mud:reads(0)
+assert(type(str) == "string" and #str == mud:size())
 assert(str == "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
 -- Free the mud

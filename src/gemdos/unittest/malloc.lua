@@ -93,21 +93,21 @@ mud:poke(u8, 3, 66)
 
 -- Second parameter is number of bytes to read, if it is missing
 -- will read the whole memory.
-local num_bytes, str = mud:reads(0)
-assert(num_bytes == mud:size() and type(str) == "string")
+local str = mud:reads(0)
+assert(type(str) == "string" and #str == mud:size())
 assert(str == "EEABEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
 -- Read four bytes from offset two
-num_bytes, str = mud:reads(2, 4)
-assert(num_bytes == 4 and str == "ABEE")
+str = mud:reads(2, 4)
+assert(#str == 4 and str == "ABEE")
 
 -- Read zero bytes
-num_bytes, str = mud:reads(2, 0);
-assert(num_bytes == 0 and str == "")
+str = mud:reads(2, 0);
+assert(#str == 0 and str == "")
 
 -- Read from offset 2 to end
-num_bytes, str = mud:reads(2);
-assert(num_bytes == 30 and str == "ABEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+str = mud:reads(2);
+assert(#str == 30 and str == "ABEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
 ---------------------------------------------------------------------
 -- Test writing a string into the memory ----------------------------
@@ -118,27 +118,25 @@ assert(num_bytes == 30 and str == "ABEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 -- three and four are optional and if present specify the start
 -- character position and the end character position (one based
 -- positions).
-num_bytes = mud:writes(16, "Oranges")
+local num_bytes = mud:writes(16, "Oranges")
 assert(num_bytes == 7)
-num_bytes, str = mud:reads(0)
-assert(str == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
+str = mud:reads(0)
+assert(#str == 32 and str == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
 
 ---------------------------------------------------------------------
 -- Test writing a string out of bounds of the memory ----------------
 ---------------------------------------------------------------------
 
 -- Writing before the beginning
-local old
-num_bytes, old = mud:reads(0)
+local old = mud:reads(0)
 ok = pcall(function() mud:writes(-1, "No") end)
-local new
-num_bytes, new = mud:reads(0)
+local new = mud:reads(0)
 assert(not ok and old == new)
 
 -- Writing beyond the end
-num_bytes, old = mud:reads(0)
+old = mud:reads(0)
 ok = pcall(function() mud:writes(31, "No") end)
-num_bytes, new = mud:reads(0)
+new = mud:reads(0)
 assert(not ok and old == new)
 
 ---------------------------------------------------------------------
@@ -156,7 +154,7 @@ assert(mud:writes(18, str, 1, 5) == 5)   -- 'retro'
 assert(mud:writes(23, ' Atari ') == 7)   -- ' Atari '
 assert(mud:writes(30, 'S', -1, -1) == 1) -- 'S'
 assert(mud:writes(31, 'T', 1, 1) == 1)   -- 'T'
-num_bytes, new = mud:reads(0)
+new = mud:reads(0)
 assert(new == "cool computing is retro Atari ST")
 
 ---------------------------------------------------------------------
@@ -276,25 +274,25 @@ for _, term_byte in ipairs( { 0, 127, 128, 255} ) do
   num_bytes = mud:set(0, 49)
   assert(num_bytes == 32)
   assert(mud:poke(u8, 31, term_byte) == 1)
-  num_bytes, str = mud:reads(0, nil, term_byte)
-  assert(num_bytes == 31)
+  str = mud:reads(0, nil, term_byte)
+  assert(#str == 31)
   assert(str == '1111111111111111111111111111111')
   assert(mud:poke(u8, 8, term_byte) == 1)
-  num_bytes, str = mud:reads(0, mud:size(), term_byte)
-  assert(num_bytes == 8)
+  str = mud:reads(0, mud:size(), term_byte)
+  assert(#str == 8)
   assert(str == '11111111')
   assert(mud:poke(u8, 0, term_byte) == 1)
-  num_bytes, str = mud:reads(0, nil, term_byte)
-  assert(num_bytes == 0)
+  str = mud:reads(0, nil, term_byte)
+  assert(#str == 0)
   assert(str == '')
-  num_bytes, str = mud:reads(1, nil, term_byte)
-  assert(num_bytes == 7)
+  str = mud:reads(1, nil, term_byte)
+  assert(#str == 7)
   assert(str == '1111111')
-  num_bytes, str = mud:reads(1, 7, term_byte)
-  assert(num_bytes == 7)
+  str = mud:reads(1, 7, term_byte)
+  assert(#str == 7)
   assert(str == '1111111')
-  num_bytes, str = mud:reads(1, 6, term_byte)
-  assert(num_bytes == 6)
+  str = mud:reads(1, 6, term_byte)
+  assert(#str == 6)
   assert(str == '111111')
 end
 
@@ -361,7 +359,7 @@ assert(num_bytes == 16)
 num_bytes = mud:copym(16, mud16, 0, mud16:size())
 assert(num_bytes == 16)
 
-num_bytes, str = mud:reads(0)
+str = mud:reads(0)
 assert(str == "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 
 mud:poke(u8, 0, 42)
@@ -388,8 +386,8 @@ mud:writes(0, "Copy within memories with copym.")
 num_bytes = mud:copym(5, mud, 12, mud:size() - 12)
 assert(num_bytes == 20)
 
-num_bytes, str = mud:reads(0)
-assert(num_bytes == 32 and str == "Copy memories with copym. copym.")
+str = mud:reads(0)
+assert(#str == 32 and str == "Copy memories with copym. copym.")
 
 ---------------------------------------------------------------------
 -- Test imodes with poke and peek -----------------------------------

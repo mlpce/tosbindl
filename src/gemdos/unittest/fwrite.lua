@@ -225,8 +225,8 @@ ec = fud:readm(mud, 0, 16)
 assert(ec == 16)
 
 -- read from memory into string
-ec, str = mud:reads(0, 16)
-assert(ec == 16)
+str = mud:reads(0, 16)
+assert(#str == 16)
 assert(str == "89ABCDEF01234567")
 
 -- Close the file

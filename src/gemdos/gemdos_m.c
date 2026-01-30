@@ -324,8 +324,7 @@ static int MemoryWrites(lua_State *L) {
     3) optional integer: number of bytes to read (offset to end if missing)
     4) optional integer: early termination byte (e.g. 0 for c string memory)
   Returns:
-    1) integer: number of bytes read
-    2) string: bytes read
+    1) string: bytes read
 */
 static int MemoryReads(lua_State *L) {
   const Memory *const mud =
@@ -372,8 +371,6 @@ static int MemoryReads(lua_State *L) {
     }
   }
 
-  /* Number of bytes read */
-  lua_pushinteger(L, count);
   /* Copy bytes into string buffer */
   str = luaL_buffinitsize(L, &b, (size_t) count);
   memcpy(str, src_ptr, (size_t) count);
@@ -381,7 +378,7 @@ static int MemoryReads(lua_State *L) {
   /* Push string */
   luaL_pushresultsize(&b, (size_t) count);
 
-  return 2;
+  return 1;
 }
 
 /*

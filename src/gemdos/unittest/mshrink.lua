@@ -17,17 +17,16 @@ assert(ec == 16)
 assert(mud:size() == 16)
 
 -- Read the memory, it must still contain 69
-local num_bytes, str = mud:reads(0)
-assert(num_bytes == 16 and str == "EEEEEEEEEEEEEEEE")
+local str = mud:reads(0)
+assert(#str == 16 and str == "EEEEEEEEEEEEEEEE")
 
 -- Try enlarge the memory, this must fail
 ec = gemdos.Mshrink(mud, 32)
 assert(ec == gemdos.const.Error.EGSBF)
 
 -- The memory must still contain 69
-local str2
-num_bytes, str2 = mud:reads(0)
-assert(num_bytes == 16 and str2 == "EEEEEEEEEEEEEEEE")
+local str2 = mud:reads(0)
+assert(#str2 == 16 and str2 == "EEEEEEEEEEEEEEEE")
 
 ---------------------------------------------------------------------
 -- Check memory can be shrunk through self --------------------------
