@@ -361,7 +361,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     1. integer: on failure:  -ve gemdos error number
   ```
 
-### gemdos.Freadt (file, imode, numvalues)
+### gemdos.Freadt (file, imode, numvalues [, tbl])
   Freadt. Read values from a file into an array table.
 
   ```
@@ -369,6 +369,7 @@ The GEMDOS functions are published through a global table 'gemdos'
     file: userdata: file
     imode: integer: mode for integer value conversion
     numvalues: integer: number of values to read
+    tbl: optional table: the result table (a new one is created if missing)
 
   Note: gemdos.const.Imode contains integer mode constants.
   ```
@@ -380,6 +381,7 @@ The GEMDOS functions are published through a global table 'gemdos'
 
   Note: Can return less values than requested if EOF reached. Will return 0
   values and empty table if EOF already reached.
+  Note: Table key "n" is set to the number of values read.
   ```
 
 ### gemdos.Fwritet (file, imode, t [, i [, j]])

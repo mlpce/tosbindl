@@ -413,6 +413,7 @@ int l_Fwrites(lua_State *L) {
     1) userdata: file
     2) integer: imode controlling Lua integer conversion
     3) integer: number of values to read
+    4) optional table: the result table (a new one is created if missing)
   Returns:
     1) integer: on success:  >= 0 number of bytes read
     1) integer: on failure:  -ve gemdos error number
@@ -420,16 +421,19 @@ int l_Fwrites(lua_State *L) {
   Note:
     Can return less values than requested if EOF reached.
     Will return 0 values and empty table if EOF already reached.
+    Table key "n" is set to the number of values read.
 */
 int l_Freadt(lua_State *L) {
   const File *const fud = (const File *) luaL_checkudata(L, 1,
     TOSBINDL_UD_T_Gemdos_File); /* File ud */
   const lua_Integer imode = luaL_checkinteger(L, 2); /* Integer mode */
   const lua_Integer count = luaL_checkinteger(L, 3); /* Num values to read */
+  const int arg_4_type = lua_type(L, 4); /* Optional table argument */
   long result = 0;
   long key_base = 1; /* Base key for table */
-  lua_Integer count_bytes; /* Number of bytes to write */
-  lua_Integer remaining_bytes; /* Remaining bytes to write */
+  lua_Integer count_bytes; /* Number of bytes to read */
+  lua_Integer remaining_bytes; /* Remaining bytes to read */
+  lua_Integer read_bytes; /* Number of bytes that were read */
   unsigned char *buff; /* Pointer to temporary buffer */
 
   /* Check file */
@@ -446,8 +450,13 @@ int l_Freadt(lua_State *L) {
   luaL_argcheck(L, count >= 0, 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Create table to hold the array */
-  lua_createtable(L, count < INT_MAX ? (int) count : INT_MAX, 0);
+  /* Was a table specified in which to store the values? */
+  if (arg_4_type != LUA_TNIL && arg_4_type != LUA_TNONE) {
+    luaL_checktype(L, 4, LUA_TTABLE);
+  } else {
+    /* Push table to hold the array */
+    lua_createtable(L, count < INT_MAX ? (int) count : INT_MAX, 1);
+  }
 
   /* Userdata for temporary space */
   if (lua_getiuservalue(L, 1, 1) != LUA_TUSERDATA) {
@@ -458,9 +467,9 @@ int l_Freadt(lua_State *L) {
   }
   buff = lua_touserdata(L, -1);
 
-  /* Number of bytes to write */
+  /* Number of bytes to read */
   count_bytes = IMODE_NVAL_TO_SIZE(imode, count);
-  /* Number of bytes remaining to write */
+  /* Number of bytes remaining to read */
   remaining_bytes = count_bytes;
 
   /* Loop while bytes are remaining to be read */
@@ -499,8 +508,12 @@ int l_Freadt(lua_State *L) {
   }
 
   lua_pop(L, 1); /* Pop temporary buffer */
+
+  /* The number of bytes that were read */
+  read_bytes = count_bytes - remaining_bytes;
+
   /* Push result */
-  lua_pushinteger(L, result < 0 ? result : count_bytes - remaining_bytes);
+  lua_pushinteger(L, result < 0 ? result : read_bytes);
   /* Rotate array table to top */
   lua_rotate(L, 4, 1);
 
@@ -509,6 +522,11 @@ int l_Freadt(lua_State *L) {
     lua_pop(L, 1);
     /* push nil instead */
     lua_pushnil(L);
+  } else {
+    /* Set the number of values read using key "n" */
+    lua_pushstring(L, "n");
+    lua_pushinteger(L, IMODE_SIZE_TO_NVAL(imode, read_bytes));
+    lua_rawset(L, -3);
   }
 
   /* Return result and array table */
