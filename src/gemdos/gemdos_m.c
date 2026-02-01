@@ -198,15 +198,17 @@ static int MemoryWritet(lua_State *L) {
     2) integer: imode controlling Lua integer conversion
     3) integer: offset
     4) optional integer: number of values to read (offset to end if missing)
+    5) optional table: the output table (a new one is created if missing)
   Returns:
-    1) integer: number of bytes read
-    2) table: an array of integers holding values read
+    1) table: an array of integers holding values read
+    NOTE: Table key "n" is set to the number of values read 
 */
 static int MemoryReadt(lua_State *L) {
   const Memory *const mud =
     (const Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
   const lua_Integer imode = luaL_checkinteger(L, 2); /* Integer mode */
   const lua_Integer offset = luaL_checkinteger(L, 3); /* Offset into memory */
+  const int arg_5_type = lua_type(L, 5); /* Optional table argument */
   lua_Integer count; /* Number of values read */
   lua_Integer num_bytes; /* Number of bytes read */
   const unsigned char *src; /* Source read pointer */
@@ -238,10 +240,18 @@ static int MemoryReadt(lua_State *L) {
     count >= 0 && offset + num_bytes <= mud->size, 4,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Push number of bytes read */
-  lua_pushinteger(L, num_bytes);
-  /* Push table to hold the array */
-  lua_createtable(L, count < INT_MAX ? (int) count : INT_MAX, 0);
+  /* Was a table specified in which to store the values? */
+  if (arg_5_type != LUA_TNIL && arg_5_type != LUA_TNONE) {
+    luaL_checktype(L, 5, LUA_TTABLE);
+  } else {
+    /* Push table to hold the array */
+    lua_createtable(L, count < INT_MAX ? (int) count : INT_MAX, 1);
+  }
+
+  /* Set the count value using key "n" */
+  lua_pushstring(L, "n");
+  lua_pushinteger(L, count);
+  lua_rawset(L, -3);
 
   /* Source read pointer starts at memory plus offset */
   src = mud->ptr + offset;
@@ -257,7 +267,7 @@ static int MemoryReadt(lua_State *L) {
     lua_rawseti(L, -2, key);
   }
 
-  return 2;
+  return 1;
 }
 
 /*

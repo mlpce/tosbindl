@@ -904,7 +904,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
     1. integer: the total number of bytes written into the memory
   ```
 
-### readt (imode, offset [, numvalues])
+### readt (imode, offset [, numvalues, tbl])
   Read integer values from a memory into an array table.
 
   ```
@@ -913,14 +913,15 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
     offset: integer: source offset in the memory in bytes
     numvalues: optional integer: number of values to read (offset to end if
     missing)
+    tbl: optional table: the result table (a new one is created if missing)
 
   Note: gemdos.const.Imode contains integer mode constants. For 16 or 32 bit
   modes offset must be even.
   ```
   ```
   Results
-    1. integer: the total number of bytes read from the memory
-    2. table: an array of integers holding the values read
+    1. table: an array of integers holding the values read
+  Note: Table key "n" is set to the number of values read.
   ```
 
 ### writes (offset, s [, i [, j]])
