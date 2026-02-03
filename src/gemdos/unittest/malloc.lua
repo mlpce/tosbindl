@@ -184,9 +184,8 @@ mud:set(0, 69, mud:size())
 
 -- Read memory into a table. Second parameter is number of bytes to
 -- read, if it is missing will read the whole memory.
-local tbl
-num_bytes, tbl = mud:readt(u8, 0)
-assert(num_bytes == mud:size() and type(tbl) == "table")
+local tbl = mud:readt(u8, 0)
+assert(type(tbl) == "table" and tbl.n == mud:size() and #tbl == tbl.n)
 
 -- Check all values are correct
 for i=1,#tbl do
@@ -198,8 +197,8 @@ mud:poke(u8, 2, 65)
 mud:poke(u8, 3, 66)
 
 -- Read four bytes from offset two
-num_bytes, tbl = mud:readt(u8, 2, 4)
-assert(num_bytes == 4)
+tbl = mud:readt(u8, 2, 4)
+assert(tbl.n == 4 and #tbl == 4)
 
 -- Check the table values. The tables use one based indices.
 assert(tbl[1] == 65 and tbl[2] == 66)
@@ -217,8 +216,8 @@ assert(string.char(table.unpack(tbl)) == "ABEE")
 num_bytes = mud:writet(u8, 16, {79, 114, 97, 110, 103, 101, 115})
 assert(num_bytes == 7)
 
-num_bytes, tbl = mud:readt(u8, 0)
-assert(num_bytes == 32)
+tbl = mud:readt(u8, 0)
+assert(tbl.n == 32 and #tbl == 32)
 assert(string.char(table.unpack(tbl)) == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
 
 ---------------------------------------------------------------------
@@ -226,15 +225,15 @@ assert(string.char(table.unpack(tbl)) == "EEABEEEEEEEEEEEEOrangesEEEEEEEEE")
 ---------------------------------------------------------------------
 
 -- Writing before the beginning
-num_bytes, old = mud:readt(u8, 0)
+old = mud:readt(u8, 0)
 ok = pcall(function() mud:writet(u8, -1, {1, 2}) end)
-num_bytes, new = mud:readt(u8, 0)
+new = mud:readt(u8, 0)
 assert(not ok and table.concat(old) == table.concat(new))
 
 -- Writing beyond the end
-num_bytes, old = mud:readt(u8, 0)
+old = mud:readt(u8, 0)
 ok = pcall(function() mud:writet(u8, 31, {1, 2}) end)
-num_bytes, new = mud:readt(u8, 0)
+new = mud:readt(u8, 0)
 assert(not ok and table.concat(old) == table.concat(new))
 
 ---------------------------------------------------------------------
@@ -250,7 +249,7 @@ assert(mud:writet(u8, 5, tbl, 7, -9) == 9)   -- 'computing'
 assert(mud:writet(u8, 14, tbl, 16, 19) == 4) -- ' is '
 assert(mud:writet(u8, 18, tbl, 1, 5) == 5)   -- 'retro'
 mud:writet(u8, 23, table.pack(string.byte(' Atari ST', 1, -1)))
-num_bytes, new = mud:readt(u8, 0)
+new = mud:readt(u8, 0)
 assert(string.char(table.unpack(new)) == "cool computing is retro Atari ST")
 
 ---------------------------------------------------------------------
@@ -562,8 +561,8 @@ for v=1,16 do
   t[v] = v
 end
 assert(mud:writet(s16, 0, t) == 32)
-local num, t2 = mud:readt(s16, 0)
-assert(num == 32)
+local t2 = mud:readt(s16, 0)
+assert(t2.n == 16 and #t2 == 16)
 for k=1,16 do
   assert(t2[k] == t[k])
 end
@@ -574,8 +573,8 @@ for v=1,16 do
   t[v] = v
 end
 assert(mud:writet(u16, 0, t) == 32)
-num, t2 = mud:readt(u16, 0)
-assert(num == 32)
+t2 = mud:readt(u16, 0)
+assert(t2.n == 16 and #t2 == 16)
 for k=1,16 do
   assert(t2[k] == t[k])
 end
@@ -586,8 +585,8 @@ for v=1,8 do
   t[v] = v
 end
 assert(mud:writet(s32, 0, t) == 32)
-num, t2 = mud:readt(s32, 0)
-assert(num == 32)
+t2 = mud:readt(s32, 0)
+assert(t2.n == 8 and #t2 == 8)
 for k=1,8 do
   assert(t2[k] == t[k])
 end
@@ -595,8 +594,8 @@ end
 -- signed 8 bit max value
 t = { 127 }
 assert(mud:writet(s8, 0, t) == 1)
-num, t2 = mud:readt(s8, 0, 1)
-assert(num == 1 and t2[1] == t[1])
+t2 = mud:readt(s8, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = 128
 ok = pcall(function() mud:writet(s8, 0, t) end)
 assert(not ok)
@@ -604,8 +603,8 @@ assert(not ok)
 -- signed 8 bit min value
 t = { -128 }
 assert(mud:writet(s8, 0, t) == 1)
-num, t2 = mud:readt(s8, 0, 1)
-assert(num == 1 and t2[1] == t[1])
+t2 = mud:readt(s8, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = -129
 ok = pcall(function() mud:writet(s8, 0, t) end)
 assert(not ok)
@@ -613,8 +612,8 @@ assert(not ok)
 -- unsigned 8 bit max value
 t = { 255 }
 assert(mud:writet(u8, 0, t) == 1)
-num, t2 = mud:readt(u8, 0, 1)
-assert(num == 1 and t2[1] == t[1])
+t2 = mud:readt(u8, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = 256
 ok = pcall(function() mud:writet(u8, 0, t) end)
 assert(not ok)
@@ -622,8 +621,8 @@ assert(not ok)
 -- unsigned 8 bit min value
 t = { 0 }
 assert(mud:writet(u8, 0, t) == 1)
-num, t2 = mud:readt(u8, 0, 1)
-assert(num == 1 and t2[1] == t[1])
+t2 = mud:readt(u8, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = -1
 ok = pcall(function() mud:writet(u8, 0, t) end)
 assert(not ok)
@@ -631,8 +630,8 @@ assert(not ok)
 -- signed 16 bit max value
 t = { 32767 }
 assert(mud:writet(s16, 0, t) == 2)
-num, t2 = mud:readt(s16, 0, 1)
-assert(num == 2 and t2[1] == t[1])
+t2 = mud:readt(s16, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = 32768
 ok = pcall(function() mud:writet(s16, 0, t) end)
 assert(not ok)
@@ -640,8 +639,8 @@ assert(not ok)
 -- signed 16 bit min value
 t = { -32768 }
 assert(mud:writet(s16, 0, t) == 2)
-num, t2 = mud:readt(s16, 0, 1)
-assert(num == 2 and t2[1] == t[1])
+t2 = mud:readt(s16, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = -32769
 ok = pcall(function() mud:writet(s16, 0, t) end)
 assert(not ok)
@@ -649,8 +648,8 @@ assert(not ok)
 -- unsigned 16 bit max value
 t = { 65535 }
 assert(mud:writet(u16, 0, t) == 2)
-num, t2 = mud:readt(u16, 0, 1)
-assert(num == 2 and t2[1] == t[1])
+t2 = mud:readt(u16, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = 65536
 ok = pcall(function() mud:writet(u16, 0, t) end)
 assert(not ok)
@@ -658,8 +657,8 @@ assert(not ok)
 -- unsigned 16 bit min value
 t = { 0 }
 assert(mud:writet(u16, 0, t) == 2)
-num, t2 = mud:readt(u16, 0, 1)
-assert(num == 2 and t2[1] == t[1])
+t2 = mud:readt(u16, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 t[1] = -1
 ok = pcall(function() mud:writet(u16, 0, t) end)
 assert(not ok)
@@ -667,14 +666,14 @@ assert(not ok)
 -- signed 32 bit max value
 t = { 2147483647 }
 assert(mud:writet(s32, 0, t) == 4)
-num, t2 = mud:readt(s32, 0, 1)
-assert(num == 4 and t2[1] == t[1])
+t2 = mud:readt(s32, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 
 -- signed 32 bit min value
 t = { -2147483648 }
 assert(mud:writet(s32, 0, t) == 4)
-num, t2 = mud:readt(s32, 0, 1)
-assert(num == 4 and t2[1] == t[1])
+t2 = mud:readt(s32, 0, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 
 -- odd offsets for signed 16 bit values must fail
 t = { 0 }
@@ -699,8 +698,8 @@ assert(not ok)
 mud:set(0, 0)
 t = { 32767 }
 assert(mud:writet(s16, 14, t) == 2)
-ec, t2 = mud:readt(s16, 14, 1)
-assert(ec == 2 and t2[1] == t[1])
+t2 = mud:readt(s16, 14, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 for k = 1, 13 do
   assert(mud:peek(u8, k) == 0)
 end
@@ -711,8 +710,8 @@ assert(mud:peek(u8, 15) == 0xff)
 mud:set(0, 0)
 t = { 32768 }
 assert(mud:writet(u16, 14, t) == 2)
-ec, t2 = mud:readt(u16, 14, 1)
-assert(ec == 2 and t2[1] == t[1])
+t2 = mud:readt(u16, 14, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 for k = 1, 13 do
   assert(mud:peek(u8, k) == 0)
 end
@@ -723,8 +722,8 @@ assert(mud:peek(u8, 15) == 0x00)
 mud:set(0, 0)
 t = { 2147483647 }
 assert(mud:writet(s32, 12, t) == 4)
-ec, t2 = mud:readt(s32, 12, 1)
-assert(ec == 4 and t2[1] == t[1])
+t2 = mud:readt(s32, 12, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 for k = 1, 11 do
   assert(mud:peek(u8, k) == 0)
 end
@@ -739,8 +738,8 @@ t = { 42, 43 }
 assert(mud:writet(s16, 30, t, 1, 1) == 2)
 ok = pcall(function() mud:writet(s16, 30, t, 1) end)
 assert(not ok)
-ec, t2 = mud:readt(s16, 30, 1)
-assert(ec == 2 and t2[1] == t[1])
+t2 = mud:readt(s16, 30, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 ok = pcall(function() mud:readt(s16, 30, 2) end)
 assert(not ok)
 
@@ -749,8 +748,8 @@ t = { 44, 45 }
 assert(mud:writet(u16, 30, t, 1, 1) == 2)
 ok = pcall(function() mud:writet(u16, 30, t, 1) end)
 assert(not ok)
-ec, t2 = mud:readt(u16, 30, 1)
-assert(ec == 2 and t2[1] == t[1])
+t2 = mud:readt(u16, 30, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 ok = pcall(function() mud:readt(u16, 30, 2) end)
 assert(not ok)
 
@@ -759,8 +758,8 @@ t = { 46, 47 }
 assert(mud:writet(s32, 28, t, 1, 1) == 4)
 ok = pcall(function() mud:writet(s32, 28, t, 1) end)
 assert(not ok)
-ec, t2 = mud:readt(s32, 28, 1)
-assert(ec == 4 and t2[1] == t[1])
+t2 = mud:readt(s32, 28, 1)
+assert(t2.n == 1 and #t2 == 1 and t2[1] == t[1])
 ok = pcall(function() mud:readt(s32, 28, 2) end)
 assert(not ok)
 
@@ -881,14 +880,14 @@ table.insert(t2, 8)
 ok = pcall(function() mud:writet(s16, 0, t2) end)
 assert(not ok)
 -- Reading seven values for imode s16 must succeed
-num, t2 = mud:readt(s16, 0, 7)
-assert(num == 14)
+t2 = mud:readt(s16, 0, 7)
+assert(t2.n == 7 and #t2 == 7)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
 -- Without num values, must only read complete values
-num, t2 = mud:readt(s16, 0)
-assert(num == 14)
+t2 = mud:readt(s16, 0)
+assert(t2.n == 7 and #t2 == 7)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
@@ -906,14 +905,14 @@ table.insert(t2, 7)
 ok = pcall(function() mud:writet(s16, 2, t2) end)
 assert(not ok)
 -- Reading six values for imode s16 with offset 2 must succeed
-num, t2 = mud:readt(s16, 2, 6)
-assert(num == 12)
+t2 = mud:readt(s16, 2, 6)
+assert(t2.n == 6 and #t2 == 6)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
 -- Without num values, must only read complete values
-num, t2 = mud:readt(s16, 2)
-assert(num == 12)
+t2 = mud:readt(s16, 2)
+assert(t2.n == 6 and #t2 == 6)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
@@ -930,14 +929,14 @@ table.insert(t2, 8)
 ok = pcall(function() mud:writet(u16, 0, t2) end)
 assert(not ok)
 -- Reading seven values for imode u16 must succeed
-num, t2 = mud:readt(u16, 0, 7)
-assert(num == 14)
+t2 = mud:readt(u16, 0, 7)
+assert(t2.n == 7 and #t2 == 7)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
 -- Without num values, must only read complete values
-num, t2 = mud:readt(u16, 0)
-assert(num == 14)
+t2 = mud:readt(u16, 0)
+assert(t2.n == 7 and #t2 == 7)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
@@ -955,14 +954,14 @@ table.insert(t2, 7)
 ok = pcall(function() mud:writet(u16, 2, t2) end)
 assert(not ok)
 -- Reading six values for imode u16 with offset 2 must succeed
-num, t2 = mud:readt(u16, 2, 6)
-assert(num == 12)
+t2 = mud:readt(u16, 2, 6)
+assert(t2.n == 6 and #t2 == 6)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
 -- Without num values, must only read complete values
-num, t2 = mud:readt(u16, 2)
-assert(num == 12)
+t2 = mud:readt(u16, 2)
+assert(t2.n == 6 and #t2 == 6)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
@@ -979,14 +978,14 @@ table.insert(t2, 4)
 ok = pcall(function() mud:writet(s32, 0, t2) end)
 assert(not ok)
 -- Reading three values for imode s32 must succeed
-num, t2 = mud:readt(s32, 0, 3)
-assert(num == 12)
+t2 = mud:readt(s32, 0, 3)
+assert(t2.n == 3 and #t2 == 3)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
 -- Without num values, must only read complete values
-num, t2 = mud:readt(s32, 0)
-assert(num == 12)
+t2 = mud:readt(s32, 0)
+assert(t2.n == 3 and #t2 == 3)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
@@ -1004,20 +1003,67 @@ table.insert(t2, 3)
 ok = pcall(function() mud:writet(s32, 4, t2) end)
 assert(not ok)
 -- Reading two values for imode s32 with offset 4 must succeed
-num, t2 = mud:readt(s32, 4, 2)
-assert(num == 8)
+t2 = mud:readt(s32, 4, 2)
+assert(t2.n == 2 and #t2 == 2)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
 -- Without num values, must only read complete values
-num, t2 = mud:readt(s32, 4)
-assert(num == 8)
+t2 = mud:readt(s32, 4)
+assert(t2.n == 2 and #t2 == 2)
 for k,v in ipairs(t2) do
   assert(v == t[k])
 end
 -- Reading three values for imode s32 with offset 4 must fail
 ok = pcall(function() mud:readt(s32, 4, 3) end)
 assert(not ok)
+
+---------------------------------------------------------------------
+-- readt with output table passed as parameter
+---------------------------------------------------------------------
+mud:free()
+
+-- Size rotator for imodes
+local imode_sz_r <const> = {
+  [s8] = 0,
+  [u8] = 0,
+  [s16] = 1,
+  [u16] = 1,
+  [s32] = 2
+}
+
+-- Allocate 16 byte mud
+ec, mud = gemdos.Malloc(16)
+assert(ec > 0)
+assert(mud:address() ~= 0)
+assert(mud:size() == 16)
+mud:set(0, 0)
+
+local output_tbl = {}
+for _,test in ipairs(
+    { {s8, 0, { -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16 } },
+      {u8, 0, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 } },
+      {s16, 0, { -101, -102, -103, -104, -105, -106, -107, -108 } },
+      {u16, 0, { 101, 102, 103, 104, 105, 106, 107, 108 } },
+      {s32, 0, { 201, 202, 203, 204 } },
+      {s8, 1, { -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15 } },
+      {u8, 1, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 } },
+      {s16, 2, { -101, -102, -103, -104, -105, -106, -107 } },
+      {u16, 2, { 101, 102, 103, 104, 105, 106, 107 } },
+      {s32, 4, { 201, 202, 203 } } } ) do
+  local imode = test[1]
+  local offset = test[2]
+  local write_table = test[3]
+  num_bytes = mud:writet(imode, offset, write_table)
+  assert(num_bytes == #write_table << imode_sz_r[imode])
+  local read_tbl = mud:readt(imode, offset, nil, output_tbl)
+  assert(read_tbl == output_tbl)
+  assert(read_tbl.n == #write_table)
+  assert(#read_tbl == 16)
+  for k,v in ipairs(write_table) do
+    assert(v == read_tbl[k])
+  end
+end
 
 ---------------------------------------------------------------------
 -- Compare memory ---------------------------------------------------

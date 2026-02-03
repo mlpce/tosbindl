@@ -1137,5 +1137,9 @@ conin, conout, aux, prn
 
 ### 1.2.0 Memory and File userdata API changes
   1) Memory userdata reads function now returns a single value, the string read, instead of the number of bytes and the string. The length operator can be used on the string value if the number of bytes is required.
+  2) Memory userdata readt function now returns a single value, the table read, instead of the number
+  of bytes read and the table. Additionally, the result table can be passed as parameter instead of a
+  new table being created. In either case, key "n" is set to the number of values read into the table.
+  3) File userdata readt function result table can be passed as parameter instead of a new table being created. In either case, key "n" is set to the number of values read into the table.
 
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.

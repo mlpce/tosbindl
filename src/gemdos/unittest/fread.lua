@@ -28,7 +28,7 @@ assert(ec == 2 and str == "01")
 -- Read table
 local tbl
 ec, tbl = gemdos.Freadt(fud, u8, 2)
-assert(ec == 2 and string.char(table.unpack(tbl)) == "23")
+assert(ec == 2 and tbl.n == 2 and string.char(table.unpack(tbl)) == "23")
 
 -- Read memory
 local mud
@@ -51,7 +51,7 @@ assert(str == "7")
 
 -- Read table using self
 ec, tbl = fud:readt(u8, 1)
-assert(ec == 1)
+assert(ec == 1 and tbl.n == 1)
 assert(tbl[1] == string.byte("8"))
 
 -- Read memory using self

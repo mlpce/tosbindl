@@ -108,7 +108,7 @@ assert(ec == 0)
 -- Check contents
 local tbl
 ec, tbl = fud:readt(u8, 8)
-assert(ec == 8 and string.char(table.unpack(tbl)) == "01234567")
+assert(ec == 8 and tbl.n == 8 and string.char(table.unpack(tbl)) == "01234567")
 ec = gemdos.Fclose(fud)
 assert(ec == 0)
 
@@ -142,7 +142,7 @@ assert(ec == 0, fud)
 
 -- Read 100 bytes - only 32 are obtained
 ec, new = fud:readt(u8, 100)
-assert(ec == 32 and
+assert(ec == 32 and new.n == 32 and
   string.char(table.unpack(new)) == "cool computing is retro Atari ST")
 fud:close()
 
@@ -170,7 +170,7 @@ fud:close()
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 ec, tbl = fud:readt(u8, small_block_size + 1)
-assert(ec == small_block_size + 1)
+assert(ec == small_block_size + 1 and tbl.n == ec)
 fud:close()
 for i = 0,small_block_size - 1 do
   assert(tbl[i + 1] == i % 8)
@@ -590,34 +590,34 @@ ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 -- signed 8 bit max value
 ec, tbl = fud:readt(s8, 1)
-assert(ec == 1 and tbl[1] == 127)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == 127)
 -- signed 8 bit min value
 ec, tbl = fud:readt(s8, 1)
-assert(ec == 1 and tbl[1] == -128)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == -128)
 -- unsigned 8 bit max value
 ec, tbl = fud:readt(u8, 1)
-assert(ec == 1 and tbl[1] == 255)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == 255)
 -- unsigned 8 bit min value
 ec, tbl = fud:readt(u8, 1)
-assert(ec == 1 and tbl[1] == 0)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == 0)
 -- signed 16 bit max value
 ec, tbl = fud:readt(s16, 1)
-assert(ec == 2 and tbl[1] == 32767)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == 32767)
 -- signed 16 bit min value
 ec, tbl = fud:readt(s16, 1)
-assert(ec == 2 and tbl[1] == -32768)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == -32768)
 -- unsigned 16 bit max value
 ec, tbl = fud:readt(u16, 1)
-assert(ec == 2 and tbl[1] == 65535)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == 65535)
 -- unsigned 16 bit min value
 ec, tbl = fud:readt(u16, 1)
-assert(ec == 2 and tbl[1] == 0)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == 0)
 -- signed 32 bit max value
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == 2147483647)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == 2147483647)
 -- signed 32 bit min value
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == -2147483648)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == -2147483648)
 
 -- Close the file
 fud:close()
@@ -644,22 +644,22 @@ fud:close()
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 ec, tbl = fud:readt(s8, 4)
-assert(ec == 4 and tbl[1] == -1 and tbl[2] == -2 and
+assert(ec == 4 and tbl.n == 4 and tbl[1] == -1 and tbl[2] == -2 and
   tbl[3] == -3 and tbl[4] == -4)
 ec, tbl = fud:readt(u8, 4)
-assert(ec == 4 and tbl[1] == 1 and tbl[2] == 2 and
+assert(ec == 4 and tbl.n == 4 and tbl[1] == 1 and tbl[2] == 2 and
   tbl[3] == 3 and tbl[4] == 4)
 ec, tbl = fud:readt(s16, 4)
-assert(ec == 8 and tbl[1] == -1 and tbl[2] == -2 and
+assert(ec == 8 and tbl.n == 4 and tbl[1] == -1 and tbl[2] == -2 and
   tbl[3] == -3 and tbl[4] == -4)
 ec, tbl = fud:readt(u16, 4)
-assert(ec == 8 and tbl[1] == 1 and tbl[2] == 2 and
+assert(ec == 8 and tbl.n == 4 and tbl[1] == 1 and tbl[2] == 2 and
   tbl[3] == 3 and tbl[4] == 4)
 ec, tbl = fud:readt(s32, 4)
-assert(ec == 16 and tbl[1] == -1 and tbl[2] == 2 and
+assert(ec == 16 and tbl.n == 4 and tbl[1] == -1 and tbl[2] == 2 and
   tbl[3] == -3 and tbl[4] == 4)
 ec, tbl = fud:readt(s32, 4) -- 2 byte read then EOF
-assert(ec == 2 and #tbl == 0 ) -- 2 bytes read, not enough for s32 value
+assert(ec == 2 and tbl.n == 0 and #tbl == 0 ) -- 2 bytes read, not enough for s32 value
 
 fud:close()
 
@@ -676,9 +676,9 @@ fud:close()
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == -1)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == -1)
 ec, tbl = fud:readt(s32, 1) -- 1 byte read then EOF
-assert(ec == 1 and #tbl == 0) -- 1 byte read, not enough for s32 value
+assert(ec == 1 and tbl.n == 0 and #tbl == 0) -- 1 byte read, not enough for s32 value
 
 fud:close()
 
@@ -696,9 +696,9 @@ fud:close()
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == -1)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == -1)
 ec, tbl = fud:readt(s32, 1) -- 3 byte read then EOF
-assert(ec == 3 and #tbl == 0) -- 3 byte read, not enough for s32 value
+assert(ec == 3 and tbl.n == 0 and #tbl == 0) -- 3 byte read, not enough for s32 value
 
 fud:close()
 
@@ -714,9 +714,9 @@ fud:close()
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == -1)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == -1)
 ec, tbl = fud:readt(s16, 1) -- 1 byte read then EOF
-assert(ec == 1 and #tbl == 0) -- 1 byte read, not enough for s16 value
+assert(ec == 1 and tbl.n == 0 and #tbl == 0) -- 1 byte read, not enough for s16 value
 
 fud:close()
 
@@ -732,9 +732,9 @@ fud:close()
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == -1)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == -1)
 ec, tbl = fud:readt(u16, 1) -- 1 byte read then EOF
-assert(ec == 1 and #tbl == 0) -- 1 byte read, not enough for u16 value
+assert(ec == 1 and tbl.n == 0 and #tbl == 0) -- 1 byte read, not enough for u16 value
 
 fud:close()
 
@@ -758,28 +758,74 @@ fud:close()
 ec, fud = gemdos.Fopen("TESTFILE", gemdos.const.Fopen.readonly)
 assert(ec == 0)
 ec, tbl = fud:readt(s8, 1)
-assert(ec == 1 and tbl[1] == -128)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == -128)
 ec, tbl = fud:readt(s8, 1)
-assert(ec == 1 and tbl[1] == 127)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == 127)
 ec, tbl = fud:readt(u8, 1)
-assert(ec == 1 and tbl[1] == 0)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == 0)
 ec, tbl = fud:readt(u8, 1)
-assert(ec == 1 and tbl[1] == 255)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == 255)
 ec, tbl = fud:readt(s16, 1)
-assert(ec == 2 and tbl[1] == -32768)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == -32768)
 ec, tbl = fud:readt(s16, 1)
-assert(ec == 2 and tbl[1] == 32767)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == 32767)
 ec, tbl = fud:readt(u16, 1)
-assert(ec == 2 and tbl[1] == 0)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == 0)
 ec, tbl = fud:readt(u16, 1)
-assert(ec == 2 and tbl[1] == 65535)
+assert(ec == 2 and tbl.n == 1 and tbl[1] == 65535)
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == -2147483648)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == -2147483648)
 ec, tbl = fud:readt(s32, 1)
-assert(ec == 4 and tbl[1] == 2147483647)
+assert(ec == 4 and tbl.n == 1 and tbl[1] == 2147483647)
 ec, tbl = fud:readt(s8, 1)
-assert(ec == 1 and tbl[1] == 42)
+assert(ec == 1 and tbl.n == 1 and tbl[1] == 42)
 
 fud:close()
+
+---------------------------------------------------------------------
+-- readt with output table passed as parameter
+---------------------------------------------------------------------
+
+-- Size rotator for imodes
+local imode_sz_r <const> = {
+  [s8] = 0,
+  [u8] = 0,
+  [s16] = 1,
+  [u16] = 1,
+  [s32] = 2
+}
+
+local output_tbl = {}
+for _,test in ipairs(
+    { {s8, { -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16 } },
+      {u8, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 } },
+      {s16, { -101, -102, -103, -104, -105, -106, -107, -108 } },
+      {u16, { 101, 102, 103, 104, 105, 106, 107, 108 } },
+      {s32, { 201, 202, 203, 204 } } } ) do
+  local imode = test[1]
+  local write_table = test[2]
+
+  ec, fud = gemdos.Fcreate("TESTFILE", gemdos.const.Fattrib.none)
+  assert(ec == 0)
+
+  ec = fud:writet(imode, write_table)
+  assert(ec == #write_table << imode_sz_r[imode])
+
+  local abs_pos = gemdos.Fseek(fud, 0, gemdos.const.Fseek.seek_set)
+  assert(abs_pos == 0)
+
+  local read_tbl
+  ec, read_tbl = fud:readt(imode, #write_table, output_tbl)
+  fud:close()
+
+  assert(ec == #write_table << imode_sz_r[imode])
+  assert(read_tbl == output_tbl)
+  assert(read_tbl.n == #write_table)
+
+  assert(#read_tbl == 16)
+  for k,v in ipairs(write_table) do
+    assert(v == read_tbl[k])
+  end
+end
 
 gemdos.Cconws("Test gemdos.Fwrite completed\r\n")
