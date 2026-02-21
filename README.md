@@ -1109,6 +1109,38 @@ conin, conout, aux, prn
     1. table: the GEMDOS environment as a table
   ```
 
+### gemdos.utility.allocm (n)
+  Allocates memory using the libc allocator. The memory can be freed with
+  Mfree, but not shrunk with Mshrink.
+
+  ```
+  Parameters
+    n: integer: number of bytes to allocate
+  ```
+  ```
+  Results
+    1. integer: on success: number of bytes allocated
+    1. integer: on failure: gemdos error code
+    2. userdata: on success: memory userdata
+  ```
+
+### gemdos.utility.wrapm (addr, size)
+  Wraps an existing address into a memory. The memory can be unwrapped with
+  Mfree,  be not shrunk with Mshrink. Wrapping an inaccessible memory area
+  will cause a bus error when writing or reading. Writing to wrapped memory
+  can cause corruption and crashes if used incorrectly.
+
+  ```
+  Parameters
+    addr: integer: the address to wrap
+    size: integer: the number of bytes to wrap
+  Note: The wrapped address must be even
+  ```
+  ```
+  Results
+    1. userdata: wrapping memory userdata
+  ```
+
 ### gemdos.utility.version ()
   Gets the tosbindl GEMDOS binding version number.
 
@@ -1141,5 +1173,9 @@ conin, conout, aux, prn
   of bytes read and the table. Additionally, the result table can be passed as parameter instead of a
   new table being created. In either case, key "n" is set to the number of values read into the table.
   3) File userdata readt function result table can be passed as parameter instead of a new table being created. In either case, key "n" is set to the number of values read into the table.
+
+### 1.2.1 Add gemdos.utility.allocm and gemdos.utility.wrapm
+  1) allocm allocates using libc allocator into a memory userdata.
+  2) wrapm wraps a pre-existing address into a memory userdata.
 
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.

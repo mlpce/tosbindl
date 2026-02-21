@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h>
+#include <stdlib.h>
 #include <limits.h>
 
 #include "lua.h"
@@ -9,12 +10,17 @@
 #include "src/gemdos/gemdosi.h"
 #include "src/gemdos/gemdos_m.h"
 
+#define MEMORY_ALLOCATOR_NONE 0
+#define MEMORY_ALLOCATOR_GEMDOS 1
+#define MEMORY_ALLOCATOR_LIBC 2
+
 /*
   Mark the memory userdata as invalid.
 */
 static void InvalidateMemoryUserData(Memory *mud) {
   mud->ptr = NULL;
   mud->size = 0;
+  mud->allocator = MEMORY_ALLOCATOR_NONE;
 }
 
 /*
@@ -25,12 +31,16 @@ static void InvalidateMemoryUserData(Memory *mud) {
 static int MemoryFree(lua_State *L) {
   Memory *const mud = (Memory *) lua_touserdata(L, 1); /* Memory userdata */
   if (mud && mud->ptr) {
-    /* Free the Gemdos memory */
-    const long result = Mfree(mud->ptr);
-    if (result < 0) {
-      (void) Cconws("MemoryFree: ");
-      (void) Cconws(TOSBINDL_GEMDOS_ErrMess(result));
-      (void) Cconws("\r\n");
+    if (mud->allocator == MEMORY_ALLOCATOR_GEMDOS) {
+      /* Free the Gemdos memory */
+      const long result = Mfree(mud->ptr);
+      if (result < 0) {
+        (void) Cconws("MemoryFree: ");
+        (void) Cconws(TOSBINDL_GEMDOS_ErrMess(result));
+        (void) Cconws("\r\n");
+      }
+    } else if (mud->allocator == MEMORY_ALLOCATOR_LIBC) {
+      free(mud->ptr);
     }
 
     /* userdata is no longer valid */
@@ -68,7 +78,12 @@ static int MemoryClose(lua_State *L) {
 static int MemoryToString(lua_State *L) {
   const Memory *const mud =
     (const Memory *) lua_touserdata(L, 1); /* Memory userdata */
-  lua_pushfstring(L, "p: %p s: %I", mud->ptr, (lua_Integer) mud->size);
+  lua_pushfstring(L,
+    "ptr: %p sz: %I type: %s",
+    mud->ptr, (lua_Integer) mud->size,
+    mud->allocator == MEMORY_ALLOCATOR_NONE ? "none" :
+    mud->allocator == MEMORY_ALLOCATOR_GEMDOS ? "gemdos" :
+    "libc");
   return 1;
 }
 
@@ -619,34 +634,12 @@ static int MemorySet(lua_State *L) {
 }
 
 /*
-  Malloc. Allocate memory
-  Inputs:
-    integer: either -1 or greater than 0
-    Use A) 1) -1 obtains the size of largest block of free memory
-    Use B) 1) >0 allocates memory
+  Pushes userdata TOSBINDL_UD_T_Gemdos_Memory
   Returns:
-    Use A) 1) integer: when obtaining the size of largest block of free memory
-    Use B) 1) integer: on success: number of bytes allocated
-    Use B) 1) integer: on failure: gemdos error code
-    Use B) 2) userdata: on success: memory
+    1) userdata: TOSBINDL_UD_T_Gemdos_Memory
 */
-int l_Malloc(lua_State *L) {
-  const lua_Integer amount = luaL_checkinteger(L, 1);
-  Memory *mud;
-
-  /* -1 to get size of the largest block of free memory,
-  otherwise the number of bytes to allocate */
-  luaL_argcheck(L, amount == -1 || amount > 0, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
-
-  if (amount == -1) {
-    /* Return integer : the largest block of free memory */
-    lua_pushinteger(L, (lua_Integer) Malloc(amount));
-    return 1;
-  }
-
-  /* Create userdata to hold the Memory */
-  mud = lua_newuserdatauv(L, sizeof(Memory), 0);
+static PushMemoryUserData(lua_State *L) {
+  Memory *const mud = lua_newuserdatauv(L, sizeof(Memory), 0);
   /* userdata is not yet valid */
   InvalidateMemoryUserData(mud);
 
@@ -690,6 +683,39 @@ int l_Malloc(lua_State *L) {
   /* Set the metatable on the userdata */
   lua_setmetatable(L, -2);
 
+  return mud;
+}
+
+/*
+  Malloc. Allocate memory
+  Inputs:
+    integer: either -1 or greater than 0
+    Use A) 1) -1 obtains the size of largest block of free memory
+    Use B) 1) >0 allocates memory
+  Returns:
+    Use A) 1) integer: when obtaining the size of largest block of free memory
+    Use B) 1) integer: on success: number of bytes allocated
+    Use B) 1) integer: on failure: gemdos error code
+    Use B) 2) userdata: on success: memory
+*/
+int l_Malloc(lua_State *L) {
+  const lua_Integer amount = luaL_checkinteger(L, 1);
+  Memory *mud;
+
+  /* -1 to get size of the largest block of free memory,
+  otherwise the number of bytes to allocate */
+  luaL_argcheck(L, amount == -1 || amount > 0, 1,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+
+  if (amount == -1) {
+    /* Return integer : the largest block of free memory */
+    lua_pushinteger(L, (lua_Integer) Malloc(amount));
+    return 1;
+  }
+
+  /* Push the memory userdata will which hold the memory pointer */
+  mud = PushMemoryUserData(L);
+
   /* Allocate the memory and store ptr and size in userdata */
   mud->ptr = (unsigned char *) Malloc(amount);
 
@@ -700,11 +726,85 @@ int l_Malloc(lua_State *L) {
   }
 
   mud->size = amount;
+  mud->allocator = MEMORY_ALLOCATOR_GEMDOS;
+
   lua_pushinteger(L, amount); /* Number of bytes allocated */
   lua_rotate(L, 2, 1); /* Rotate userdata to top */
 
   /* Return number of bytes allocated and userdata */
   return 2;
+}
+
+/*
+  Mallocm. Allocate memory using the libc allocator. The allocated
+  memory can be freed with Mfree, but not shrunk with Mshrink.
+  Inputs:
+    1) integer: the amount of memory to allocate (greater than zero)
+  Returns:
+    1) integer: on success: the number of bytes allocated
+    1) integer: on failure: gemdos error code
+    2) userdata: on success: memory
+*/
+int l_Mallocm(lua_State *L) {
+  const lua_Integer amount = luaL_checkinteger(L, 1);
+  Memory *mud;
+
+  luaL_argcheck(L, amount > 0, 1,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+
+  /* Push the memory userdata which will hold the memory pointer */
+  mud = PushMemoryUserData(L);
+
+  /* Allocate the memory and store ptr and size in userdata */
+  mud->ptr = (unsigned char *) malloc(amount);
+
+  if (!mud->ptr) {
+    lua_pop(L, 1); /* malloc failed - pop user data */
+    lua_pushinteger(L, TOSBINDL_GEMDOS_ERROR_ENSMEM);
+    return 1;
+  }
+
+  mud->size = amount;
+  mud->allocator = MEMORY_ALLOCATOR_LIBC;
+
+  lua_pushinteger(L, amount); /* Number of bytes allocated */
+  lua_rotate(L, 2, 1); /* Rotate userdata to top */
+
+  /* Return number of bytes allocated and userdata */
+  return 2;
+}
+
+/*
+  Mwrapm. Wrap an address. The wrapped memory can be unwrapped with Mfree
+  but not shrunk with Mshrink.
+  Inputs:
+    1) integer: the address of the memory to wrap
+    2) integer: the size of the memory to wrap
+    NOTE: wrapping an inaccessible memory area will cause a bus error
+    when writing or reading.
+  Returns:
+    1) userdata: wrapping memory userdata
+*/
+int l_Mwrapm(lua_State *L) {
+  const lua_Integer address = luaL_checkinteger(L, 1);
+  const lua_Integer amount = luaL_checkinteger(L, 2);
+  Memory *mud;
+
+  luaL_argcheck(L, address >= 0x800 && !(address & 1), 1,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+  luaL_argcheck(L, amount > 0, 2,
+    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
+
+  /* Push the memory userdata which will hold the memory pointer */
+  mud = PushMemoryUserData(L);
+
+  /* Store address and size in user data */
+  mud->ptr = (unsigned char *) address;
+  mud->size = amount;
+  mud->allocator = MEMORY_ALLOCATOR_NONE;
+
+  /* Return wrapping userdata */
+  return 1;
 }
 
 /*
@@ -717,14 +817,19 @@ int l_Malloc(lua_State *L) {
 int l_Mfree(lua_State *L) {
   Memory *const mud =
     (Memory *) luaL_checkudata(L, 1, TOSBINDL_UD_T_Gemdos_Memory);
-  long result;
+  long result = 0;
 
-  /* Check pointer */
-  luaL_argcheck(L, mud && mud->ptr, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
+  /* Check pointer. */
+  luaL_argcheck(L,
+    mud && mud->ptr, 1, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
 
   /* Free the memory */
-  result = Mfree(mud->ptr); 
+  if (mud->allocator == MEMORY_ALLOCATOR_GEMDOS) {
+    result = Mfree(mud->ptr);
+  } else if (mud->allocator == MEMORY_ALLOCATOR_LIBC) {
+    free(mud->ptr);
+  }
+
   InvalidateMemoryUserData(mud);
 
   lua_pushinteger(L, result); /* Error code */
@@ -747,9 +852,10 @@ int l_Mshrink(lua_State *L) {
   const lua_Integer size = luaL_checkinteger(L, 2);
   long result;
 
-  /* Check pointer */
-  luaL_argcheck(L, mud && mud->ptr, 1,
-    TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
+  /* Check pointer. Can only shrink if allocated by GEMDOS. */
+  luaL_argcheck(L,
+    mud && mud->ptr && mud->allocator == MEMORY_ALLOCATOR_GEMDOS,
+    1, TOSBINDL_ErrMess[TOSBINDL_EM_InvalidMemory]);
 
   /* Shrink */
   result = Mshrink(mud->ptr, size);

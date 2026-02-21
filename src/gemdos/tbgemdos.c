@@ -21,7 +21,7 @@
 /* GEMDOS binding version */
 #define TBGEMDOS_MAJOR_VERSION 1
 #define TBGEMDOS_MINOR_VERSION 2
-#define TBGEMDOS_MICRO_VERSION 0
+#define TBGEMDOS_MICRO_VERSION 1
 
 static const struct luaL_Reg gemdos[] = {
   {"Sversion", l_Sversion},
@@ -262,6 +262,8 @@ int luaopen_gemdos(lua_State *L) {
     {"getenv", GetEnv},
     {"esc", Esc},
     {"version", Version},
+    {"wrapm", l_Mwrapm},
+    {"allocm", l_Mallocm},
     {NULL, NULL}
   };
 
