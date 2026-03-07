@@ -83,13 +83,13 @@ assert(fud:readi(u8, 1) == 0)
 
 -- Seek back to beginning
 assert(gemdos.Fseek(fud, 0, gemdos.const.Fseek.seek_set) == 0)
--- Max number of readi values is 16 so 17 must fail
+-- Max number of readi values is 24 so 25 must fail
 -- See TOSBINDL_GEMDOS_MAX_MULTIVAL
-local ok = pcall(function() fud:readi(u8, 17) end)
+local ok = pcall(function() fud:readi(u8, 25) end)
 assert(not ok)
 local v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12
--- Attempt to read 16 values, only 11 will be produced
-ec, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 = fud:readi(u8, 16)
+-- Attempt to read 24 values, only 11 will be produced
+ec, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12 = fud:readi(u8, 24)
 assert(ec == 11)
 assert(v1 == string.byte("0"))
 assert(v2 == string.byte("1"))

@@ -430,7 +430,7 @@ The GEMDOS functions are published through a global table 'gemdos'
   Parameters
     file: userdata: file userdata
     imode: integer: mode for integer value conversion
-    n: integer: the number of values to read (default 1 maximum 16)
+    n: integer: the number of values to read (default 1 maximum 24)
 
   Note: gemdos.const.Imode contains integer mode constants.
   ```
@@ -988,7 +988,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   Parameters
     imode: integer: mode for integer value conversion
     offset: integer: source offset in the memory in bytes
-    n: integer: the number of values to peek (default 1 maximum 16)
+    n: integer: the number of values to peek (default 1 maximum 24)
 
   Note: gemdos.const.Imode contains integer mode constants. For 16 or 32 bit
   modes offset must be even.
@@ -1126,7 +1126,7 @@ conin, conout, aux, prn
 
 ### gemdos.utility.wrapm (addr, size)
   Wraps an existing address into a memory. The memory can be unwrapped with
-  Mfree,  be not shrunk with Mshrink. Wrapping an inaccessible memory area
+  Mfree,  but not shrunk with Mshrink. Wrapping an inaccessible memory area
   will cause a bus error when writing or reading. Writing to wrapped memory
   can cause corruption and crashes if used incorrectly.
 
@@ -1177,5 +1177,9 @@ conin, conout, aux, prn
 ### 1.2.1 Add gemdos.utility.allocm and gemdos.utility.wrapm
   1) allocm allocates using libc allocator into a memory userdata.
   2) wrapm wraps a pre-existing address into a memory userdata.
+
+### 1.2.2 Memory and File userdata API changes
+  1) Increased maximum value of n for File userdata readi function from 16 to 24.
+  2) Increased maximum value of n for Memory userdata peek function from 16 to 24.
 
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.

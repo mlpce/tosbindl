@@ -121,7 +121,7 @@ NOTE(mlpce): only supports native endian. */
 #define TOSBINDL_GEMDOS_FO_WRITE 1
 #define TOSBINDL_GEMDOS_FO_RW 2
 
-#define TOSBINDL_GEMDOS_MAX_MULTIVAL 16
+#define TOSBINDL_GEMDOS_MAX_MULTIVAL 24
 
 #if (defined(ATARI) && defined(LATTICE))
 #include <dos.h>

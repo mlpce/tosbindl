@@ -69,9 +69,9 @@ assert(mud:peek(s16, 0, 0) == nil)
 assert(mud:peek(u16, 0, 0) == nil)
 assert(mud:peek(s32, 0, 0) == nil)
 
--- Max number of peek values is 16 so 17 must fail
+-- Max number of peek values is 24 so 25 must fail
 -- See TOSBINDL_GEMDOS_MAX_MULTIVAL
-ok = pcall(function() mud:peek(u8, 0, 17) end)
+ok = pcall(function() mud:peek(u8, 0, 25) end)
 assert(not ok)
 
 -- Set memory from offset 0 to value '69', for the whole size

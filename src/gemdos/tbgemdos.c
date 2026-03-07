@@ -21,7 +21,7 @@
 /* GEMDOS binding version */
 #define TBGEMDOS_MAJOR_VERSION 1
 #define TBGEMDOS_MINOR_VERSION 2
-#define TBGEMDOS_MICRO_VERSION 1
+#define TBGEMDOS_MICRO_VERSION 2
 
 static const struct luaL_Reg gemdos[] = {
   {"Sversion", l_Sversion},
