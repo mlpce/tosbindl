@@ -6,7 +6,7 @@
 /* TOSBINDL binding version */
 #define TOSBINDL_MAJOR_VERSION 1
 #define TOSBINDL_MINOR_VERSION 0
-#define TOSBINDL_MICRO_VERSION 0
+#define TOSBINDL_MICRO_VERSION 1
 
 /* Error messages */
 const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max] = {
@@ -86,6 +86,14 @@ void TOSBINDL_ROProxy(lua_State *L) {
 
   /* Metatable __newindex set to pushed c function (pops function) */
   lua_setfield(L, -2, "__newindex"); 
+  /* Stack: proxy, metatable */
+
+  /* Push value for __metatable field */
+  lua_pushboolean(L, 0);
+  /* Stack: proxy, metatable, false */
+
+  /* Set Metatable __metatable, protects the metatable */
+  lua_setfield(L, -2, "__metatable");
   /* Stack: proxy, metatable */
 
   /* Set Proxy's metatable to be the Metatable (pops metatable)*/
