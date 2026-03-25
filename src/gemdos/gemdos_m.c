@@ -756,7 +756,7 @@ int l_Mallocm(lua_State *L) {
   mud = PushMemoryUserData(L);
 
   /* Allocate the memory and store ptr and size in userdata */
-  mud->ptr = (unsigned char *) malloc(amount);
+  mud->ptr = (unsigned char *) malloc((size_t) amount);
 
   if (!mud->ptr) {
     lua_pop(L, 1); /* malloc failed - pop user data */
