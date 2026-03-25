@@ -638,7 +638,7 @@ static int MemorySet(lua_State *L) {
   Returns:
     1) userdata: TOSBINDL_UD_T_Gemdos_Memory
 */
-static PushMemoryUserData(lua_State *L) {
+static Memory *PushMemoryUserData(lua_State *L) {
   Memory *const mud = lua_newuserdatauv(L, sizeof(Memory), 0);
   /* userdata is not yet valid */
   InvalidateMemoryUserData(mud);
