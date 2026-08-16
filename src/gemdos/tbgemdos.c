@@ -248,13 +248,13 @@ int luaopen_gemdos(lua_State *L) {
     TOSBINDL_GEMDOS_ERROR_EGSBF
   };
 
-  /* gemdos.const.imode values */
+  /* gemdos.const.Imode values */
   static const TOSBINDL_RegInt imode_ints[] = {
     {"s8", TOSBINDL_GEMDOS_IMODE_S8},
     {"u8", TOSBINDL_GEMDOS_IMODE_U8},
     {"s16", TOSBINDL_GEMDOS_IMODE_S16},
     {"u16", TOSBINDL_GEMDOS_IMODE_U16},
-    {"s32", TOSBINDL_GEMDOS_IMODE_S32},
+    {"s32", TOSBINDL_GEMDOS_IMODE_S32}
   };
 
   /* gemdos.utility table keys and functions */

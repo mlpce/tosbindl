@@ -1,0 +1,6 @@
+TBGEMPB.LIB
+.C	[-b4 -r6 -d0 -m0 -rs -fm -i. -i..\..\.. -dMLPCE_ENABLED]
+.S	[-m0]
+=
+..\..\..\SRC\GEMPB\LCTRAP2.S
+..\..\..\SRC\GEMPB\TBGEMPB.C

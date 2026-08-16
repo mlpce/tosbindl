@@ -7,7 +7,7 @@ set(CMAKE_C_STANDARD 90)
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" )
   # Using GCC
   set(CMAKE_C_FLAGS
-    "${CMAKE_C_FLAGS} -Wall -Wextra -Wno-unused-parameter -pedantic -Wconversion")
+    "${CMAKE_C_FLAGS} -Wall -Wextra -Wcast-qual -Wno-unused-parameter -pedantic -Wconversion")
 
   if ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fomit-frame-pointer")

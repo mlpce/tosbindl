@@ -1,5 +1,6 @@
 # Add gemdos
 add_subdirectory(gemdos)
+add_subdirectory(gempb)
 
 set(TOSBINDL_LIBRARY_NAME tosbindl)
 

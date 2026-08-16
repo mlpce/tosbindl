@@ -8,6 +8,7 @@ set -e
 rm -Rfv 8.3/TOSBINDL*
 mkdir -p 8.3/TOSBINDL/BUILD/TOS/LATTICEC
 mkdir -p 8.3/TOSBINDL/SRC/GEMDOS/UNITTEST
+mkdir -p 8.3/TOSBINDL/SRC/GEMPB/UNITTEST
 
 function copy_lower_upper() {
   local wild_path=$1
@@ -21,7 +22,15 @@ function copy_lower_upper() {
 # Copy files as 8.3 filenames
 cp -v ../../LICENSE 8.3/TOSBINDL
 copy_lower_upper "latticec/tbgemdos.prj"
+copy_lower_upper "latticec/tbgempb.prj"
 copy_lower_upper "latticec/tosbindl.prj"
+copy_lower_upper "../../src/gempb/lctrap2.s"
+copy_lower_upper "../../src/gempb/tbgempb.[ch]"
+copy_lower_upper "../../src/gempb/unittest/call.lua"
+copy_lower_upper "../../src/gempb/unittest/pokepeek.lua"
+copy_lower_upper "../../src/gempb/unittest/setget.lua"
+copy_lower_upper "../../src/gempb/unittest/string.lua"
+copy_lower_upper "../../src/gempb/unittest/utility.lua"
 copy_lower_upper "../../src/gemdos/gemdos_[cdfmpst].[ch]"
 copy_lower_upper "../../src/gemdos/gemdosi.[ch]"
 copy_lower_upper "../../src/gemdos/tbgemdos.[ch]"

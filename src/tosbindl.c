@@ -47,7 +47,7 @@ static int ROProxyPairs(lua_State *L) {
 }
 
 /* Wrap a table on the stack with a readonly proxy */
-void TOSBINDL_ROProxy(lua_State *L) {
+int TOSBINDL_ROProxy(lua_State *L) {
   /* Check table has been passed on the stack */
   luaL_checktype(L, -1, LUA_TTABLE);
   /* Stack: target */
@@ -99,6 +99,8 @@ void TOSBINDL_ROProxy(lua_State *L) {
   /* Set Proxy's metatable to be the Metatable (pops metatable)*/
   lua_setmetatable(L, -2);
   /* Stack: proxy */
+
+  return 1;
 }
 
 static int l_version(lua_State *L) {
@@ -110,6 +112,7 @@ static int l_version(lua_State *L) {
 
 static const struct luaL_Reg tosbindl[] = {
   {"version", l_version},
+  {"roproxy", TOSBINDL_ROProxy},
   {NULL, NULL}
 };
 

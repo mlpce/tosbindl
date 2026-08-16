@@ -15,7 +15,7 @@ enum {
 extern const char *const TOSBINDL_ErrMess[TOSBINDL_EM_Max];
 
 /* Wrap a table passed on the stack with a read-only proxy */
-void TOSBINDL_ROProxy(lua_State *L);
+int TOSBINDL_ROProxy(lua_State *L);
 
 /* Used for setting tables with string keys and integers from int values */
 typedef struct TOSBINDL_RegInt {

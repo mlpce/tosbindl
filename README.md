@@ -1,11 +1,12 @@
 # tosbindl
 
-## Atari ST GEMDOS binding for Lua 5.5, Lua 5.4
+## Atari ST GEMDOS and GEM parameter block binding for Lua
 
-This is a Lua binding to TOS GEMDOS functions. The functions available in TOS 1.X have been implemented. EmuTOS 1.3 and TOS 1.04 have been used during development, no other TOS versions have been tried or tested.
+This is a Lua binding to TOS GEMDOS functions and GEM parameter block. The GEMDOS functions available in TOS 1.X have been implemented. EmuTOS 1.3/1.4 and TOS 1.04 have been used during development, no other TOS versions have been tried or tested.
 
 ## Lua API
 
+This binding is compatible with Lua 5.5 and 5.4.
 For information about Lua see the [Lua website](https://www.lua.org/). For the copyright notice of the Lua API included by this binding see lua.h.
 
 luaconf.h should be configured with
@@ -19,7 +20,7 @@ The binding expects the GEMDOS environment pointer (the third parameter to main(
 ## Precaution
 This binding has the potential to change and destroy data. Development and testing of scripts using this binding should be performed in a safe environment isolated from sensitive data. Additionally, the unit tests themselves change and delete data on GEMDOS drives (HD and floppy) and must only be run in an isolated test environment.
 
-## Implemented functions
+## Implemented GEMDOS functions
 
 ### Character functions
 
@@ -1058,7 +1059,7 @@ Memory userdata include a __close metamethod so they can be used with the \<clos
   none, readonly, hidden, system, volume, dir, archive
 
 ### gemdos.const.Fdup
-conin, conout, aux, prn
+  conin, conout, aux, prn
 
 ### gemdos.const.Fopen
   readonly, writeonly, readwrite
@@ -1151,7 +1152,9 @@ conin, conout, aux, prn
     3. integer: Micro version
   ```
 
-## Version history
+## GEMDOS Binding Version history
+
+The GEMDOS binding version is queried using gemdos.utility.version().
 
 ### 1.0.0 Initial version
   1) Initial version.
@@ -1183,3 +1186,197 @@ conin, conout, aux, prn
   2) Increased maximum value of n for Memory userdata peek function from 16 to 24.
 
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
+
+## GEM parameter block functions
+
+The GEM parameter block is published through a global table 'gempb'.
+
+## Parameter block factory
+
+### gempb.create_pb ()
+  create_pb. Parameter block factory function.
+
+  ```
+  Results
+    1. userdata: GEM parameter block
+  ```
+
+## GEM parameter block Userdata Functions
+
+### vdi (handle, opcode [, subopcode, nintin, nptsin, addrone, addrtwo ] )
+  vdi. Calls VDI Trap #2.
+
+  ```
+  Parameters
+    handle: integer: workstation handle
+    opcode: integer: opcode
+    subobcode: optional integer: subopcode (default 0)
+    nintin: optional integer: Number of intin array values (default 0)
+    nptsin: optional integer: Number of ptsin array values (default 0)
+    addrone: optional integer: First address (default 0)
+    addrtwo: optional integer: Second address (default 0)
+  ```
+
+### aes (opcode [, nintin, nintout, naddrin, naddrout ] )
+  aes. Calls AES Trap #2.
+
+  ```
+  Parameters
+    opcode: integer: opcode
+    nintin: optional integer: Number of intin array values (default 0)
+    nintout: optional integer: Number of intout array values (default 0)
+    naddrin: optional integer: Number of addrin array values (default 0)
+    naddrout: optional integer: Number of addrout array values (default 0)
+  ```
+
+### set (array_id, offset, t)
+  set. Sets a parameter block array with values from a table.
+
+  ```
+  Parameters
+    array_id: integer: The parameter block array identifier
+    offset: integer: Zero-based array writing offset
+    t: table: the table containing the values as integers
+
+  Note: The values are 16 bit except for aes_addrin and aes_addrout.
+  Note: See gempb.const.Pbid for array identifiers.
+  ```
+
+### get (array_id, offset [, numvalues ] )
+  get. Gets a parameter block array's values into a table.
+
+  ```
+  Parameters
+    array_id: integer: The parameter block array identifier
+    offset: integer: Zero-based array reading offset
+    numvalues: optional integer: num values to read (default array size - read_offset)
+
+  Note: See gempb.const.Pbid for array identifiers.
+  ```
+  ```
+  Returns
+    1. table: table containing the values read
+
+  Note: The values are 16 bit except for aes_addrin and aes_addrout.
+  ```
+
+### poke (array_id, offset, i1, ...)
+  poke. Poke one or more values into a parameter block array.
+  ```
+  Parameters
+    array_id: integer: The parameter block array identifier
+    offset: integer: Zero-based array poking offset.
+    i1: integer: 16 or 32 bit value depending on array
+    ...: optional integer(s): the subsequent values
+
+  Note: The values are 16 bit except for aes_addrin and aes_addrout.
+  Note: See gempb.const.Pbid for array identifiers.
+  ```
+
+### peek (array_id, offset [, num_values ] )
+  peek. Peek one or more values from a parameter block array.
+  ```
+  Parameters
+    array_id: integer: The parameter block array identifier
+    offset: integer: Zero-based array peeking offset.
+    num_values: integer: The number of values to peek (default 1)
+
+  Note: The values are 16 bit except for aes_addrin and aes_addrout.
+  Note: See gempb.const.Pbid for array identifiers.
+  ```
+  ```
+  Results
+    X. zero or more integers: 16 or 32 bit values depending on array
+  ```
+
+### setstr (offset, str)
+  setstr. Sets the VDI intin array to a string.
+  ```
+  Parameters
+    offset: integer: Zero-based array writing offset
+    str: string: string to write into the intin array
+  ```
+
+### getstr (offset, max_chars)
+  getstr. Gets a string from the VDI intout array
+  ```
+  Parameters
+    offset: integer: Zero-base array reading offset
+    max_chars: integer: maximum number of characters to read
+  ```
+  ```
+  Returns
+    1. string: the obtained string
+  ```
+
+### call (...)
+  call. This function combines zero or more parameter block array pokes,
+  a single GEM trap and then the peeking of zero or more parameter block
+  arrays into a single API call.
+  ```
+  Parameters
+    First stage is poking to zero or more parameter block arrays:
+      array_id: integer: parameter block array identifier
+      offnum:  integer: high word = array offset, low word = number of values
+      ...: integer: integers to write to parameter block array
+    Second stage occurs when array identifier is vdi_control or aes_control:
+      array_id: integer: vdi_control or aes_control
+      num: integer: low word = number of values to write to control array
+      ...: integer: integers to write to control array
+    After last control array integer is written the VDI or AES trap is called
+    and the third stage is then entered. The third stage reads from zero or
+    more parameter block arrays pushing the integers onto the stack:
+      array_id: integer: parameter block array identifier
+      offnum: integer: high word = array offset, low word = number of values
+
+  Note: See gempb.const.Pbid for array identifiers.
+  ```
+  ```
+  Returns
+    The third stage reads from zero or more parameter block arrays pushing
+    the integers onto the stack:
+      X. zero or more integers: 16 or 32 bit values depending on array
+  ```
+
+## Utility functions
+  Utility functions are published through the table 'gempb.utility'
+
+### gempb.utility.version ()
+  Gets the parameter block binding version number.
+
+  ```
+  Results
+    1. integer: Major version
+    2. integer: Minor version
+    3. integer: Micro version
+  ```
+
+### gempb.utility.scr_devid ()
+
+  scr_devid. Obtain the screen device id from XBIOS, returning the result of Getrez() + 2. 
+  ```
+  Returns:
+    1. integer: screen device id
+  ```
+
+### gempb.utility.vq_gdos ()
+
+  vq_gdos. Queries the presence of GDOS.
+
+  ```
+  Returns:
+    1. integer: non-zero if GDOS present.
+  ```
+
+## Constants
+  Constant tables are published through the table 'gempb.const'.
+
+### gempb.const.Pbid
+  vdi_control, vdi_intin, vdi_ptsin, vdi_intout, vdi_ptsout, aes_control, aes_global, aes_intin, aes_intout, aes_addrin, aes_addrout
+
+  Parameter block array identifiers.
+
+### gempb.const.Pbsize
+  vdi_control, vdi_intin, vdi_ptsin, vdi_intout, vdi_ptsout, aes_control, aes_global, aes_intin, aes_intout, aes_addrin, aes_addrout
+
+  Parameter block array sizes, indicating the maximum number of entries in each array. Each entry is a single word (or long for aes_addrin and aes_addrout).
