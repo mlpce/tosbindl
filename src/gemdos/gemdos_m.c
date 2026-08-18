@@ -14,6 +14,8 @@
 #define MEMORY_ALLOCATOR_GEMDOS 1
 #define MEMORY_ALLOCATOR_LIBC 2
 
+#define MAX_ALLOC_TRIES 3
+
 /*
   Mark the memory userdata as invalid.
 */
@@ -700,6 +702,7 @@ static Memory *PushMemoryUserData(lua_State *L) {
 */
 int l_Malloc(lua_State *L) {
   const lua_Integer amount = luaL_checkinteger(L, 1);
+  int try = 0;
   Memory *mud;
 
   /* -1 to get size of the largest block of free memory,
@@ -717,7 +720,12 @@ int l_Malloc(lua_State *L) {
   mud = PushMemoryUserData(L);
 
   /* Allocate the memory and store ptr and size in userdata */
-  mud->ptr = (unsigned char *) Malloc(amount);
+  for (;;) {
+    mud->ptr = (unsigned char *) Malloc(amount);
+    if (mud->ptr || ++try == MAX_ALLOC_TRIES)
+      break;
+    lua_gc(L, LUA_GCCOLLECT);
+  }
 
   if (!mud->ptr) {
     lua_pop(L, 1); /* Malloc failed - pop user data */
@@ -747,6 +755,7 @@ int l_Malloc(lua_State *L) {
 */
 int l_Mallocm(lua_State *L) {
   const lua_Integer amount = luaL_checkinteger(L, 1);
+  int try = 0;
   Memory *mud;
 
   luaL_argcheck(L, amount > 0, 1,
@@ -756,7 +765,12 @@ int l_Mallocm(lua_State *L) {
   mud = PushMemoryUserData(L);
 
   /* Allocate the memory and store ptr and size in userdata */
-  mud->ptr = (unsigned char *) malloc((size_t) amount);
+  for (;;) {
+    mud->ptr = (unsigned char *) malloc((size_t) amount);
+    if (mud->ptr || ++try == MAX_ALLOC_TRIES)
+      break;
+    lua_gc(L, LUA_GCCOLLECT);
+  }
 
   if (!mud->ptr) {
     lua_pop(L, 1); /* malloc failed - pop user data */

@@ -1185,6 +1185,10 @@ The GEMDOS binding version is queried using gemdos.utility.version().
   1) Increased maximum value of n for File userdata readi function from 16 to 24.
   2) Increased maximum value of n for Memory userdata peek function from 16 to 24.
 
+### 1.2.3 Memory userdata allocation retries
+  1) If gemdos.utility.allocm allocation fails run the garbage collector and try again.
+  2) If gemdos.Malloc allocation fails run the garbage collector and try again.
+
 [^1]: The runtime library may automatically redirect handle 2 to the console to provide stderr, so handle 2 may not be attached to the serial port by default.
 
 ## GEM parameter block functions
