@@ -14,7 +14,7 @@ if ("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" )
   endif()
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMLPCE_ENABLED")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DMLPCE_ENABLED -DMLPCE_TOS_ENABLED")
 
 include_directories(".")
 include_directories("${CMAKE_INSTALL_PREFIX}/include")
