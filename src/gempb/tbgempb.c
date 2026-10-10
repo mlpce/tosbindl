@@ -145,7 +145,7 @@ static int GEMDataToString(lua_State *L) {
     1) userdata: TOSBINDL_UD_T_GEMPB_Data
     2) integer: array id
     3) integer: write offset
-    3) integer: table containing 16 or 32 bit integer values
+    4) table: table containing 16 or 32 bit integer values
   Returns:
     None
 */
