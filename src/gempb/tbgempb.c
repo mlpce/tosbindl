@@ -18,7 +18,7 @@
 
 /* GEMPB binding version */
 #define TBGEMPB_MAJOR_VERSION 1
-#define TBGEMPB_MINOR_VERSION 0
+#define TBGEMPB_MINOR_VERSION 1
 #define TBGEMPB_MICRO_VERSION 0
 
 /* VDI array sizes */
