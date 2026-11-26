@@ -18,7 +18,7 @@
 
 /* GEMPB binding version */
 #define TBGEMPB_MAJOR_VERSION 1
-#define TBGEMPB_MINOR_VERSION 0
+#define TBGEMPB_MINOR_VERSION 1
 #define TBGEMPB_MICRO_VERSION 0
 
 /* VDI array sizes */
@@ -386,8 +386,10 @@ static int ArrayPeek(lua_State *L) {
     1) userdata: TOSBINDL_UD_T_GEMPB_Data
     2) integer: write offset
     3) string: string to write into the intin array
+    4) integer: optional position of the first character in the string
+    5) integer: optional position of the last character in the string
   Returns:
-    None
+    1) integer: the number of characters placed into the array
 */
 int ArraySetStr(lua_State *L) {
   TBGEMPB_ParamBlock *const vud =
@@ -396,23 +398,46 @@ int ArraySetStr(lua_State *L) {
     luaL_checkinteger(L, 2); /* array write offset */
   size_t str_len;
   const char *str = luaL_checklstring(L, 3, &str_len); /* String to write */
+  const lua_Integer i = luaL_optinteger(L, 4, 1); /* One based start */
+  const lua_Integer j = luaL_optinteger(L, 5, -1); /* One based end */
+  lua_Integer zero_based_index = i < 0 ?
+    (lua_Integer) str_len + i : i - 1;
+  lua_Integer one_based_end_index = j < 0 ?
+    (lua_Integer) str_len + j + 1: j;
   short *short_array_ptr = vud->vdi.intin + array_offset;
+  lua_Integer count;
+
+  /* Limit indices by range */
+  if (zero_based_index < 0)
+    zero_based_index = 0;
+  if (one_based_end_index > (lua_Integer) str_len)
+    one_based_end_index = (lua_Integer) str_len;
+
+  /* Treat reversed indices as empty string */
+  if (zero_based_index >= one_based_end_index)
+    count = 0;
+  else
+    count = one_based_end_index - zero_based_index;
 
   /* Check array offset is valid */
   luaL_argcheck(L,
     array_offset >= 0 && array_offset < TBGEMPB_VDI_INTIN_MAX, 2,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
-  /* Check string length */
+  /* Check string write fits into array */
   luaL_argcheck(L,
-    (lua_Integer) str_len + array_offset <= TBGEMPB_VDI_INTIN_MAX, 3,
+    (lua_Integer) count + array_offset <= TBGEMPB_VDI_INTIN_MAX, 3,
     TOSBINDL_ErrMess[TOSBINDL_EM_InvalidValue]);
 
+  /* Number of characters copied into the short array */
+  lua_pushinteger(L, count);
+
   /* Copy string into short array */
-  while (str_len--)
+  str += zero_based_index;
+  while (count--)
     *short_array_ptr++ = (short) ((unsigned char) *str++);
 
-  return 0;
+  return 1;
 }
 
 /*
