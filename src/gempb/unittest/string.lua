@@ -59,6 +59,18 @@ assert(not ok)
 ok = pcall(function() pb:getstr(1, vdi_intout_size) end)
 assert(not ok)
 
+-- Test ranges of positional arguments relative to a string
+assert("cd" == string.char(table.unpack(
+  pb:get(vdi_intin, 0, pb:setstr(0, "abcd", 3, 6)))))
+assert("abc" == string.char(table.unpack(
+  pb:get(vdi_intin, 0, pb:setstr(0, "abcd", -7, 3)))))
+assert("" == string.char(table.unpack(
+  pb:get(vdi_intin, 0, pb:setstr(0, "abcd", -7, -5)))))
+assert("" == string.char(table.unpack(
+  pb:get(vdi_intin, 0, pb:setstr(0, "abcd", 5, 6)))))
+assert("" == string.char(table.unpack(
+  pb:get(vdi_intin, 0, pb:setstr(0, "abcd", 3, 2)))))
+
 -- Write a string with first and last positions
 local function test_setstr_pos(str, first_pos, last_pos)
   local <const> num_written = pb:setstr(0, str, first_pos, last_pos)

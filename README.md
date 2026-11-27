@@ -1293,12 +1293,24 @@ The GEM parameter block is published through a global table 'gempb'.
     X. zero or more integers: 16 or 32 bit values depending on array
   ```
 
-### setstr (offset, str)
+### setstr (offset, str [, i [, j]])
   setstr. Sets the VDI intin array to a string.
   ```
   Parameters
     offset: integer: Zero-based array writing offset
     str: string: string to write into the intin array
+    i: integer: position of the first byte in the string (default first)
+    j: integer: position of the last byte in the string (default last)
+
+  Note: Positive positions count from the start of the string with the first
+  byte at position 1. Negative positions count from the end of string with -1
+  being the last byte. Out of range positions write the partial string if any.
+  For example setstr(0, "abcd", 3, 6) would write "cd". Reversed positions
+  (e.g. 3, 2) write nothing.
+  ```
+  ```
+  Returns
+    1. integer: the number of characters written to the intin array
   ```
 
 ### getstr (offset, max_chars)
@@ -1342,6 +1354,19 @@ The GEM parameter block is published through a global table 'gempb'.
       X. zero or more integers: 16 or 32 bit values depending on array
   ```
 
+## Constants
+  Constant tables are published through the table 'gempb.const'.
+
+### gempb.const.Pbid
+  vdi_control, vdi_intin, vdi_ptsin, vdi_intout, vdi_ptsout, aes_control, aes_global, aes_intin, aes_intout, aes_addrin, aes_addrout
+
+  Parameter block array identifiers.
+
+### gempb.const.Pbsize
+  vdi_control, vdi_intin, vdi_ptsin, vdi_intout, vdi_ptsout, aes_control, aes_global, aes_intin, aes_intout, aes_addrin, aes_addrout
+
+  Parameter block array sizes, indicating the maximum number of entries in each array. Each entry is a single word (or long for aes_addrin and aes_addrout).
+
 ## Utility functions
   Utility functions are published through the table 'gempb.utility'
 
@@ -1372,15 +1397,12 @@ The GEM parameter block is published through a global table 'gempb'.
     1. integer: non-zero if GDOS present.
   ```
 
-## Constants
-  Constant tables are published through the table 'gempb.const'.
+## GEM Parameter Block Binding Version history
 
-### gempb.const.Pbid
-  vdi_control, vdi_intin, vdi_ptsin, vdi_intout, vdi_ptsout, aes_control, aes_global, aes_intin, aes_intout, aes_addrin, aes_addrout
+The GEM parameter block binding version is queried using gempb.utility.version().
 
-  Parameter block array identifiers.
+### 1.0.0 Initial version
+  1) Initial version.
 
-### gempb.const.Pbsize
-  vdi_control, vdi_intin, vdi_ptsin, vdi_intout, vdi_ptsout, aes_control, aes_global, aes_intin, aes_intout, aes_addrin, aes_addrout
-
-  Parameter block array sizes, indicating the maximum number of entries in each array. Each entry is a single word (or long for aes_addrin and aes_addrout).
+### 1.1.0 Add SetStr optional arguments for the start and end character positions
+  1) SetStr takes two optional additional parameters, the string character start and end positions, and returns the number of characters written to the intin array. This simplifies writing substrings to the array.
